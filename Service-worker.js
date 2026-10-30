@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "axon-cache-v1";
+const CACHE_NAME = "axon-cache-v2";
 
 const APP_FILES = [
   "./",
