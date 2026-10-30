@@ -31,10 +31,11 @@ button{cursor:pointer;color:inherit}
 
 .sidebar{
   width:280px;flex-shrink:0;background:#0d0d1a;
-  border-right:1px solid var(--border);padding:20px 14px;
-  display:flex;flex-direction:column;position:fixed;
-  z-index:20;top:0;bottom:0;left:0;
-  transform:translateX(-105%);transition:transform .28s ease;
+  border-right:1px solid var(--border);
+  padding:20px 14px;display:flex;flex-direction:column;
+  position:fixed;z-index:20;top:0;bottom:0;left:0;
+  transform:translateX(-105%);
+  transition:transform .28s ease;
   box-shadow:15px 0 40px #0005;
 }
 .sidebar.open{transform:translateX(0)}
@@ -72,8 +73,7 @@ button{cursor:pointer;color:inherit}
 .sidebottom{border-top:1px solid var(--border);padding-top:12px}
 
 .main{
-  flex:1;min-width:0;display:flex;
-  flex-direction:column;width:100%;
+  flex:1;min-width:0;display:flex;flex-direction:column;width:100%;
 }
 .topbar{
   height:62px;flex-shrink:0;border-bottom:1px solid var(--border);
@@ -119,7 +119,6 @@ button{cursor:pointer;color:inherit}
 }
 .suggestions button:hover{border-color:var(--purple);background:#201a36}
 
-/* CHAT */
 .message{
   max-width:850px;width:100%;margin:0 auto;
   display:flex;align-items:flex-start;gap:11px;
@@ -163,7 +162,6 @@ button{cursor:pointer;color:inherit}
   border:1px solid #44345f;background:#201831;
   border-radius:15px;padding:4px 10px;font-size:12px;color:#c7b9e8;
 }
-.message-actions button:hover{border-color:var(--pink)}
 .message-actions button.selected{
   background:#45234c;border-color:var(--pink);color:#ff9bd9;
 }
@@ -187,13 +185,12 @@ textarea::placeholder{color:#77748e}
   width:42px;height:42px;min-width:42px;border:0;border-radius:50%;
   background:linear-gradient(135deg,#ff65c8,#a855f7,#7045ff);
   color:white;font-size:23px;font-weight:600;
-  display:grid;place-items:center;transition:transform .2s;
+  display:grid;place-items:center;
 }
-.send:hover{transform:scale(1.08)}
 .send:disabled{opacity:.5;cursor:not-allowed}
 .note{text-align:center;color:#74718a;font-size:10px;padding-top:10px}
+.typing{color:#b8a4ef;font-size:13px;padding:8px 2px}
 
-/* SETTINGS */
 .overlay{
   position:fixed;inset:0;background:#000b;display:none;
   align-items:center;justify-content:center;padding:18px;z-index:30;
@@ -203,11 +200,6 @@ textarea::placeholder{color:#77748e}
   width:100%;max-width:420px;max-height:88dvh;overflow:auto;
   background:#151527;border:1px solid var(--border);
   border-radius:18px;padding:22px;box-shadow:0 18px 60px #0008;
-  animation:modal-in .2s ease;
-}
-@keyframes modal-in{
-  from{opacity:0;transform:translateY(12px) scale(.98)}
-  to{opacity:1;transform:translateY(0) scale(1)}
 }
 .modal h2{margin:0 0 8px}
 .modal p{color:var(--muted);font-size:13px}
@@ -246,14 +238,12 @@ textarea::placeholder{color:#77748e}
 .info-row span:last-child{color:#e5d8ff}
 .danger{color:#ff8fbd!important;border-color:#713552!important}
 .setting-error{color:#ff8fbd;font-size:12px;margin-top:8px}
-
 @media(max-width:650px){
   .topbar{padding:0 12px}
   .messages{padding:22px 12px}
   .composer-area{padding:10px 12px 15px}
   .welcome h1{font-size:29px}
   .content-wrap{max-width:84%}
-  .content{font-size:14px}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
@@ -270,11 +260,9 @@ textarea::placeholder{color:#77748e}
       <img class="logo" src="axon-logo.png" alt="AXON logo">
       <strong>AXON</strong>
     </div>
-
     <button class="newchat" onclick="newChat()">＋ New chat</button>
     <div class="sideheading">YOUR CONVERSATIONS</div>
     <div class="history" id="history"></div>
-
     <div class="sidebottom">
       <button class="chatitem" onclick="openSettings()">
         <span>⚙</span><span class="chat-title">Settings</span>
@@ -285,7 +273,7 @@ textarea::placeholder{color:#77748e}
     </div>
   </aside>
 
-  <main class="main" id="main">
+  <main class="main">
     <header class="topbar">
       <div class="topbar-left">
         <button class="iconbtn" onclick="toggleSidebar()" aria-label="Open dashboard">☰</button>
@@ -317,18 +305,12 @@ textarea::placeholder{color:#77748e}
       <p>Select your chat profile avatar.</p>
       <div class="avatar-options">
         <button class="avatar-option" id="maleOption" onclick="selectAvatar('male')">
-          <span class="avatar-preview">
-            <img src="male-avatar.png" alt="Male avatar">
-          </span>
-          <strong>Male</strong>
-          <small>Boy avatar</small>
+          <span class="avatar-preview"><img src="male-avatar.png" alt="Male avatar"></span>
+          <strong>Male</strong><small>Boy avatar</small>
         </button>
         <button class="avatar-option" id="femaleOption" onclick="selectAvatar('female')">
-          <span class="avatar-preview">
-            <img src="female-avatar.png" alt="Female avatar">
-          </span>
-          <strong>Female</strong>
-          <small>Girl avatar</small>
+          <span class="avatar-preview"><img src="female-avatar.png" alt="Female avatar"></span>
+          <strong>Female</strong><small>Girl avatar</small>
         </button>
       </div>
       <div id="avatarStatus" class="setting-error"></div>
@@ -357,7 +339,6 @@ textarea::placeholder{color:#77748e}
 "use strict";
 
 const $ = id => document.getElementById(id);
-
 const CHAT_KEY = "axon_chats";
 const URL_KEY = "axon_worker_url";
 const AVATAR_KEY = "axon_user_avatar";
@@ -387,18 +368,15 @@ function save(){
     console.error("Save error:",error);
   }
 }
-
 function currentChat(){
   return chats.find(c => c.id === currentId) || null;
 }
-
 function createChat(){
   const chat = {id:Date.now(),title:"New conversation",messages:[]};
   chats.unshift(chat);
   currentId = chat.id;
   return chat;
 }
-
 function newChat(){
   if(busy)return;
   currentId = null;
@@ -409,7 +387,6 @@ function newChat(){
   closeSidebar();
   $("input").focus();
 }
-
 function selectChat(id){
   if(busy)return;
   currentId = id;
@@ -417,28 +394,20 @@ function selectChat(id){
   renderHistory();
   closeSidebar();
 }
-
 function deleteChat(id){
   if(busy)return;
   const chat = chats.find(c => c.id === id);
-  if(!chat)return;
-  if(!confirm("Delete this conversation permanently?"))return;
-
+  if(!chat || !confirm("Delete this conversation permanently?"))return;
   chats = chats.filter(c => c.id !== id);
   if(currentId === id)currentId = null;
   save();
   renderHistory();
   renderMessages();
 }
-
 function deleteAllChats(){
   if(busy)return;
-  if(!chats.length){
-    alert("No recent chats to delete.");
-    return;
-  }
+  if(!chats.length){alert("No recent chats to delete.");return;}
   if(!confirm("Delete ALL recent conversations? This cannot be undone."))return;
-
   chats = [];
   currentId = null;
   save();
@@ -446,7 +415,6 @@ function deleteAllChats(){
   renderMessages();
   closeSidebar();
 }
-
 function renderHistory(){
   const history = $("history");
   history.replaceChildren();
@@ -471,7 +439,6 @@ function renderHistory(){
     del.className = "delete-chat";
     del.textContent = "✕";
     del.title = "Delete conversation";
-    del.setAttribute("aria-label","Delete conversation");
     del.onclick = event => {
       event.stopPropagation();
       deleteChat(chat.id);
@@ -481,7 +448,6 @@ function renderHistory(){
     history.appendChild(row);
   });
 }
-
 function welcomeMarkup(){
   return `
     <div class="welcome">
@@ -496,11 +462,9 @@ function welcomeMarkup(){
       </div>
     </div>`;
 }
-
 function makeAvatar(role){
   const avatar = document.createElement("div");
   avatar.className = "avatar";
-
   const img = document.createElement("img");
 
   if(role === "assistant"){
@@ -510,22 +474,18 @@ function makeAvatar(role){
     avatar.classList.add("user-avatar");
     img.src = selectedAvatar === "female" ? "female-avatar.png" : "male-avatar.png";
     img.alt = selectedAvatar === "female" ? "Female avatar" : "Male avatar";
-    avatar.title = img.alt;
   }
 
   img.onerror = () => {
-    avatar.style.background = "#30233f";
     img.style.display = "none";
     const fallback = document.createElement("span");
-    fallback.textContent = role === "assistant" ? "A" : " ";
+    fallback.textContent = role === "assistant" ? "A" : "U";
     fallback.style.color = "#d9caff";
     avatar.appendChild(fallback);
   };
-
   avatar.appendChild(img);
   return avatar;
 }
-
 function renderMessages(){
   const area = $("messages");
   area.replaceChildren();
@@ -535,21 +495,17 @@ function renderMessages(){
     area.innerHTML = welcomeMarkup();
     return;
   }
-
   chat.messages.forEach((message,index) => {
     addMessage(message.role,message.text,false,message,index);
   });
   area.scrollTop = area.scrollHeight;
 }
-
-function addMessage(role,text,scroll=true,messageData=null,index=-1){
+function addMessage(role,text,scroll=true,messageData=null){
   const row = document.createElement("div");
   row.className = "message " + role;
-
   const avatar = makeAvatar(role);
   const wrap = document.createElement("div");
   wrap.className = "content-wrap";
-
   const content = document.createElement("div");
   content.className = "content";
   content.textContent = text;
@@ -558,18 +514,14 @@ function addMessage(role,text,scroll=true,messageData=null,index=-1){
   if(role === "assistant" && messageData){
     const actions = document.createElement("div");
     actions.className = "message-actions";
-
     const like = document.createElement("button");
     like.textContent = "♥ Like";
     like.className = messageData.feedback === "like" ? "selected" : "";
-
     const dislike = document.createElement("button");
     dislike.textContent = "♥ Unlike";
     dislike.className = "dislike " + (messageData.feedback === "dislike" ? "selected" : "");
-
     like.onclick = () => setFeedback(messageData,"like",like,dislike);
     dislike.onclick = () => setFeedback(messageData,"dislike",like,dislike);
-
     actions.append(like,dislike);
     wrap.appendChild(actions);
 
@@ -579,7 +531,6 @@ function addMessage(role,text,scroll=true,messageData=null,index=-1){
       pressTimer = setTimeout(() => row.classList.add("show-actions"),450);
     };
     const cancelPress = () => clearTimeout(pressTimer);
-
     content.addEventListener("pointerdown",startPress);
     content.addEventListener("pointerup",cancelPress);
     content.addEventListener("pointerleave",cancelPress);
@@ -592,29 +543,24 @@ function addMessage(role,text,scroll=true,messageData=null,index=-1){
 
   if(role === "user")row.append(wrap,avatar);
   else row.append(avatar,wrap);
-
   $("messages").appendChild(row);
   if(scroll)$("messages").scrollTop = $("messages").scrollHeight;
   return content;
 }
-
 function setFeedback(message,value,likeButton,dislikeButton){
   message.feedback = message.feedback === value ? null : value;
   likeButton.classList.toggle("selected",message.feedback === "like");
   dislikeButton.classList.toggle("selected",message.feedback === "dislike");
   save();
 }
-
 function suggest(text){
   $("input").value = text;
   sendMessage();
 }
-
 function resizeInput(element){
   element.style.height = "auto";
   element.style.height = Math.min(element.scrollHeight,140) + "px";
 }
-
 function handleKey(event){
   if(event.key === "Enter" && !event.shiftKey){
     event.preventDefault();
@@ -624,19 +570,16 @@ function handleKey(event){
 
 async function sendMessage(){
   if(busy)return;
-
   const input = $("input");
   const text = input.value.trim();
   if(!text)return;
 
   const url = (localStorage.getItem(URL_KEY) || "").trim();
-
   if(!url){
     openSettings();
     alert("First add your Cloudflare Worker URL in Settings.");
     return;
   }
-
   if(!/^https:\/\/.+/i.test(url)){
     alert("Please enter a valid HTTPS Worker URL.");
     openSettings();
@@ -644,4 +587,136 @@ async function sendMessage(){
   }
 
   let chat = currentChat();
-  
+  if(!chat)chat = createChat();
+
+  const userMessage = {role:"user",text};
+  chat.messages.push(userMessage);
+  if(chat.messages.length === 1){
+    chat.title = text.length > 32 ? text.slice(0,32) + "…" : text;
+  }
+
+  input.value = "";
+  resizeInput(input);
+  save();
+  renderHistory();
+  renderMessages();
+
+  busy = true;
+  $("send").disabled = true;
+
+  const typing = document.createElement("div");
+  typing.className = "typing";
+  typing.textContent = "AXON is thinking…";
+  $("messages").appendChild(typing);
+  $("messages").scrollTop = $("messages"). scrollHeight;
+  try{
+    const apiMessages = chat.messages.map(m => ({
+      role:m.role,
+      content:m.text
+    }));
+
+    const response = await fetch(url,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({messages:apiMessages})
+    });
+
+    let data;
+    try{
+      data = await response.json();
+    }catch(parseError){
+      throw new Error("Worker returned an invalid response.");
+    }
+
+    if(!response.ok){
+      throw new Error(data.details || data.error || `Server error (${response.status})`);
+    }
+
+    const answer = data.response || data.result || data.output;
+    if(typeof answer !== "string" || !answer.trim()){
+      throw new Error(data.error || "AXON received an empty response.");
+    }
+
+    chat.messages.push({role:"assistant",text:answer.trim()});
+    save();
+  }catch(error){
+    console.error("AXON request failed:",error);
+    chat.messages.push({
+      role:"assistant",
+      text:"AXON Error: " + (error.message || "Something went wrong. Please try again.")
+    });
+    save();
+  }finally{
+    busy = false;
+    $("send").disabled = false;
+    renderMessages();
+    renderHistory();
+    input.focus();
+  }
+}
+
+function openSettings(){
+  pendingAvatar = selectedAvatar;
+  $("workerUrl").value = localStorage.getItem(URL_KEY) || "";
+  updateAvatarOptions();
+  $("avatarStatus").textContent = "";
+  $("settings").classList.add("show");
+}
+function closeSettings(){
+  $("settings").classList.remove("show");
+}
+function selectAvatar(value){
+  pendingAvatar = value;
+  updateAvatarOptions();
+}
+function updateAvatarOptions(){
+  $("maleOption").classList.toggle("selected",pendingAvatar === "male");
+  $("femaleOption").classList.toggle("selected",pendingAvatar === "female");
+}
+function saveSettings(){
+  const url = $("workerUrl").value.trim();
+  if(url && !/^https:\/\/.+/i.test(url)){
+    $("avatarStatus").textContent = "Worker URL must begin with https://";
+    return;
+  }
+  if(url){
+    try{
+      const parsed = new URL(url);
+      if(parsed.protocol !== "https:")throw new Error("Invalid protocol");
+    }catch(error){
+      $("avatarStatus").textContent = "Please enter a valid Worker URL.";
+      return;
+    }
+  }
+
+  localStorage.setItem(URL_KEY,url);
+  selectedAvatar = pendingAvatar;
+  localStorage.setItem(AVATAR_KEY,selectedAvatar);
+  closeSettings();
+  renderMessages();
+  alert("Settings saved successfully.");
+}
+function toggleSidebar(){
+  $("sidebar").classList.toggle("open");
+  $("drawerShade").classList.toggle("show");
+}
+function closeSidebar(){
+  $("sidebar").classList.remove("open");
+  $("drawerShade").classList.remove("show");
+}
+
+document.addEventListener("keydown",event => {
+  if(event.key === "Escape"){
+    closeSidebar();
+    closeSettings();
+  }
+});
+
+function init(){
+  renderHistory();
+  renderMessages();
+}
+init();
+</script>
+</body>
+</html>
