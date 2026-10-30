@@ -721,8 +721,14 @@ async function sendMessage(){
     });
 
     if(!response.ok){
-      throw new Error("Server error: " + response.status);
-    }
+  const errorData = await response.json().catch(() => ({}));
+
+  throw new Error(
+    errorData.details ||
+    errorData.error ||
+    "Server error: " + response.status
+  );
+          }
 
     const data = await response.json();
 
@@ -739,10 +745,7 @@ async function sendMessage(){
     reply.textContent = answer;
     c.messages[c.messages.length - 1].text = answer;
 
-  }catch(error){
-
-    const msg =
-      "Sorry, AXON couldn't connect. Please check your Worker URL or try again.";
+"AXON Error: " + (error.message || "Unknown error");
 
     reply.textContent = msg;
 
