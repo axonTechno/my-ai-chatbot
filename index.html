@@ -5,161 +5,438 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#090914">
-<title>AXON — AI Chat</title>
+<title>AXON</title>
 
 <style>
 :root{
   --bg:#090914;
   --panel:#101020;
-  --panel2:#17172b;
+  --panel2:#19182b;
   --purple:#9875ff;
+  --pink:#ff65c8;
   --text:#f4f1ff;
   --muted:#9290aa;
   --border:#292640;
 }
+
 *{box-sizing:border-box}
+
 body{
-  margin:0;background:var(--bg);color:var(--text);
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
   font-family:Inter,system-ui,Arial,sans-serif;
-  height:100dvh;overflow:hidden;
+  height:100dvh;
+  overflow:hidden;
 }
+
 button,input,textarea{font:inherit}
 button{cursor:pointer;color:inherit}
-.app{height:100dvh;display:flex}
+
+.app{
+  height:100dvh;
+  display:flex;
+}
+
 .sidebar{
-  width:270px;background:#0d0d1a;border-right:1px solid var(--border);
-  padding:20px 14px;display:flex;flex-direction:column;
-  transition:.25s;flex-shrink:0;
+  width:270px;
+  background:#0d0d1a;
+  border-right:1px solid var(--border);
+  padding:20px 14px;
+  display:flex;
+  flex-direction:column;
+  transition:.25s;
+  flex-shrink:0;
 }
-.brand{display:flex;align-items:center;gap:11px;padding:5px 8px 24px}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:5px 8px 24px;
+}
+
 .logo{
-  width:34px;height:34px;border-radius:50%;
-  border:3px solid #a58aff;
-  box-shadow:0 0 12px #9875ff,0 0 28px #7651e866;
-  animation:glow 2.5s infinite alternate;
+  width:38px;
+  height:38px;
+  object-fit:contain;
+  filter:drop-shadow(0 0 9px #9875ff99);
+  animation:appear .8s ease-out,glow 2.5s infinite alternate;
 }
-@keyframes glow{to{box-shadow:0 0 20px #b49aff,0 0 38px #7651e899}}
-.brand strong{font-size:21px;letter-spacing:3px}
-.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2px}
+
+.brand strong{
+  font-size:21px;
+  letter-spacing:3px;
+}
+
+.sideheading{
+  font-size:11px;
+  color:var(--muted);
+  padding:24px 9px 9px;
+}
+
 .newchat{
-  border:1px solid #44366b;background:#1b1730;border-radius:12px;
-  padding:12px;text-align:left;color:#cbbcff;width:100%;
+  border:1px solid #44366b;
+  background:#1b1730;
+  border-radius:12px;
+  padding:12px;
+  text-align:left;
+  color:#cbbcff;
+  width:100%;
 }
-.newchat:hover,.iconbtn:hover{background:#29213f}
-.sideheading{font-size:11px;color:var(--muted);padding:24px 9px 9px}
-.history{overflow:auto;flex:1}
+
+.newchat:hover,.iconbtn:hover{
+  background:#29213f;
+}
+
+.history{
+  overflow:auto;
+  flex:1;
+}
+
 .chatitem{
-  width:100%;border:0;background:transparent;text-align:left;
-  color:#c9c5db;padding:11px 10px;border-radius:9px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;
+  width:100%;
+  border:0;
+  background:transparent;
+  text-align:left;
+  color:#c9c5db;
+  padding:11px 10px;
+  border-radius:9px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-size:13px;
 }
-.chatitem:hover,.chatitem.active{background:var(--panel2)}
-.sidebottom{border-top:1px solid var(--border);padding-top:12px}
+
+.chatitem:hover,.chatitem.active{
+  background:var(--panel2);
+}
+
+.sidebottom{
+  border-top:1px solid var(--border);
+  padding-top:12px;
+}
+
 .iconbtn{
-  border:0;background:transparent;padding:10px;border-radius:10px;
+  border:0;
+  background:transparent;
+  padding:10px;
+  border-radius:10px;
 }
-.main{flex:1;min-width:0;display:flex;flex-direction:column}
+
+.main{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+
 .topbar{
-  height:62px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;padding:0 20px;
+  height:62px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
 }
-.topbar span{font-size:13px;color:var(--muted)}
-.status{color:#9de6bd!important;font-size:11px!important}
+
+.topbar span{
+  font-size:13px;
+  color:var(--muted);
+}
+
+.status{
+  color:#9de6bd!important;
+  font-size:11px!important;
+}
+
 .messages{
-  flex:1;overflow-y:auto;padding:28px 18px 20px;
-  display:flex;flex-direction:column;gap:22px;
+  flex:1;
+  overflow-y:auto;
+  padding:28px 18px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:22px;
 }
-.welcome{margin:auto;text-align:center;max-width:500px;padding:25px 10px}
-.welcome .biglogo{
-  width:62px;height:62px;border:4px solid #a58aff;
-  border-radius:50%;margin:0 auto 25px;
-  box-shadow:0 0 22px #9875ff,0 0 55px #7651ff55;
-  animation:glow 2.5s infinite alternate;
+
+.welcome{
+  margin:auto;
+  text-align:center;
+  max-width:500px;
+  padding:25px 10px;
 }
-.welcome h1{font-size:32px;margin:0 0 10px}
-.welcome p{color:var(--muted);font-size:14px;line-height:1.7}
-.suggestions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:25px}
+
+.biglogo{
+  width:110px;
+  height:110px;
+  object-fit:contain;
+  margin:0 auto 22px;
+  filter:drop-shadow(0 0 17px #9875ff77);
+  animation:appear 1s ease-out,glow 2.5s infinite alternate;
+}
+
+@keyframes appear{
+  from{
+    opacity:0;
+    transform:scale(.75);
+  }
+  to{
+    opacity:1;
+    transform:scale(1);
+  }
+}
+
+@keyframes glow{
+  to{
+    filter:drop-shadow(0 0 24px #9875ff);
+  }
+}
+
+.welcome h1{
+  font-size:34px;
+  letter-spacing:5px;
+  margin:0 0 12px;
+}
+
+.welcome p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+}
+
+.suggestions{
+  display:flex;
+  gap:9px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top:25px;
+}
+
 .suggestions button{
-  background:var(--panel);border:1px solid var(--border);
-  padding:10px 13px;border-radius:20px;color:#c9baff;font-size:12px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  padding:10px 13px;
+  border-radius:20px;
+  color:#c9baff;
+  font-size:12px;
 }
-.message{max-width:780px;width:100%;margin:0 auto;display:flex;gap:12px;line-height:1.7}
+
+.suggestions button:hover{
+  border-color:var(--purple);
+  background:#201a36;
+}
+
+.message{
+  max-width:780px;
+  width:100%;
+  margin:0 auto;
+  display:flex;
+  gap:12px;
+  line-height:1.7;
+}
+
 .avatar{
-  width:30px;height:30px;border-radius:50%;background:#28203e;
-  display:grid;place-items:center;flex-shrink:0;font-size:13px;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:#28203e;
+  display:grid;
+  place-items:center;
+  flex-shrink:0;
+  font-size:12px;
 }
-.message.user .avatar{background:#24243a}
-.content{min-width:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
-.message.assistant .content{color:#e5e1f2}
-.composer-area{padding:12px 18px 18px}
+
+.message.user .avatar{
+  background:#24243a;
+}
+
+.content{
+  min-width:0;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  font-size:14px;
+}
+
+.message.assistant .content{
+  color:#e5e1f2;
+}
+
+.composer-area{
+  padding:12px 18px 18px;
+}
+
 .composer{
-  max-width:780px;margin:auto;background:#141425;
-  border:1px solid #393451;border-radius:18px;padding:12px;
-  display:flex;align-items:flex-end;gap:10px;
+  max-width:780px;
+  margin:auto;
+  background:#141425;
+  border:1px solid #393451;
+  border-radius:20px;
+  padding:12px;
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
   box-shadow:0 8px 35px #0005;
 }
+
 textarea{
-  flex:1;resize:none;max-height:140px;min-height:27px;
-  border:0;outline:0;background:transparent;color:var(--text);
-  padding:5px;font-size:14px;
+  flex:1;
+  resize:none;
+  max-height:140px;
+  min-height:27px;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:var(--text);
+  padding:8px 5px;
+  font-size:14px;
 }
-textarea::placeholder{color:#77748e}
+
+textarea::placeholder{
+  color:#77748e;
+}
+
+/* Circular pink-purple send button */
 .send{
-  width:38px;height:38px;border:0;border-radius:12px;
-  background:var(--purple);color:#fff;font-size:18px;
+  width:42px;
+  height:42px;
+  min-width:42px;
+  border:0;
+  border-radius:50%;
+  background:linear-gradient(
+    135deg,
+    #ff65c8,
+    #a855f7,
+    #7045ff
+  );
+  color:white;
+  font-size:23px;
+  font-weight:600;
+  display:grid;
+  place-items:center;
+  box-shadow:0 0 15px #c052ff66;
+  transition:transform .2s,box-shadow .2s;
 }
-.send:disabled{opacity:.45}
-.note{text-align:center;color:#74718a;font-size:10px;padding-top:10px}
+
+.send:hover{
+  transform:scale(1.08);
+  box-shadow:0 0 23px #d052ff99;
+}
+
+.send:active{
+  transform:scale(.94);
+}
+
+.send:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.note{
+  text-align:center;
+  color:#74718a;
+  font-size:10px;
+  padding-top:10px;
+}
+
 .overlay{
-  position:fixed;inset:0;background:#0009;display:none;
-  align-items:center;justify-content:center;padding:18px;z-index:5;
+  position:fixed;
+  inset:0;
+  background:#0009;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:5;
 }
-.overlay.show{display:flex}
+
+.overlay.show{
+  display:flex;
+}
+
 .modal{
-  width:100%;max-width:380px;background:#151527;
-  border:1px solid var(--border);border-radius:18px;padding:22px;
+  width:100%;
+  max-width:380px;
+  background:#151527;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:22px;
 }
+
 .modal h2{margin-top:0}
-.modal p{color:var(--muted);font-size:13px}
+
+.modal p{
+  color:var(--muted);
+  font-size:13px;
+}
+
 .modal button{
-  background:var(--panel2);border:1px solid var(--border);
-  padding:10px 14px;border-radius:9px;margin-top:12px;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  padding:10px 14px;
+  border-radius:9px;
+  margin-top:12px;
 }
+
 .modal input{
-  width:100%;padding:11px;background:#090914;color:white;
-  border:1px solid var(--border);border-radius:9px;margin-top:8px;
+  width:100%;
+  padding:11px;
+  background:#090914;
+  color:white;
+  border:1px solid var(--border);
+  border-radius:9px;
+  margin-top:8px;
 }
+
 @media(max-width:650px){
- .sidebar{position:fixed;z-index:4;top:0;bottom:0;left:-280px}
- .sidebar.open{left:0}
- .topbar{padding:0 12px}
- .messages{padding:22px 13px}
- .composer-area{padding:10px 12px 15px}
- .welcome h1{font-size:27px}
+  .sidebar{
+    position:fixed;
+    z-index:4;
+    top:0;
+    bottom:0;
+    left:-280px;
+  }
+
+  .sidebar.open{
+    left:0;
+  }
+
+  .topbar{padding:0 12px}
+  .messages{padding:22px 13px}
+  .composer-area{padding:10px 12px 15px}
+  .welcome h1{font-size:29px}
 }
 </style>
 </head>
 
 <body>
+
 <div class="app">
 
 <aside class="sidebar" id="sidebar">
+
   <div class="brand">
-    <div class="logo"></div>
-    <div><strong>AXON</strong><small>AI INTELLIGENCE</small></div>
+    <img class="logo" src="axon-logo.png" alt="AXON logo">
+    <strong>AXON</strong>
   </div>
 
-  <button class="newchat" onclick="newChat()">＋ New chat</button>
+  <button class="newchat" onclick="newChat()">
+    ＋ New chat
+  </button>
 
   <div class="sideheading">YOUR CONVERSATIONS</div>
+
   <div class="history" id="history"></div>
 
   <div class="sidebottom">
-    <button class="chatitem" onclick="openSettings()">⚙ Settings</button>
+    <button class="chatitem" onclick="openSettings()">
+      ⚙ Settings
+    </button>
   </div>
+
 </aside>
 
 <main class="main">
+
   <header class="topbar">
     <div>
       <button class="iconbtn" onclick="toggleSidebar()">☰</button>
@@ -169,211 +446,356 @@ textarea::placeholder{color:#77748e}
   </header>
 
   <section class="messages" id="messages">
-    <div class="welcome" id="welcome">
-      <div class="biglogo"></div>
-      <h1>Meet AXON.</h1>
-      <p>Your AI conversation space.<br>Ask anything. Explore ideas. Learn something new.</p>
+
+    <div class="welcome">
+      <img class="biglogo" src="axon-logo.png" alt="AXON">
+      <h1>AXON</h1>
+
+      <p>
+        Your AI conversation space.<br>
+        Ask anything. Explore ideas. Learn something new.
+      </p>
+
       <div class="suggestions">
-        <button onclick="suggest('Explain artificial intelligence simply')">Explore AI</button>
-        <button onclick="suggest('Help me learn coding')">Learn coding</button>
-        <button onclick="suggest('Tell me an interesting science fact')">Science fact</button>
+        <button onclick="suggest('Explain artificial intelligence simply')">
+          Explore AI
+        </button>
+
+        <button onclick="suggest('Help me learn coding')">
+          Learn coding
+        </button>
+
+        <button onclick="suggest('Tell me an interesting science fact')">
+          Science fact
+        </button>
       </div>
     </div>
+
   </section>
 
   <div class="composer-area">
+
     <div class="composer">
-      <textarea id="input" rows="1" placeholder="Message AXON..."
+
+      <textarea
+        id="input"
+        rows="1"
+        placeholder="Message AXON..."
         oninput="resizeInput(this)"
-        onkeydown="handleKey(event)"></textarea>
-      <button class="send" id="send" onclick="sendMessage()">↑</button>
+        onkeydown="handleKey(event)"
+      ></textarea>
+
+      <button class="send" id="send" onclick="sendMessage()">
+        ↑
+      </button>
+
     </div>
-    <div class="note">AXON can make mistakes. Verify important information.</div>
+
+    <div class="note">
+      AXON can make mistakes. Verify important information.
+    </div>
+
   </div>
+
 </main>
 </div>
 
 <div class="overlay" id="settings">
+
   <div class="modal">
-    <h2>⚙ Settings</h2>
+    <h2>Settings</h2>
     <p>AXON configuration</p>
-    <label style="font-size:12px;color:#aaa">AI Worker URL</label>
-    <input id="workerUrl" placeholder="Your Cloudflare Worker URL">
+
+    <label style="font-size:12px;color:#aaa">
+      AI Worker URL
+    </label>
+
+    <input
+      id="workerUrl"
+      placeholder="Your Cloudflare Worker URL"
+    >
+
     <button onclick="saveSettings()">Save settings</button>
     <button onclick="closeSettings()">Close</button>
   </div>
+
 </div>
 
 <script>
-const $=id=>document.getElementById(id);
-let chats=JSON.parse(localStorage.getItem("axon_chats")||"[]");
-let currentId=null;
-let busy=false;
+const $ = id => document.getElementById(id);
+
+let chats = JSON.parse(
+  localStorage.getItem("axon_chats") || "[]"
+);
+
+let currentId = null;
+let busy = false;
 
 function save(){
-  localStorage.setItem("axon_chats",JSON.stringify(chats));
+  localStorage.setItem(
+    "axon_chats",
+    JSON.stringify(chats)
+  );
 }
+
 function currentChat(){
-  return chats.find(c=>c.id===currentId);
+  return chats.find(c => c.id === currentId);
 }
+
 function newChat(){
-  currentId=null;
+  currentId = null;
   renderMessages();
   renderHistory();
   $("sidebar").classList.remove("open");
 }
+
 function createChat(){
-  const c={id:Date.now(),title:"New conversation",messages:[]};
+  const c = {
+    id: Date.now(),
+    title: "New conversation",
+    messages: []
+  };
+
   chats.unshift(c);
-  currentId=c.id;
+  currentId = c.id;
   return c;
 }
+
 function selectChat(id){
-  currentId=id;
+  currentId = id;
   renderMessages();
   renderHistory();
   $("sidebar").classList.remove("open");
 }
+
 function renderHistory(){
-  $("history").innerHTML="";
-  chats.forEach(c=>{
-    const b=document.createElement("button");
-    b.className="chatitem"+(c.id===currentId?" active":"");
-    b.textContent="▢  "+c.title;
-    b.onclick=()=>selectChat(c.id);
+  $("history").innerHTML = "";
+
+  chats.forEach(c => {
+    const b = document.createElement("button");
+
+    b.className =
+      "chatitem" + (c.id === currentId ? " active" : "");
+
+    b.textContent = "▢  " + c.title;
+    b.onclick = () => selectChat(c.id);
+
     $("history").appendChild(b);
   });
 }
+
 function renderMessages(){
-  const area=$("messages");
-  area.innerHTML="";
-  const c=currentChat();
-  if(!c||!c.messages.length){
-    area.innerHTML=`
-    <div class="welcome" id="welcome">
-      <div class="biglogo"></div>
-      <h1>Meet AXON.</h1>
-      <p>Your AI conversation space.<br>Ask anything. Explore ideas. Learn something new.</p>
-      <div class="suggestions">
-        <button onclick="suggest('Explain artificial intelligence simply')">Explore AI</button>
-        <button onclick="suggest('Help me learn coding')">Learn coding</button>
-        <button onclick="suggest('Tell me an interesting science fact')">Science fact</button>
+  const area = $("messages");
+  area.innerHTML = "";
+
+  const c = currentChat();
+
+  if(!c || !c.messages.length){
+
+    area.innerHTML = `
+      <div class="welcome">
+        <img class="biglogo" src="axon-logo.png" alt="AXON">
+        <h1>AXON</h1>
+        <p>Your AI conversation space.<br>
+        Ask anything. Explore ideas. Learn something new.</p>
+
+        <div class="suggestions">
+          <button onclick="suggest('Explain artificial intelligence simply')">Explore AI</button>
+          <button onclick="suggest('Help me learn coding')">Learn coding</button>
+          <button onclick="suggest('Tell me an interesting science fact')">Science fact</button>
+        </div>
       </div>
-    </div>`;
+    `;
+
     return;
   }
-  c.messages.forEach(m=>addMessage(m.role,m.text,false));
-  area.scrollTop=area.scrollHeight;
+
+  c.messages.forEach(m => {
+    addMessage(m.role, m.text, false);
+  });
+
+  area.scrollTop = area.scrollHeight;
 }
-function addMessage(role,text,scroll=true){
-  const row=document.createElement("div");
-  row.className="message "+role;
-  const avatar=document.createElement("div");
-  avatar.className="avatar";
-  avatar.textContent=role==="user"?"You":"A";
-  const content=document.createElement("div");
-  content.className="content";
-  content.textContent=text;
-  row.append(avatar,content);
+
+function addMessage(role, text, scroll = true){
+
+  const row = document.createElement("div");
+  row.className = "message " + role;
+
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  avatar.textContent = role === "user" ? "You" : "A";
+
+  const content = document.createElement("div");
+  content.className = "content";
+  content.textContent = text;
+
+  row.append(avatar, content);
   $("messages").appendChild(row);
-  if(scroll)$("messages").scrollTop=$("messages").scrollHeight;
+
+  if(scroll){
+    $("messages").scrollTop =
+      $("messages").scrollHeight;
+  }
+
   return content;
 }
+
 function suggest(text){
-  $("input").value=text;
+  $("input").value = text;
   sendMessage();
 }
+
 function resizeInput(el){
-  el.style.height="auto";
-  el.style.height=Math.min(el.scrollHeight,140)+"px";
+  el.style.height = "auto";
+  el.style.height =
+    Math.min(el.scrollHeight, 140) + "px";
 }
+
 function handleKey(e){
-  if(e.key==="Enter"&&!e.shiftKey){
+  if(e.key === "Enter" && !e.shiftKey){
     e.preventDefault();
     sendMessage();
   }
 }
-async function sendMessage(){
-  if(busy)return;
-  const input=$("input");
-  const text=input.value.trim();
-  if(!text)return;
 
-  const url=localStorage.getItem("axon_worker_url");
+async function sendMessage(){
+
+  if(busy) return;
+
+  const input = $("input");
+  const text = input.value.trim();
+
+  if(!text) return;
+
+  const url = localStorage.getItem("axon_worker_url");
+
   if(!url){
     openSettings();
     alert("First add your Cloudflare Worker URL in Settings.");
     return;
   }
 
-  busy=true;
-  $("send").disabled=true;
-  input.value="";
-  input.style.height="27px";
+  busy = true;
+  $("send").disabled = true;
 
-  let c=currentChat()||createChat();
-  if(!c.messages.length)c.title=text.slice(0,35);
-  c.messages.push({role:"user",text});
-  addMessage("user",text);
+  input.value = "";
+  input.style.height = "27px";
 
-  const reply=addMessage("assistant","Thinking...");
-  c.messages.push({role:"assistant",text:""});
+  let c = currentChat() || createChat();
+
+  if(!c.messages.length){
+    c.title = text.slice(0, 35);
+  }
+
+  c.messages.push({
+    role:"user",
+    text:text
+  });
+
+  addMessage("user", text);
+
+  const reply = addMessage("assistant", "Thinking...");
+
+  c.messages.push({
+    role:"assistant",
+    text:""
+  });
+
   save();
   renderHistory();
 
   try{
-    const response=await fetch(url,{
+
+    const response = await fetch(url,{
       method:"POST",
-      headers:{"Content-Type":"application/json"},
+      headers:{
+        "Content-Type":"application/json"
+      },
       body:JSON.stringify({
-        messages:c.messages.slice(0,-1).map(m=>({
-          role:m.role==="assistant"?"assistant":"user",
+        messages:c.messages.slice(0,-1).map(m => ({
+          role:m.role === "assistant" ? "assistant" : "user",
           content:m.text
         }))
       })
     });
 
-    if(!response.ok)throw new Error("Server error: "+response.status);
-    const data=await response.json();
-    const answer=data.response||data.reply||data.text||data.result;
-    if(!answer)throw new Error("No answer received from AI server.");
+    if(!response.ok){
+      throw new Error("Server error: " + response.status);
+    }
 
-    reply.textContent=answer;
-    c.messages[c.messages.length-1].text=answer;
+    const data = await response.json();
+
+    const answer =
+      data.response ||
+      data.reply ||
+      data.text ||
+      data.result;
+
+    if(!answer){
+      throw new Error("No answer received from AI server.");
+    }
+
+    reply.textContent = answer;
+    c.messages[c.messages.length - 1].text = answer;
+
   }catch(error){
-    const msg="Sorry, AXON couldn't connect. Please check your Worker URL or try again.";
-    reply.textContent=msg;
+
+    const msg =
+      "Sorry, AXON couldn't connect. Please check your Worker URL or try again.";
+
+    reply.textContent = msg;
+
     c.messages.pop();
-    c.messages.push({role:"assistant",text:msg});
+
+    c.messages.push({
+      role:"assistant",
+      text:msg
+    });
+
     console.error(error);
   }
 
   save();
-  busy=false;
-  $("send").disabled=false;
-  $("messages").scrollTop=$("messages").scrollHeight;
+  busy = false;
+  $("send").disabled = false;
+
+  $("messages").scrollTop =
+    $("messages").scrollHeight;
 }
+
 function toggleSidebar(){
   $("sidebar").classList.toggle("open");
 }
+
 function openSettings(){
-  $("workerUrl").value=localStorage.getItem("axon_worker_url")||"";
+  $("workerUrl").value =
+    localStorage.getItem("axon_worker_url") || "";
+
   $("settings").classList.add("show");
 }
+
 function closeSettings(){
   $("settings").classList.remove("show");
 }
+
 function saveSettings(){
-  const url=$("workerUrl").value.trim();
-  if(url&&!url.startsWith("https://")){
+
+  const url = $("workerUrl").value.trim();
+
+  if(url && !url.startsWith("https://")){
     alert("Please enter a valid HTTPS Worker URL.");
     return;
   }
-  localStorage.setItem("axon_worker_url",url);
+
+  localStorage.setItem("axon_worker_url", url);
+
   closeSettings();
   alert("Settings saved!");
 }
+
 renderHistory();
 </script>
+
 </body>
 </html>
