@@ -1793,5 +1793,18 @@ if(document.readyState === "loading"){
 }
 
 </script>
+  <script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./service-worker.js")
+      .then(function () {
+        console.log("AXON PWA Ready");
+      })
+      .catch(function (error) {
+        console.error("AXON PWA Error:", error);
+      });
+  });
+}
+  </script>
 </body>
 </html>
