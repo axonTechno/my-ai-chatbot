@@ -1278,22 +1278,66 @@ async function requestAxonAI(userText) {
     content: message.content
   }));
 
-  const response = await fetch(appState.workerUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      message: userText,
-      messages: conversation,
-      language: appState.language,
-      images: selectedImages
-    })
-  });
+  let response;
+let lastError;
 
-  if (!response.ok) {
-    throw new Error("AI connection failed: " + response.status);
+for (let attempt = 1; attempt <= 2; attempt++) {
+  const controller = new AbortController();
+
+  const timeout = setTimeout(() => {
+    controller.abort();
+  }, 90000);
+
+  try {
+    response = await fetch(appState.workerUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        message: userText,
+        messages: conversation,
+        language: appState.language,
+        images: selectedImages
+      })
+    });
+
+    if (
+      !response.ok &&
+      [502, 503, 504].includes(response.status) &&
+      attempt < 2
+    ) {
+      throw new Error("Temporary server error: " + response.status);
+    }
+
+    if (!response.ok) {
+      throw new Error("AI connection failed: " + response.status);
+    }
+
+    break;
+
+  } catch (error) {
+    lastError = error;
+
+    if (attempt === 2) {
+      throw error;
+    }
+
+    if (
+      error.name === "AbortError" ||
+      error.message.includes("Temporary server error") ||
+      error instanceof TypeError
+    ) {
+      continue;
+    }
+
+    throw error;
+
+  } finally {
+    clearTimeout(timeout);
   }
+      }
 
   const data = await response.json();
 
