@@ -1286,7 +1286,8 @@ async function requestAxonAI(userText) {
     body: JSON.stringify({
       message: userText,
       messages: conversation,
-      language: appState.language
+      language: appState.language,
+      images: selectedImages
     })
   });
 
@@ -1307,7 +1308,7 @@ async function requestAxonAI(userText) {
   }
 
   return answer.trim();
-}
+    }
 
 /* SEND MESSAGE */
 
@@ -1318,7 +1319,9 @@ async function sendMessage() {
   if (!input) return;
 
   const text = input.value.trim();
-  if (!text) return;
+  const imagesToSend = [...selectedImages];
+
+  if (!text && imagesToSend.length === 0) return;
 
   if (!getActiveChat()) {
     createNewChat();
@@ -1337,18 +1340,22 @@ async function sendMessage() {
       return;
     }
 
-    chat.messages = chat.messages.slice(0, editingIndex);
+    chat.messages = chat.messas jiges.slice(0, editingIndex);
     appState.editingIndex = null;
   }
 
+  const messageText = text ||
+    `Please analyze these ${imagesToSend.length} images.`;
+
   const userMessage = {
     role: "user",
-    content: text
+    content: imagesToSend.length
+      ? `${messageText} [${imagesToSend.length} images attached]`
+      : messageText
   };
 
   chat.messages.push(userMessage);
-
-  updateChatTitle(chat, text);
+  updateChatTitle(chat, messageText);
 
   input.value = "";
   input.style.height = "41px";
@@ -1362,12 +1369,15 @@ async function sendMessage() {
   setTyping(true);
 
   try {
-    const answer = await requestAxonAI(text);
+    const answer = await requestAxonAI(messageText);
 
     chat.messages.push({
       role: "assistant",
       content: answer
     });
+
+    selectedImages = [];
+    renderImagePreviews();
 
   } catch (error) {
     chat.messages.push({
@@ -1387,7 +1397,7 @@ async function sendMessage() {
     renderMessages();
     input.focus();
   }
-}
+                    }
 
 /* INITIAL LOAD */
 
