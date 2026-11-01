@@ -582,6 +582,34 @@ svg {
     scroll-behavior: auto !important;
   }
 }
+  .image-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.image-preview img {
+  width: 76px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.image-preview button {
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  background: #eee;
+  color: #333;
+  font-size: 20px;
+}
+
+.image-preview.hidden {
+  display: none;
+}
 </style>
 </head>
 
@@ -700,6 +728,12 @@ svg {
 
     <!-- MESSAGE COMPOSER -->
     <div class="composer-wrap">
+      <div id="imagePreview" class="image-preview hidden">
+  <img id="previewImage" alt="Selected image preview">
+  <button type="button" id="removeImageBtn" aria-label="Remove image">
+    ×
+  </button>
+      </div>
       <div class="composer" id="composer">
 
         <button class="icon-btn" id="attachBtn" aria-label="Attach file">
