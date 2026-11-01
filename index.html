@@ -18,7 +18,7 @@
   --purple: #7655e8;
   --pink: #e58acb;
   --hover: #f5f4fa;
-  --shadow: 0 8px 30px rgba(30, 20, 60, .08);
+  --shadow: 0 8px 30px rgba(30,20,60,.08);
 }
 
 * {
@@ -70,6 +70,7 @@ svg {
 
 .app {
   width: 100%;
+  height: 100%;
   height: 100dvh;
   display: flex;
   overflow: hidden;
@@ -109,9 +110,10 @@ svg {
   font-size: 21px;
   font-weight: 750;
   letter-spacing: 1.5px;
-  background: linear-gradient(100deg, #7554e8, #dc83c6);
+  background: linear-gradient(100deg,#7554e8,#dc83c6);
   color: transparent;
   background-clip: text;
+  -webkit-background-clip: text;
 }
 
 .icon-btn {
@@ -139,7 +141,7 @@ svg {
   height: 45px;
   border: 1px solid #e7e1fa;
   border-radius: 13px;
-  background: linear-gradient(110deg, #f5f1ff, #fff3fb);
+  background: linear-gradient(110deg,#f5f1ff,#fff3fb);
   color: #6849d2;
   display: flex;
   align-items: center;
@@ -249,7 +251,7 @@ svg {
   justify-content: space-between;
   padding: 0 17px;
   border-bottom: 1px solid #f0eff4;
-  background: rgba(255,255,255,.92);
+  background: rgba(255,255,255,.96);
   z-index: 5;
 }
 
@@ -280,6 +282,7 @@ svg {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   scroll-behavior: smooth;
   padding: 24px 16px 20px;
   position: relative;
@@ -291,6 +294,8 @@ svg {
   margin: 0 auto;
 }
 
+/* WELCOME SCREEN */
+
 .welcome {
   min-height: 65%;
   display: flex;
@@ -298,27 +303,47 @@ svg {
   align-items: center;
   justify-content: center;
   text-align: center;
-  animation: welcomeIn .65s ease both;
+  padding: 25px 10px;
 }
 
 .welcome-logo {
+  display: block;
   width: 105px;
   height: 105px;
+  max-width: 30vw;
   object-fit: contain;
-  margin-bottom: 24px;
-  animation: logoFloat 4s ease-in-out infinite;
+  object-position: center;
+  flex-shrink: 0;
+  margin: 0 auto 24px;
+
+  /* Static logo: no motion */
+  animation: none !important;
+  transform: none !important;
 }
 
 .welcome h1 {
-  font-size: clamp(25px, 5vw, 35px);
-  font-weight: 650;
+  font-size: clamp(25px,5vw,35px);
+  font-weight: 700;
   letter-spacing: -.8px;
+  line-height: 1.25;
   margin-bottom: 10px;
+
+  background: linear-gradient(
+    100deg,
+    #7655e8 0%,
+    #a16cdd 48%,
+    #e58acb 100%
+  );
+
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
 }
 
 .welcome p {
   font-size: 14px;
   color: var(--muted);
+  line-height: 1.6;
 }
 
 .suggestions {
@@ -337,13 +362,12 @@ svg {
   border-radius: 22px;
   color: #555565;
   font-size: 12px;
-  transition: all .22s ease;
+  transition: border-color .2s, background .2s;
 }
 
 .suggestion:hover {
   border-color: #c8b8f7;
   background: #faf8ff;
-  transform: translateY(-2px);
 }
 
 /* MESSAGES */
@@ -358,7 +382,7 @@ svg {
   width: 100%;
   display: flex;
   flex-direction: column;
-  animation: messageIn .28s ease both;
+  animation: messageIn .22s ease both;
 }
 
 .message.user {
@@ -370,7 +394,7 @@ svg {
 }
 
 .message-content {
-  max-width: min(85%, 650px);
+  max-width: min(85%,650px);
   font-size: 14px;
   line-height: 1.7;
   overflow-wrap: anywhere;
@@ -414,7 +438,7 @@ svg {
 
 .composer-wrap {
   padding: 12px 15px 18px;
-  background: linear-gradient(to top, #f7f3ff 0%, #fff 65%);
+  background: linear-gradient(to top,#f7f3ff 0%,#fff 65%);
 }
 
 .composer {
@@ -424,7 +448,7 @@ svg {
   margin: 0 auto;
   padding: 7px 8px;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 7px;
   border: 1px solid #e8e4ef;
   border-radius: 19px;
@@ -441,8 +465,10 @@ svg {
 .message-input {
   flex: 1;
   min-width: 0;
+  min-height: 41px;
   max-height: 130px;
   resize: none;
+  overflow-y: auto;
   border: 0;
   outline: 0;
   background: transparent;
@@ -450,6 +476,8 @@ svg {
   font-size: 14px;
   line-height: 1.5;
   padding: 10px 3px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .message-input::placeholder {
@@ -459,9 +487,10 @@ svg {
 .send-btn {
   width: 41px;
   height: 41px;
+  flex-shrink: 0;
   border: 0;
   border-radius: 14px;
-  background: linear-gradient(135deg, #7958e8, #b56bd8);
+  background: linear-gradient(135deg,#7958e8,#b56bd8);
   color: white;
   display: flex;
   align-items: center;
@@ -477,43 +506,79 @@ svg {
   transform: scale(.9);
 }
 
+.send-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
 .voice-btn {
   color: #7458d5;
 }
 
+.cancel-edit-btn {
+  display: none;
+  color: #777b86;
+}
+
 /* ANIMATIONS */
 
-@keyframes welcomeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 @keyframes messageIn {
-  from { opacity: 0; transform: translateY(9px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@keyframes logoFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
+/* IMPORTANT: Logo and welcome screen do not move */
 
 .hidden {
   display: none !important;
 }
 
+/* MOBILE */
+
 @media (max-width: 600px) {
-  .sidebar { width: min(290px, 86vw); }
-  .topbar { padding: 0 11px; }
-  .chat-area { padding: 18px 13px; }
-  .composer-wrap { padding: 9px 10px 13px; }
-  .message-content { max-width: 91%; }
+  .sidebar {
+    width: min(290px,86vw);
+  }
+
+  .topbar {
+    padding: 0 11px;
+  }
+
+  .chat-area {
+    padding: 18px 13px;
+  }
+
+  .composer-wrap {
+    padding: 9px 10px 13px;
+  }
+
+  .message-content {
+    max-width: 91%;
+  }
+
+  .welcome-logo {
+    width: 95px;
+    height: 95px;
+    margin-bottom: 20px;
+  }
+
+  .welcome h1 {
+    font-size: 27px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: .01ms !important;
-    transition-duration: .01ms !important;
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
     scroll-behavior: auto !important;
   }
 }
@@ -528,32 +593,25 @@ svg {
     <div class="sidebar-top">
       <div class="brand">AXON</div>
       <button class="icon-btn" id="closeSidebar" aria-label="Close sidebar">
-        <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        <svg viewBox="0 0 24 24">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
       </button>
     </div>
 
     <button class="new-chat" id="newChatBtn">
-      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-      <span>New Chat</span>
+      <svg viewBox="0 0 24 24">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      <span>New chat</span>
     </button>
 
     <div class="history-area">
-      <div class="section-label">Pinned</div>
-      <div class="history-list" id="pinnedList"></div>
-
-      <div class="section-label">Recent</div>
-      <div class="history-list" id="recentList"></div>
+      <div class="section-label">Your Conversations</div>
+      <div class="history-list" id="historyList"></div>
     </div>
 
     <div class="sidebar-bottom">
-      <button class="nav-item" id="settingsBtn">
-        <svg viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.6.9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.6-.9l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.9l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.6-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.6.9l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1 0 1.9Z"/>
-        </svg>
-        <span>Settings</span>
-      </button>
-
       <button class="nav-item" id="profileBtn">
         <svg viewBox="0 0 24 24">
           <circle cx="12" cy="8" r="4"/>
@@ -562,29 +620,35 @@ svg {
         <span>Personal Details</span>
       </button>
 
-      <button class="nav-item" id="loginBtn">
+      <button class="nav-item" id="settingsBtn">
         <svg viewBox="0 0 24 24">
-          <path d="M10 17l5-5-5-5M15 12H3"/>
-          <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/>
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 2.9-.2-.1a1.7 1.7 0 0 0-1.8.1l-.2.1h-3.4l-.1-.2a1.7 1.7 0 0 0-1.5-1l-.3-.1-2.9 1.1-.1-.2-1.7-2.9.1-.2a1.7 1.7 0 0 0-.1-1.8l-.1-.2v-3.4l.2-.1a1.7 1.7 0 0 0 1-1.5l.1-.3-1.1-2.9.2-.1 2.9-1.7.2.1a1.7 1.7 0 0 0 1.8-.1l.2-.1h3.4l.1.2a1.7 1.7 0 0 0 1.5 1l.3.1 2.9-1.1.1.2 1.7 2.9-.1.2a1.7 1.7 0 0 0 .1 1.8l.1.2v3.4z"/>
         </svg>
-        <span>Login / Sign up</span>
+        <span>Settings</span>
+      </button>
+
+      <button class="nav-item" id="deleteAllBtn">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/>
+        </svg>
+        <span>Delete all chats</span>
       </button>
     </div>
   </aside>
 
-  <!-- SIDEBAR BACKDROP -->
-  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <!-- MAIN CHAT -->
+  <main class="main">
 
-  <!-- CHAT MAIN -->
-  <main class="main" id="chatPage">
     <header class="topbar">
       <div class="topbar-left">
         <button class="icon-btn" id="menuBtn" aria-label="Open menu">
           <svg viewBox="0 0 24 24">
-            <path d="M4 6h16M4 12h16M4 18h16"/>
+            <path d="M4 7h16M4 12h16M4 17h16"/>
           </svg>
         </button>
-        <span class="topbar-title">AXON AI</span>
+
+        <div class="topbar-title">AXON</div>
       </div>
 
       <div class="topbar-right">
@@ -595,444 +659,803 @@ svg {
     <section class="chat-area" id="chatArea">
       <div class="chat-inner">
 
-        <div class="welcome" id="welcome">
-          <img class="welcome-logo" src="axon-logo.png" alt="AXON logo"
-               onerror="this.style.display='none'">
+        <!-- WELCOME SCREEN -->
+        <div class="welcome" id="welcomeScreen">
+          <img
+            src="axon-logo.png"
+            class="welcome-logo"
+            alt="AXON logo"
+          >
+
           <h1>Hello, How can I help you?</h1>
           <p>Ask anything. Let's explore ideas together.</p>
 
           <div class="suggestions">
-            <button class="suggestion" data-prompt="Explain artificial intelligence in simple words">
-              Learn about AI
+            <button class="suggestion" data-prompt="Explain something interesting about space.">
+              Explore space
             </button>
-            <button class="suggestion" data-prompt="Give me an interesting science fact">
-              Science facts
+
+            <button class="suggestion" data-prompt="Teach me something new today.">
+              Learn something new
             </button>
-            <button class="suggestion" data-prompt="Help me write something creative">
-              Creative writing
-            </button>
-            <button class="suggestion" data-prompt="Help me learn coding step by step">
-              Learn coding
+
+            <button class="suggestion" data-prompt="Help me write something creative.">
+              Write something
             </button>
           </div>
         </div>
 
-        <div class="messages" id="messages"></div>
+        <!-- MESSAGES -->
+        <div class="messages hidden" id="messages"></div>
+
+        <!-- TYPING INDICATOR -->
+        <div class="typing-indicator hidden" id="typingIndicator">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
       </div>
     </section>
 
-    <!-- COMPOSER -->
+    <!-- MESSAGE COMPOSER -->
     <div class="composer-wrap">
-      <div class="composer">
+      <div class="composer" id="composer">
 
-        <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.doc,.docx"
-               multiple hidden>
-
-        <button class="icon-btn" id="attachBtn" aria-label="Attach files">
+        <button class="icon-btn" id="attachBtn" aria-label="Attach file">
           <svg viewBox="0 0 24 24">
             <path d="M12 5v14M5 12h14"/>
           </svg>
         </button>
 
-        <textarea class="message-input" id="messageInput"
-                  rows="1" placeholder="Message AXON..."></textarea>
+        <textarea
+          id="messageInput"
+          class="message-input"
+          rows="1"
+          placeholder="Message AXON..."
+          aria-label="Write a message"
+        ></textarea>
 
-        <button class="icon-btn voice-btn" id="liveVoiceBtn"
-                aria-label="Live voice chat">
+        <button
+          class="icon-btn voice-btn"
+          id="voiceBtn"
+          aria-label="Voice mode"
+        >
           <svg viewBox="0 0 24 24">
-            <path d="M3 10v4M7 6v12M11 3v18M15 7v10M19 10v4M23 9v6"/>
+            <rect x="9" y="2" width="6" height="13" rx="3"/>
+            <path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/>
           </svg>
         </button>
 
-        <button class="send-btn" id="sendBtn" aria-label="Send message">
+        <button
+          class="send-btn"
+          id="sendBtn"
+          aria-label="Send message"
+        >
           <svg viewBox="0 0 24 24">
             <path d="M12 19V5M5 12l7-7 7 7"/>
           </svg>
         </button>
+
       </div>
 
-      <div id="attachmentInfo" class="attachment-info"></div>
+      <input
+        type="file"
+        id="fileInput"
+        class="hidden"
+        accept="image/*,.pdf,.txt,.doc,.docx"
+      >
     </div>
+
   </main>
-
-  <!-- FULL-SCREEN SETTINGS PAGE -->
-  <section class="full-page hidden" id="settingsPage">
-    <header class="page-header">
-      <button class="icon-btn back-btn" data-back aria-label="Back">
-        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6M9 12h12"/></svg>
-      </button>
-      <h2>Settings</h2>
-    </header>
-
-    <div class="page-content">
-      <div class="page-intro">
-        <h1>Settings</h1>
-        <p>Customize your AXON experience.</p>
-      </div>
-
-      <div class="setting-group">
-        <label for="languageSelect">Chat language</label>
-        <select id="languageSelect">
-          <option value="English">English</option>
-          <option value="Hindi">Hindi</option>
-          <option value="Korean">Korean</option>
-          <option value="Tamil">Tamil</option>
-          <option value="Urdu">Urdu</option>
-          <option value="Hinglish">Hinglish</option>
-        </select>
-      </div>
-
-      <div class="setting-group">
-        <label for="themeSelect">Appearance</label>
-        <select id="themeSelect">
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
-      </div>
-
-      <div class="setting-group">
-        <label for="workerUrl">API Worker URL</label>
-        <input id="workerUrl" type="url"
-               placeholder="https://your-worker.workers.dev">
-        <small>Use your staging Worker URL while testing.</small>
-      </div>
-
-      <button class="primary-btn" id="saveSettingsBtn">Save Settings</button>
-    </div>
-  </section>
-
-  <!-- FULL-SCREEN PERSONAL DETAILS PAGE -->
-  <section class="full-page hidden" id="profilePage">
-    <header class="page-header">
-      <button class="icon-btn back-btn" data-back aria-label="Back">
-        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6M9 12h12"/></svg>
-      </button>
-      <h2>Personal Details</h2>
-    </header>
-
-    <div class="page-content">
-      <div class="page-intro">
-        <h1>Personal Details</h1>
-        <p>Manage your profile information.</p>
-      </div>
-
-      <div class="profile-avatar">
-        <img id="profileAvatar" src="male-avatar.png" alt="Profile avatar">
-      </div>
-
-      <div class="setting-group">
-        <label for="profileName">Your name</label>
-        <input id="profileName" type="text" placeholder="Enter your name">
-      </div>
-
-      <div class="setting-group">
-        <label for="profileBio">About you</label>
-        <textarea id="profileBio" rows="3"
-                  placeholder="Write something about yourself"></textarea>
-      </div>
-
-      <div class="setting-group">
-        <label for="avatarSelect">Avatar</label>
-        <select id="avatarSelect">
-          <option value="male-avatar.png">Avatar 1</option>
-          <option value="female-avatar.png">Avatar 2</option>
-        </select>
-      </div>
-
-      <button class="primary-btn" id="saveProfileBtn">Save Details</button>
-    </div>
-  </section>
-
-  <!-- LOGIN PAGE -->
-  <section class="full-page hidden" id="loginPage">
-    <header class="page-header">
-      <button class="icon-btn back-btn" data-back aria-label="Back">
-        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6M9 12h12"/></svg>
-      </button>
-      <h2>Account</h2>
-    </header>
-
-    <div class="page-content">
-      <div class="page-intro">
-        <h1>Login / Sign up</h1>
-        <p>Account access will be connected when authentication is configured.</p>
-      </div>
-      <p class="info-note">
-        Account login is not active yet. Do not enter or save passwords here.
-      </p>
-    </div>
-  </section>
-
-  <!-- LIVE VOICE PAGE -->
-  <section class="full-page hidden" id="voicePage">
-    <header class="page-header">
-      <button class="icon-btn back-btn" data-back aria-label="Back">
-        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6M9 12h12"/></svg>
-      </button>
-      <h2>Live Voice Chat</h2>
-    </header>
-
-    <div class="voice-page-content">
-      <div class="voice-orb">
-        <svg viewBox="0 0 24 24">
-          <path d="M3 10v4M7 6v12M11 3v18M15 7v10M19 10v4"/>
-        </svg>
-      </div>
-      <h2>AXON Voice</h2>
-      <p id="voiceStatus">Live voice connection is not configured yet.</p>
-      <button class="primary-btn" id="voiceCloseBtn">Back to Chat</button>
-    </div>
-  </section>
-
-  <!-- CONTEXT MENU -->
-  <div class="context-menu hidden" id="contextMenu"></div>
-
-  <!-- NOTIFICATION -->
-  <div class="toast hidden" id="toast"></div>
-
 </div>
-</body>
-</html>
 
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay hidden" id="sidebarOverlay"></div>
+
+<!-- CONTEXT MENU -->
+<div class="context-menu hidden" id="contextMenu">
+  <button id="copyMessageBtn">
+    <svg viewBox="0 0 24 24">
+      <rect x="8" y="8" width="12" height="12" rx="2"/>
+      <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>
+    </svg>
+    <span>Copy message</span>
+  </button>
+
+  <button id="editMessageBtn">
+    <svg viewBox="0 0 24 24">
+      <path d="M12 20h9"/>
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/>
+    </svg>
+    <span>Edit message</span>
+  </button>
+</div>
+
+<!-- TOAST -->
+<div class="toast hidden" id="toast"></div>
+
+<!-- SETTINGS PAGE -->
+<section class="full-page hidden" id="settingsPage">
+  <header class="page-header">
+    <button class="icon-btn" data-back aria-label="Back">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 12H5m7 7-7-7 7-7"/>
+      </svg>
+    </button>
+    <h2>Settings</h2>
+  </header>
+
+  <div class="page-content">
+    <div class="setting-group">
+      <h3>Language</h3>
+      <p>Choose the language AXON should use in chats.</p>
+
+      <select id="languageSelect">
+        <option value="English">English</option>
+        <option value="Hindi">Hindi</option>
+        <option value="Korean">Korean</option>
+        <option value="Tamil">Tamil</option>
+        <option value="Urdu">Urdu</option>
+        <option value="Hinglish">Hinglish</option>
+      </select>
+    </div>
+
+    <div class="setting-group">
+      <h3>Appearance</h3>
+      <p>Choose how AXON looks on your device.</p>
+
+      <select id="themeSelect">
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </div>
+
+    <div class="setting-group">
+      <h3>AI connection</h3>
+      <p>Worker URL used to connect AXON to its AI service.</p>
+
+      <input
+        type="url"
+        id="workerUrlInput"
+        placeholder="Enter Worker URL"
+      >
+
+      <button class="page-action-btn" id="saveWorkerUrlBtn">
+        Save connection
+      </button>
+    </div>
+
+    <div class="setting-group">
+      <h3>About AXON</h3>
+      <p>Designer: Rachit</p>
+      <p>AI Model: Meta</p>
+      <p>Product: AXON AI Chat</p>
+    </div>
+  </div>
+</section>
+
+<!-- PERSONAL DETAILS PAGE -->
+<section class="full-page hidden" id="profilePage">
+  <header class="page-header">
+    <button class="icon-btn" data-back aria-label="Back">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 12H5m7 7-7-7 7-7"/>
+      </svg>
+    </button>
+    <h2>Personal Details</h2>
+  </header>
+
+  <div class="page-content">
+    <div class="profile-avatars">
+      <button class="avatar-option" data-avatar="male-avatar.png">
+        <img src="male-avatar.png" alt="Avatar option one">
+      </button>
+
+      <button class="avatar-option" data-avatar="female-avatar.png">
+        <img src="female-avatar.png" alt="Avatar option two">
+      </button>
+    </div>
+
+    <div class="setting-group">
+      <h3>Profile name</h3>
+      <input
+        type="text"
+        id="profileNameInput"
+        placeholder="Your name"
+      >
+    </div>
+
+    <button class="page-action-btn" id="saveProfileBtn">
+      Save details
+    </button>
+  </div>
+</section>
+
+<!-- LOGIN PAGE -->
+<section class="full-page hidden" id="loginPage">
+  <header class="page-header">
+    <button class="icon-btn" data-back aria-label="Back">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 12H5m7 7-7-7 7-7"/>
+      </svg>
+    </button>
+    <h2>Account</h2>
+  </header>
+
+  <div class="page-content">
+    <h3>Account access</h3>
+    <p>Account features are not connected yet.</p>
+  </div>
+</section>
+
+<!-- VOICE PAGE -->
+<section class="full-page hidden" id="voicePage">
+  <header class="page-header">
+    <button class="icon-btn" data-back aria-label="Back">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 12H5m7 7-7-7 7-7"/>
+      </svg>
+    </button>
+    <h2>Voice mode</h2>
+  </header>
+
+  <div class="voice-screen">
+    <div class="voice-orb">
+      <svg viewBox="0 0 24 24">
+        <rect x="9" y="2" width="6" height="13" rx="3"/>
+        <path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/>
+      </svg>
+    </div>
+
+    <h2>AXON Voice</h2>
+    <p>Voice mode interface preview</p>
+    <p class="voice-note">Live voice conversation is not connected yet.</p>
+  </div>
+</section>
+
+<script>
+/* =====================================
+   AXON AI — PART 3: CORE JAVASCRIPT
+===================================== */
+
+const API_DEFAULT = "https://axon-api-staging.axontechno.workers.dev/";
+
+const $ = (id) => document.getElementById(id);
+
+const appState = {
+  chats: [],
+  activeChatId: null,
+  workerUrl: localStorage.getItem("axon_worker_url") || API_DEFAULT,
+  language: localStorage.getItem("axon_language") || "English",
+  theme: localStorage.getItem("axon_theme") || "light",
+  profileName: localStorage.getItem("axon_profile_name") || "",
+  avatar: localStorage.getItem("axon_user_avatar") || "",
+  busy: false,
+  editingIndex: null
+};
+
+/* SAFE LOCAL STORAGE */
+
+function saveChats() {
+  localStorage.setItem("axon_chats", JSON.stringify(appState.chats));
+}
+
+function loadChats() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("axon_chats") || "[]");
+    appState.chats = Array.isArray(saved) ? saved : [];
+  } catch {
+    appState.chats = [];
+  }
+
+  if (appState.chats.length > 0) {
+    appState.activeChatId = appState.chats[0].id;
+  }
+}
+
+/* CURRENT CHAT */
+
+function getActiveChat() {
+  return appState.chats.find(
+    chat => chat.id === appState.activeChatId
+  ) || null;
+}
+
+function createNewChat() {
+  const chat = {
+    id: Date.now().toString(),
+    title: "New chat",
+    messages: [],
+    createdAt: Date.now()
+  };
+
+  appState.chats.unshift(chat);
+  appState.activeChatId = chat.id;
+  appState.editingIndex = null;
+
+  saveChats();
+  renderHistory();
+  renderMessages();
+}
+
+/* CHAT HISTORY */
+
+function renderHistory() {
+  const list = $("historyList");
+  if (!list) return;
+
+  list.replaceChildren();
+
+  appState.chats.forEach(chat => {
+    const button = document.createElement("button");
+    button.className = "history-item";
+    button.textContent = chat.title || "New chat";
+    button.dataset.chatId = chat.id;
+
+    if (chat.id === appState.activeChatId) {
+      button.classList.add("active");
+    }
+
+    button.addEventListener("click", () => {
+      appState.activeChatId = chat.id;
+      appState.editingIndex = null;
+      renderHistory();
+      renderMessages();
+      closeSidebar();
+    });
+
+    list.appendChild(button);
+  });
+}
+
+/* MESSAGE ELEMENT */
+
+function createMessageElement(message, index) {
+  const wrapper = document.createElement("article");
+  wrapper.className = `message ${message.role}`;
+
+  const content = document.createElement("div");
+  content.className = "message-content";
+  content.textContent = message.content || "";
+
+  wrapper.appendChild(content);
+
+  const actions = document.createElement("div");
+  actions.className = "message-actions";
+
+  const copyButton = document.createElement("button");
+  copyButton.className = "icon-btn";
+  copyButton.type = "button";
+  copyButton.setAttribute("aria-label", "Copy message");
+  copyButton.innerHTML = `
+    <svg viewBox="0 0 24 24">
+      <rect x="8" y="8" width="12" height="12" rx="2"/>
+      <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>
+    </svg>
+  `;
+
+  copyButton.addEventListener("click", () => {
+    copyText(message.content || "");
+  });
+
+  actions.appendChild(copyButton);
+
+  if (message.role === "user") {
+    const editButton = document.createElement("button");
+    editButton.className = "icon-btn";
+    editButton.type = "button";
+    editButton.setAttribute("aria-label", "Edit message");
+    editButton.innerHTML = `
+      <svg viewBox="0 0 24 24">
+        <path d="M12 20h9"/>
+        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/>
+      </svg>
+    `;
+
+    editButton.addEventListener("click", () => {
+      startEditing(index);
+    });
+
+    actions.appendChild(editButton);
+  }
+
+  wrapper.appendChild(actions);
+
+  return wrapper;
+}
+
+/* RENDER MESSAGES */
+
+function renderMessages() {
+  const chat = getActiveChat();
+  const welcome = $("welcomeScreen");
+  const messagesBox = $("messages");
+
+  if (!welcome || !messagesBox) return;
+
+  messagesBox.replaceChildren();
+
+  if (!chat || chat.messages.length === 0) {
+    welcome.classList.remove("hidden");
+    messagesBox.classList.add("hidden");
+  } else {
+    welcome.classList.add("hidden");
+    messagesBox.classList.remove("hidden");
+
+    chat.messages.forEach((message, index) => {
+      messagesBox.appendChild(
+        createMessageElement(message, index)
+      );
+    });
+  }
+
+  scrollToBottom();
+}
+
+/* SCROLL */
+
+function scrollToBottom() {
+  const area = $("chatArea");
+  if (!area) return;
+
+  requestAnimationFrame(() => {
+    area.scrollTop = area.scrollHeight;
+  });
+}
+
+/* COPY TEXT */
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast("Copied");
+  } catch {
+    showToast("Copy not available");
+  }
+}
+
+/* TOAST MESSAGE */
+
+let toastTimer;
+
+function showToast(message) {
+  const toast = $("toast");
+  if (!toast) return;
+
+  toast.textContent = message;
+  toast.classList.remove("hidden");
+
+  clearTimeout(toastTimer);
+
+  toastTimer = setTimeout(() => {
+    toast.classList.add("hidden");
+  }, 2200);
+}
+
+/* EDIT USER MESSAGE */
+
+function startEditing(index) {
+  const chat = getActiveChat();
+  if (!chat) return;
+
+  const message = chat.messages[index];
+  if (!message || message.role !== "user") return;
+
+  appState.editingIndex = index;
+
+  const input = $("messageInput");
+  if (!input) return;
+
+  input.value = message.content;
+  input.focus();
+
+  showToast("Edit your message, then send it");
+}
+
+/* UPDATE CHAT TITLE */
+
+function updateChatTitle(chat, firstMessage) {
+  if (!chat || chat.messages.length > 1) return;
+
+  const cleanTitle = firstMessage.trim().replace(/\s+/g, " ");
+  chat.title = cleanTitle.length >  30
+    ? cleanTitle.slice(0, 30) + "..."
+    : cleanTitle || "New chat";
+}
+
+/* SHOW TYPING STATUS */
+
+function setTyping(show) {
+  const indicator = $("typingIndicator");
+  if (!indicator) return;
+
+  indicator.classList.toggle("hidden", !show);
+
+  if (show) {
+    scrollToBottom();
+  }
+}
+
+/* AI REQUEST */
+
+async function requestAxonAI(userText) {
+  const chat = getActiveChat();
+  if (!chat) throw new Error("No active chat");
+
+  const conversation = chat.messages.map(message => ({
+    role: message.role,
+    content: message.content
+  }));
+
+  const response = await fetch(appState.workerUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message: userText,
+      messages: conversation,
+      language: appState.language
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error("AI connection failed: " + response.status);
+  }
+
+  const data = await response.json();
+
+  const answer =
+    data.reply ||
+    data.response ||
+    data.answer ||
+    data.result;
+
+  if (typeof answer !== "string" || !answer.trim()) {
+    throw new Error("AI returned an empty response");
+  }
+
+  return answer.trim();
+}
+
+/* SEND MESSAGE */
+
+async function sendMessage() {
+  if (appState.busy) return;
+
+  const input = $("messageInput");
+  if (!input) return;
+
+  const text = input.value.trim();
+  if (!text) return;
+
+  if (!getActiveChat()) {
+    createNewChat();
+  }
+
+  const chat = getActiveChat();
+  if (!chat) return;
+
+  const editingIndex = appState.editingIndex;
+
+  if (editingIndex !== null) {
+    const oldMessage = chat.messages[editingIndex];
+
+    if (!oldMessage || oldMessage.role !== "user") {
+      appState.editingIndex = null;
+      return;
+    }
+
+    chat.messages = chat.messages.slice(0, editingIndex);
+    appState.editingIndex = null;
+  }
+
+  const userMessage = {
+    role: "user",
+    content: text
+  };
+
+  chat.messages.push(userMessage);
+
+  updateChatTitle(chat, text);
+
+  input.value = "";
+  input.style.height = "41px";
+
+  appState.busy = true;
+  $("sendBtn").disabled = true;
+
+  saveChats();
+  renderHistory();
+  renderMessages();
+  setTyping(true);
+
+  try {
+    const answer = await requestAxonAI(text);
+
+    chat.messages.push({
+      role: "assistant",
+      content: answer
+    });
+
+  } catch (error) {
+    chat.messages.push({
+      role: "assistant",
+      content: "I couldn't connect right now. Please check the AI connection and try again."
+    });
+
+    console.error("AXON request error:", error);
+
+  } finally {
+    appState.busy = false;
+    $("sendBtn").disabled = false;
+
+    setTyping(false);
+    saveChats();
+    renderHistory();
+    renderMessages();
+    input.focus();
+  }
+}
+
+/* INITIAL LOAD */
+
+function initializeAxon() {
+  loadChats();
+
+  if (!getActiveChat()) {
+    createNewChat();
+  }
+
+  renderHistory();
+  renderMessages();
+
+  if ($("workerUrlInput")) {
+    $("workerUrlInput").value = appState.workerUrl;
+  }
+
+  if ($("languageSelect")) {
+    $("languageSelect").value = appState.language;
+  }
+
+  if ($("themeSelect")) {
+    $("themeSelect").value = appState.theme;
+  }
+
+  applyTheme();
+}
+
+  </script>
+ 
 <style>
-/* FULL SCREEN PAGES */
+/* EXTRA PAGE STYLES */
 
 .full-page {
   position: absolute;
-  inset: 0;
-  z-index: 40;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
+  inset: 62px 0 0;
+  z-index: 20;
   background: var(--bg);
-  animation: pageEnter .3s cubic-bezier(.2,.8,.2,1) both;
+  overflow-y: auto;
 }
 
 .page-header {
-  height: 62px;
-  padding: 0 16px;
+  height: 58px;
   display: flex;
   align-items: center;
   gap: 12px;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  background: rgba(255,255,255,.94);
+  padding: 0 16px;
   border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(12px);
+  background: var(--surface);
 }
 
 .page-header h2 {
-  font-size: 16px;
-  font-weight: 650;
-}
-
-.back-btn {
-  color: #6550b7;
+  font-size: 17px;
 }
 
 .page-content {
   width: 100%;
-  max-width: 650px;
+  max-width: 700px;
   margin: 0 auto;
-  padding: 32px 22px 55px;
-  animation: contentEnter .4s ease both;
+  padding: 24px 18px 40px;
 }
 
-.page-intro {
-  margin-bottom: 30px;
+.page-content > h3 {
+  margin-bottom: 10px;
 }
 
-.page-intro h1 {
-  font-size: 27px;
-  margin-bottom: 8px;
-  letter-spacing: -.5px;
-}
-
-.page-intro p {
+.page-content > p {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
 }
 
-/* SETTINGS INPUTS */
-
 .setting-group {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  margin-bottom: 23px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
 }
 
-.setting-group label {
+.setting-group h3 {
+  font-size: 15px;
+  margin-bottom: 7px;
+}
+
+.setting-group p {
+  color: var(--muted);
   font-size: 13px;
-  font-weight: 650;
-  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 9px;
 }
 
 .setting-group input,
-.setting-group select,
-.setting-group textarea {
+.setting-group select {
   width: 100%;
-  min-height: 47px;
-  padding: 12px 13px;
-  color: var(--text);
+  min-height: 43px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  outline: none;
-  font-size: 14px;
-  transition: border-color .2s, box-shadow .2s;
+  color: var(--text);
+  padding: 0 12px;
+  margin-top: 7px;
 }
 
-.setting-group textarea {
-  resize: vertical;
-}
-
-.setting-group input:focus,
-.setting-group select:focus,
-.setting-group textarea:focus {
-  border-color: #a995ed;
-  box-shadow: 0 0 0 3px rgba(118,85,232,.09);
-}
-
-.setting-group small {
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.5;
-}
-
-.primary-btn {
-  min-height: 46px;
-  padding: 0 21px;
+.page-action-btn {
+  min-height: 42px;
+  padding: 0 16px;
   border: 0;
-  border-radius: 12px;
-  background: linear-gradient(110deg, #7958e8, #c274d5);
+  border-radius: 11px;
+  background: linear-gradient(110deg,#7958e8,#bd75d8);
   color: white;
-  font-weight: 650;
-  font-size: 13px;
-  transition: transform .2s, filter .2s, box-shadow .2s;
+  font-weight: 600;
+  margin-top: 12px;
 }
 
-.primary-btn:hover {
-  filter: brightness(1.06);
-  box-shadow: 0 5px 18px rgba(118,85,232,.2);
-}
-
-.primary-btn:active {
-  transform: scale(.97);
-}
-
-.info-note {
-  padding: 15px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-/* PROFILE */
-
-.profile-avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #f0ecfa;
-  border: 3px solid #eee8ff;
-  margin: 0 auto 28px;
+.profile-avatars {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 15px;
+  margin-bottom: 24px;
 }
 
-.profile-avatar img {
+.avatar-option {
+  width: 76px;
+  height: 76px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.avatar-option.selected {
+  border-color: var(--purple);
+}
+
+.avatar-option img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* VOICE PAGE */
-
-.voice-page-content {
-  min-height: calc(100% - 62px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 25px;
-  animation: contentEnter .45s ease both;
-}
-
-.voice-orb {
-  width: 125px;
-  height: 125px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  background: linear-gradient(135deg, #7655e8, #dc83c6);
-  box-shadow: 0 0 0 12px rgba(118,85,232,.07),
-              0 0 0 25px rgba(118,85,232,.035);
-  animation: orbPulse 2.4s ease-in-out infinite;
-  margin-bottom: 35px;
-}
-
-.voice-orb svg {
-  width: 43px;
-  height: 43px;
-}
-
-.voice-page-content h2 {
-  font-size: 23px;
-  margin-bottom: 10px;
-}
-
-.voice-page-content p {
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.6;
-  max-width: 280px;
-  margin-bottom: 25px;
-}
-
-/* SIDEBAR BACKDROP */
-
-.sidebar-backdrop {
+.sidebar-overlay {
   position: absolute;
   inset: 0;
-  z-index: 20;
-  background: rgba(20,15,35,.24);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity .3s, visibility .3s;
+  z-index: 25;
+  background: rgba(20,15,35,.25);
 }
-
-.sidebar-backdrop.show {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* CONTEXT MENU */
 
 .context-menu {
   position: fixed;
   z-index: 100;
-  min-width: 165px;
+  min-width: 175px;
   padding: 6px;
-  background: white;
   border: 1px solid var(--border);
-  border-radius: 13px;
+  border-radius: 12px;
+  background: var(--surface);
   box-shadow: var(--shadow);
-  animation: menuEnter .16s ease both;
 }
 
 .context-menu button {
   width: 100%;
-  min-height: 39px;
+  min-height: 40px;
   padding: 0 10px;
   display: flex;
   align-items: center;
@@ -1040,855 +1463,496 @@ svg {
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: #454550;
-  font-size: 13px;
+  color: var(--text);
   text-align: left;
+  font-size: 13px;
 }
 
 .context-menu button:hover {
   background: var(--hover);
 }
 
-.context-menu button svg {
+.context-menu svg {
   width: 17px;
   height: 17px;
 }
 
-.context-menu button.danger {
-  color: #d64c61;
-}
-
-/* ATTACHMENT INFO */
-
-.attachment-info {
-  width: 100%;
-  max-width: 790px;
-  margin: 6px auto 0;
-  color: var(--muted);
-  font-size: 11px;
-}
-
-/* TOAST */
-
 .toast {
   position: fixed;
-  z-index: 120;
-  bottom: 95px;
+  z-index: 110;
   left: 50%;
+  bottom: 90px;
   transform: translateX(-50%);
-  max-width: calc(100vw - 35px);
-  padding: 11px 17px;
-  background: #25232d;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: #292536;
   color: white;
-  border-radius: 11px;
+  font-size: 13px;
   box-shadow: var(--shadow);
-  font-size: 12px;
+}
+
+.typing-indicator {
+  display: flex;
+  gap: 5px;
+  padding: 12px 4px;
+}
+
+.typing-indicator span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #987de8;
+  animation: typingPulse 1s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: .15s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: .3s;
+}
+
+@keyframes typingPulse {
+  0%, 60%, 100% { opacity: .35; }
+  30% { opacity: 1; }
+}
+
+.voice-screen {
+  min-height: 75%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
-  animation: toastEnter .22s ease both;
+  padding: 25px;
+}
+
+.voice-orb {
+  width: 100px;
+  height: 100px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: white;
+  background: linear-gradient(135deg,#7958e8,#d77acb);
+  margin-bottom: 22px;
+}
+
+.voice-orb svg {
+  width: 35px;
+  height: 35px;
+}
+
+.voice-screen h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.voice-screen p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.voice-screen .voice-note {
+  margin-top: 12px;
+  font-size: 12px;
 }
 
 /* DARK THEME */
 
 body.dark {
-  --bg: #17151d;
-  --surface: #211e29;
-  --text: #f3f0fa;
-  --muted: #aaa3b8;
-  --border: #35303f;
-  --user: #302a43;
+  --bg: #17151e;
+  --surface: #211e2a;
+  --text: #f3f0f8;
+  --muted: #aaa4b5;
+  --border: #383342;
+  --user: #302b45;
   --hover: #302b3a;
   --shadow: 0 8px 30px rgba(0,0,0,.25);
 }
 
-body.dark .sidebar,
-body.dark .topbar,
-body.dark .page-header {
+body.dark .sidebar {
   background: #1d1a25;
+}
+
+body.dark .topbar {
+  background: #211e2a;
   border-color: var(--border);
 }
 
-body.dark .history-item,
-body.dark .nav-item,
-body.dark .context-menu button {
-  color: #e2ddec;
-}
-
-body.dark .history-item:hover,
-body.dark .history-item.active,
-body.dark .nav-item:hover,
-body.dark .context-menu button:hover {
-  background: #302b3a;
-}
-
 body.dark .composer {
-  background: #211e29;
+  background: #211e2a;
   border-color: var(--border);
 }
 
 body.dark .composer-wrap {
-  background: linear-gradient(to top, #211b2d, #17151d 75%);
+  background: linear-gradient(to top,#211e2a 0%,#17151e 65%);
 }
 
 body.dark .suggestion,
-body.dark .context-menu {
-  background: #211e29;
-  border-color: var(--border);
+body.dark .new-chat {
+  background: #292437;
+  color: #ded5ff;
+  border-color: #403750;
+}
+
+body.dark .history-item {
   color: var(--text);
 }
 
-body.dark .page-header {
-  backdrop-filter: blur(12px);
-}
-
-/* ANIMATION KEYFRAMES */
-
-@keyframes pageEnter {
-  from { opacity: 0; transform: translateX(12px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes contentEnter {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes menuEnter {
-  from { opacity: 0; transform: translateY(5px) scale(.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes toastEnter {
-  from { opacity: 0; transform: translate(-50%, 8px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
-}
-
-@keyframes orbPulse {
-  0%, 100% { box-shadow: 0 0 0 12px rgba(118,85,232,.07), 0 0 0 25px rgba(118,85,232,.035); }
-  50% { box-shadow: 0 0 0 18px rgba(118,85,232,.09), 0 0 0 34px rgba(118,85,232,.025); }
-}
-
-@media (max-width: 600px) {
-  .page-content { padding: 25px 17px 45px; }
-  .page-intro h1 { font-size: 24px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .voice-orb { animation: none; }
+body.dark .history-item:hover,
+body.dark .history-item.active {
+  background: #302b3a;
 }
 </style>
 
 <script>
-/* AXON AI — CORE LOGIC */
-
-const API_DEFAULT = "https://axon-api-staging.axontechno.workers.dev";
-
-const $ = id => document.getElementById(id);
-
-const state = {
-  chats: JSON.parse(localStorage.getItem("axon_chats") || "[]"),
-  currentChatId: null,
-  currentPage: "chat",
-  menuTarget: null,
-  longPressTimer: null,
-  longPressTriggered: false,
-  attachedFiles: []
-};
-
-let workerUrl = localStorage.getItem("axon_worker_url") || API_DEFAULT;
-let language = localStorage.getItem("axon_language") || "English";
-let theme = localStorage.getItem("axon_theme") || "light";
-let profile = JSON.parse(localStorage.getItem("axon_profile") || "{}");
-
-function saveChats() {
-  localStorage.setItem("axon_chats", JSON.stringify(state.chats));
-}
-
-function makeId() {
-  return "chat_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
-}
-
-function currentChat() {
-  return state.chats.find(chat => chat.id === state.currentChatId);
-}
-
-function createChat() {
-  const chat = {
-    id: makeId(),
-    title: "New Chat",
-    messages: [],
-    pinned: false,
-    pinnedAt: 0,
-    updatedAt: Date.now()
-  };
-
-  state.chats.unshift(chat);
-  state.currentChatId = chat.id;
-  saveChats();
-  renderHistory();
-  renderMessages();
-  return chat;
-}
-
-function newChat() {
-  state.currentChatId = null;
-  renderMessages();
-  closeSidebar();
-}
-
-function getChatTitle(text) {
-  const clean = text.trim().replace(/\s+/g, " ");
-  return clean.length > 32 ? clean.slice(0, 32) + "..." : clean;
-}
-
-/* HISTORY */
-
-function renderHistory() {
-  const pinnedList = $("pinnedList");
-  const recentList = $("recentList");
-
-  pinnedList.replaceChildren();
-  recentList.replaceChildren();
-
-  const pinned = state.chats
-    .filter(chat => chat.pinned)
-    .sort((a, b) => b.pinnedAt - a.pinnedAt);
-
-  const recent = state.chats
-    .filter(chat => !chat.pinned)
-    .sort((a, b) => b.updatedAt - a.updatedAt);
-
-  function createHistoryButton(chat) {
-    const button = document.createElement("button");
-    button.className = "history-item";
-    button.textContent = chat.title || "New Chat";
-    button.dataset.chatId = chat.id;
-
-    if (chat.id === state.currentChatId) {
-      button.classList.add("active");
-    }
-
-    button.addEventListener("click", () => {
-      if (state.longPressTriggered) {
-        state.longPressTriggered = false;
-        return;
-      }
-      openChat(chat.id);
-    });
-
-    addLongPress(button, () => {
-      state.menuTarget = { type: "chat", id: chat.id };
-      showContextMenu(button, [
-        {
-          label: chat.pinned ? "Unpin chat" : "Pin chat",
-          icon: chat.pinned ? "pin-off" : "pin",
-          action: () => togglePin(chat.id)
-        },
-        {
-          label: "Delete chat",
-          icon: "trash",
-          danger: true,
-          action: () => deleteChat(chat.id)
-        }
-      ]);
-    });
-
-    return button;
-  }
-
-  pinned.forEach(chat => pinnedList.appendChild(createHistoryButton(chat)));
-  recent.forEach(chat => recentList.appendChild(createHistoryButton(chat)));
-}
-
-function openChat(id) {
-  const chat = state.chats.find(item => item.id === id);
-  if (!chat) return;
-
-  state.currentChatId = id;
-  renderHistory();
-  renderMessages();
-  closeSidebar();
-}
-
-function togglePin(id) {
-  const chat = state.chats.find(item => item.id === id);
-  if (!chat) return;
-
-  chat.pinned = !chat.pinned;
-  chat.pinnedAt = chat.pinned ? Date.now() : 0;
-  saveChats();
-  renderHistory();
-  hideContextMenu();
-  showToast(chat.pinned ? "Chat pinned" : "Chat unpinned");
-}
-
-function deleteChat(id) {
-  const chat = state.chats.find(item => item.id === id);
-  if (!chat) return;
-
-  if (!confirm("Delete this chat permanently?")) return;
-
-  state.chats = state.chats.filter(item => item.id !== id);
-
-  if (state.currentChatId === id) {
-    state.currentChatId = null;
-    renderMessages();
-  }
-
-  saveChats();
-  renderHistory();
-  hideContextMenu();
-  showToast("Chat deleted");
-}
-
-/* MESSAGE RENDERING */
-
-function renderMessages() {
-  const messages = $("messages");
-  const welcome = $("welcome");
-
-  messages.replaceChildren();
-
-  const chat = currentChat();
-  const hasMessages = !!(chat && chat.messages.length);
-
-  welcome.classList.toggle("hidden", hasMessages);
-
-  if (!hasMessages) return;
-
-  chat.messages.forEach((message, index) => {
-    messages.appendChild(createMessageElement(message, index));
-  });
-
-  requestAnimationFrame(() => {
-    $("chatArea").scrollTop = $("chatArea").scrollHeight;
-  });
-}
-
-function createMessageElement(message, index) {
-  const wrapper = document.createElement("div");
-  wrapper.className = "message " + message.role;
-
-  const content = document.createElement("div");
-  content.className = "message-content";
-  content.textContent = message.content;
-
-  wrapper.appendChild(content);
-
-  if (message.role === "assistant") {
-    const actions = document.createElement("div");
-    actions.className = "message-actions";
-
-    actions.appendChild(actionButton("copy", "Copy", () => {
-      copyText(message.content);
-    }));
-
-    const like = actionButton("thumb-up", "Like", () => {
-      setReaction(index, "like", like, dislike);
-    });
-
-    const dislike = actionButton("thumb-down", "Dislike", () => {
-      setReaction(index, "dislike", dislike, like);
-    });
-
-    if (message.reaction === "like") like.classList.add("selected");
-    if (message.reaction === "dislike") dislike.classList.add("selected");
-
-    actions.append(like, dislike);
-    wrapper.appendChild(actions);
-  }
-
-  if (message.role === "user") {
-    addLongPress(wrapper, () => {
-      state.menuTarget = { type: "message", index };
-      showContextMenu(wrapper, [
-        {
-          label: "Copy message",
-          icon: "copy",
-          action: () => copyText(message.content)
-        },
-        {
-          label: "Edit message",
-          icon: "edit",
-          action: () => editMessage(index)
-        }
-      ]);
-    });
-  }
-
-  return wrapper;
-}
-
-function actionButton(iconName, label, callback) {
-  const button = document.createElement("button");
-  button.className = "icon-btn";
-  button.type = "button";
-  button.setAttribute("aria-label", label);
-  button.title = label;
-  button.innerHTML = icon(iconName);
-  button.addEventListener("click", callback);
-  return button;
-}
-
-function setReaction(index, reaction, selectedButton, otherButton) {
-  const chat = currentChat();
-  if (!chat || !chat.messages[index]) return;
-
-  const message = chat.messages[index];
-  message.reaction = message.reaction === reaction ? null : reaction;
-
-  selectedButton.classList.toggle("selected", message.reaction === reaction);
-  otherButton.classList.remove("selected");
-
-  saveChats();
-}
-
-function addMessage(role, content) {
-  let chat = currentChat();
-  if (!chat) chat = createChat();
-
-  const message = {
-    role,
-    content,
-    time: Date.now()
-  };
-
-  chat.messages.push(message);
-  chat.updatedAt = Date.now();
-
-  if (role === "user" && chat.title === "New Chat") {
-    chat.title = getChatTitle(content);
-  }
-
-  saveChats();
-  renderHistory();
-  renderMessages();
-}
-
-/* EDIT USER MESSAGE */
-
-function editMessage(index) {
-  const chat = currentChat();
-  if (!chat || !chat.messages[index]) return;
-
-  const message = chat.messages[index];
-  if (message.role !== "user") return;
-
-  $("messageInput").value = message.content;
-  $("messageInput").focus();
-
-  chat.messages.splice(index);
-  chat.updatedAt = Date.now();
-
-  saveChats();
-  renderMessages();
-  hideContextMenu();
-}
-
-/* COPY */
-
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast("Copied");
-  } catch {
-    const area = document.createElement("textarea");
-    area.value = text;
-    document.body.appendChild(area);
-    area.select();
-    document.execCommand("copy");
-    area.remove();
-    showToast("Copied");
-  }
-}
-
-/* LONG PRESS */
-
-function addLongPress(element, callback) {
-  element.addEventListener("pointerdown", event => {
-    if (event.button !== 0 && event.pointerType === "mouse") return;
-
-    state.longPressTriggered = false;
-    clearTimeout(state.longPressTimer);
-
-    state.longPressTimer = setTimeout(() => {
-      state.longPressTriggered = true;
-      callback();
-    }, 550);
-  });
-
-  ["pointerup", "pointerleave", "pointercancel"].forEach(type => {
-    element.addEventListener(type, () => {
-      clearTimeout(state.longPressTimer);
-    });
-  });
-
-  element.addEventListener("contextmenu", event => {
-    event.preventDefault();
-  });
-}
-
-/* CONTEXT MENU */
-
-function showContextMenu(anchor, items) {
-  const menu = $("contextMenu");
-  menu.replaceChildren();
-
-  items.forEach(item => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.innerHTML = icon(item.icon) + "<span></span>";
-    button.querySelector("span").textContent = item.label;
-
-    if (item.danger) button.classList.add("danger");
-
-    button.addEventListener("click", () => {
-      item.action();
-      hideContextMenu();
-    });
-
-    menu.appendChild(button);
-  });
-
-  menu.classList.remove("hidden");
-
-  const rect = anchor.getBoundingClientRect();
-  const menuWidth = 175;
-  const menuHeight = items.length * 43 + 12;
-
-  let left = Math.min(rect.left, window.innerWidth - menuWidth - 10);
-  let top = Math.min(rect.bottom + 5, window.innerHeight - menuHeight - 10);
-
-  menu.style.left = Math.max(10, left) + "px";
-  menu.style.top = Math.max(10, top) + "px";
-}
-
-function hideContextMenu() {
-  $("contextMenu").classList.add("hidden");
-}
-
-document.addEventListener("pointerdown", event => {
-  if (!event.target.closest("#contextMenu")) hideContextMenu();
-});
-
-/* NOTIFICATIONS */
-
-let toastTimer;
-
-function showToast(message) {
-  const toast = $("toast");
-  toast.textContent = message;
-  toast.classList.remove("hidden");
-
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.add("hidden"), 1900);
-}
+/* =====================================
+   AXON AI — PART 4: EVENT HANDLERS
+===================================== */
 
 /* SIDEBAR */
 
 function openSidebar() {
   $("sidebar").classList.add("open");
-  $("sidebarBackdrop").classList.add("show");
+  $("sidebarOverlay").classList.remove("hidden");
 }
 
 function closeSidebar() {
   $("sidebar").classList.remove("open");
-  $("sidebarBackdrop").classList.remove("show");
+  $("sidebarOverlay").classList.add("hidden");
 }
-
-/* FULL-SCREEN PAGE NAVIGATION */
-
-function openPage(pageName) {
-  closeSidebar();
-  hideContextMenu();
-
-  ["settingsPage", "profilePage", "loginPage", "voicePage"].forEach(id => {
-    $(id).classList.add("hidden");
-  });
-
-  $("chatPage").classList.add("hidden");
-
-  const pageMap = {
-    settings: "settingsPage",
-    profile: "profilePage",
-    login: "loginPage",
-    voice: "voicePage"
-  };
-
-  const page = $(pageMap[pageName]);
-  if (page) page.classList.remove("hidden");
-
-  state.currentPage = pageName;
-}
-
-function backToChat() {
-  ["settingsPage", "profilePage", "loginPage", "voicePage"].forEach(id => {
-    $(id).classList.add("hidden");
-  });
-
-  $("chatPage").classList.remove("hidden");
-  state.currentPage = "chat";
-}
-
-/* SEND MESSAGE */
-
-async function sendMessage(textOverride) {
-  const input = $("messageInput");
-  const text = (textOverride ?? input.value).trim();
-
-  if (!text) return;
-
-  input.value = "";
-  input.style.height = "auto";
-
-  addMessage("user", text);
-
-  const chat = currentChat();
-  const sendButton = $("sendBtn");
-  sendButton.disabled = true;
-
-  const typing = document.createElement("div");
-  typing.className = "message assistant";
-  typing.id = "typingIndicator";
-
-  const typingText = document.createElement("div");
-  typingText.className = "message-content";
-  typingText.textContent = "AXON is thinking...";
-  typing.appendChild(typingText);
-  $("messages").appendChild(typing);
-
-  $("chatArea").scrollTop = $("chatArea").scrollHeight;
-
-  try {
-    const response = await fetch(workerUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        language,
-        messages: chat.messages.slice(-20).map(item => ({
-          role: item.role,
-          content: item.content
-        }))
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error("Server error: " + response.status);
-    }
-
-    const data = await response.json();
-    $("typingIndicator")?.remove();
-
-    if (!data.response) {
-      throw new Error("No response received from AXON API.");
-    }
-
-    addMessage("assistant", data.response);
-
-  } catch (error) {
-    $("typingIndicator")?.remove();
-    addMessage("assistant", "I couldn't connect right now. Please check your internet connection or API Worker settings.");
-    console.error("AXON API error:", error);
-  } finally {
-    sendButton.disabled = false;
-    input.focus();
-  }
-}
-
-/* LOAD SAVED SETTINGS */
-
-function loadSettings() {
-  $("languageSelect").value = language;
-  $("themeSelect").value = theme;
-  $("workerUrl").value = workerUrl;
-}
-
-function loadProfile() {
-  $("profileName").value = profile.name || "";
-  $("profileBio").value = profile.bio || "";
-
-  const avatar = profile.avatar || "male-avatar.png";
-  $("avatarSelect").value = avatar;
-  $("profileAvatar").src = avatar;
-}
-
-/* INITIAL RENDER */
-
-renderHistory();
-renderMessages();
-loadSettings();
-loadProfile();
-
-if (theme === "dark") document.body.classList.add("dark");
-
-/* Part 5 continues below */
-</script>
-
-<script>
-/* LUCIDE-STYLE SVG ICON LIBRARY */
-
-function icon(name) {
-  const paths = {
-    "copy": '<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>',
-    "thumb-up": '<path d="M7 10v12M15 5l-1 5h6a2 2 0 0 1 2 2l-2 8a2 2 0 0 1-2 2H7V10l5-7a2 2 0 0 1 3 2Z"/><rect x="2" y="10" width="5" height="12" rx="1"/>',
-    "thumb-down": '<path d="M7 14V2M15 19l-1-5h6a2 2 0 0 0 2-2l-2-8a2 2 0 0 0-2-2H7v12l5 7a2 2 0 0 0 3-2Z"/><rect x="2" y="2" width="5" height="12" rx="1"/>',
-    "edit": '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>',
-    "pin": '<path d="m16 3 5 5-4 1-4 4-1 5-2-2-5 5-1-1 5-5-2-2 5-1 4-4Z"/>',
-    "pin-off": '<path d="m3 3 18 18M16 3l5 5-4 1-2 2M9 9l-4 5 5 5 2-4"/>',
-    "trash": '<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/>'
-  };
-
-  return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name] || ""}</svg>`;
-}
-
-/* SIDEBAR EVENTS */
 
 $("menuBtn").addEventListener("click", openSidebar);
 $("closeSidebar").addEventListener("click", closeSidebar);
-$("sidebarBackdrop").addEventListener("click", closeSidebar);
+$("sidebarOverlay").addEventListener("click", closeSidebar);
 
-$("newChatBtn").addEventListener("click", newChat);
+/* NEW CHAT */
 
-$("settingsBtn").addEventListener("click", () => {
-  openPage("settings");
+$("newChatBtn").addEventListener("click", () => {
+  createNewChat();
+  closeSidebar();
+  $("messageInput").focus();
 });
 
-$("profileBtn").addEventListener("click", () => {
-  loadProfile();
-  openPage("profile");
-});
+/* SEND BUTTON */
 
-$("loginBtn").addEventListener("click", () => {
-  openPage("login");
-});
+$("sendBtn").addEventListener("click", sendMessage);
 
-/* FULL PAGE BACK BUTTONS */
+/* ENTER SENDS, SHIFT + ENTER ADDS NEW LINE */
 
-document.querySelectorAll("[data-back]").forEach(button => {
-  button.addEventListener("click", backToChat);
-});
-
-$("voiceCloseBtn").addEventListener("click", backToChat);
-
-/* SETTINGS SAVE */
-
-$("saveSettingsBtn").addEventListener("click", () => {
-  language = $("languageSelect").value;
-  theme = $("themeSelect").value;
-
-  const newUrl = $("workerUrl").value.trim();
-
-  if (newUrl) {
-    try {
-      const parsed = new URL(newUrl);
-      if (parsed.protocol !== "https:") {
-        showToast("Use a secure HTTPS Worker URL");
-        return;
-      }
-      workerUrl = newUrl.replace(/\/+$/, "");
-    } catch {
-      showToast("Please enter a valid Worker URL");
-      return;
-    }
-  }
-
-  localStorage.setItem("axon_language", language);
-  localStorage.setItem("axon_theme", theme);
-  localStorage.setItem("axon_worker_url", workerUrl);
-
-  document.body.classList.toggle("dark", theme === "dark");
-
-  showToast("Settings saved");
-});
-
-/* PROFILE SAVE */
-
-$("avatarSelect").addEventListener("change", () => {
-  $("profileAvatar").src = $("avatarSelect").value;
-});
-
-$("saveProfileBtn").addEventListener("click", () => {
-  profile = {
-    name: $("profileName").value.trim(),
-    bio: $("profileBio").value.trim(),
-    avatar: $("avatarSelect").value
-  };
-
-  localStorage.setItem("axon_profile", JSON.stringify(profile));
-  showToast("Personal details saved");
-});
-
-/* MESSAGE INPUT */
-
-const messageInput = $("messageInput");
-
-messageInput.addEventListener("input", () => {
-  messageInput.style.height = "auto";
-  messageInput.style.height =
-    Math.min(messageInput.scrollHeight, 130) + "px";
-});
-
-messageInput.addEventListener("keydown", event => {
-  if (event.key === "Enter" && !event.shiftKey) {
+$("messageInput").addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
     event.preventDefault();
     sendMessage();
   }
 });
 
-$("sendBtn").addEventListener("click", () => sendMessage());
+/* NATURAL TEXTAREA GROWTH */
 
-/* SUGGESTION BUTTONS */
+$("messageInput").addEventListener("input", () => {
+  const input = $("messageInput");
 
-document.querySelectorAll(".suggestion").forEach(button => {
+  input.style.height = "41px";
+  input.style.height = Math.min(input.scrollHeight, 130) + "px";
+});
+
+/* SUGGESTED PROMPTS */
+
+document.querySelectorAll("[data-prompt]").forEach(button => {
   button.addEventListener("click", () => {
-    sendMessage(button.dataset.prompt);
+    $("messageInput").value = button.dataset.prompt;
+    sendMessage();
   });
 });
 
-/* ATTACHMENTS */
+/* SETTINGS PAGE */
+
+function showPage(pageId) {
+  document.querySelectorAll(".full-page").forEach(page => {
+    page.classList.add("hidden");
+  });
+
+  const page = $(pageId);
+  if (page) page.classList.remove("hidden");
+
+  closeSidebar();
+}
+
+function hidePages() {
+  document.querySelectorAll(".full-page").forEach(page => {
+    page.classList.add("hidden");
+  });
+}
+
+$("settingsBtn").addEventListener("click", () => {
+  showPage("settingsPage");
+});
+
+$("profileBtn").addEventListener("click", () => {
+  showPage("profilePage");
+  $("profileNameInput").value = appState.profileName;
+});
+
+document.querySelectorAll("[data-back]").forEach(button => {
+  button.addEventListener("click", hidePages);
+});
+
+/* LANGUAGE SETTING */
+
+$("languageSelect").addEventListener("change", event => {
+  appState.language = event.target.value;
+  localStorage.setItem("axon_language", appState.language);
+  showToast("Language saved");
+});
+
+/* THEME SETTING */
+
+function applyTheme() {
+  document.body.classList.toggle("dark", appState.theme === "dark");
+
+  const selector = $("themeSelect");
+  if (selector) selector.value = appState.theme;
+}
+
+$("themeSelect").addEventListener("change", event => {
+  appState.theme = event.target.value;
+  localStorage.setItem("axon_theme", appState.theme);
+  applyTheme();
+});
+
+/* WORKER URL */
+
+$("saveWorkerUrlBtn").addEventListener("click", () => {
+  const value = $("workerUrlInput").value.trim();
+
+  if (!value) {
+    showToast("Enter a Worker URL");
+    return;
+  }
+
+  try {
+    const parsed = new URL(value);
+
+    if (parsed.protocol !== "https:") {
+      showToast("Use a secure HTTPS URL");
+      return;
+    }
+
+    appState.workerUrl = value.replace(/\/+$/, "") + "/";
+    localStorage.setItem("axon_worker_url", appState.workerUrl);
+    showToast("Connection saved");
+
+  } catch {
+    showToast("Enter a valid URL");
+  }
+});
+
+/* PROFILE AVATAR */
+
+document.querySelectorAll("[data-avatar]").forEach(button => {
+  button.addEventListener("click", () => {
+    appState.avatar = button.dataset.avatar;
+
+    document.querySelectorAll("[data-avatar]").forEach(item => {
+      item.classList.remove("selected");
+    });
+
+    button.classList.add("selected");
+  });
+});
+
+/* SAVE PROFILE */
+
+$("saveProfileBtn").addEventListener("click", () => {
+  appState.profileName = $("profileNameInput").value.trim();
+
+  localStorage.setItem("axon_profile_name", appState.profileName);
+
+  if (appState.avatar) {
+    localStorage.setItem("axon_user_avatar", appState.avatar);
+  }
+
+  showToast("Personal details saved");
+});
+
+/* DELETE ALL CHATS */
+
+$("deleteAllBtn").addEventListener("click", () => {
+  const confirmed = confirm("Delete all conversations?");
+
+  if (!confirmed) return;
+
+  appState.chats = [];
+  appState.activeChatId = null;
+  appState.editingIndex = null;
+
+  saveChats();
+  createNewChat();
+  renderHistory();
+  renderMessages();
+  closeSidebar();
+
+  showToast("All chats deleted");
+});
+
+/* ATTACHMENT PICKER */
 
 $("attachBtn").addEventListener("click", () => {
   $("fileInput").click();
 });
 
 $("fileInput").addEventListener("change", event => {
-  const files = Array.from(event.target.files || []);
-  if (!files.length) return;
+  const file = event.target.files[0];
 
-  state.attachedFiles = files;
+  if (file) {
+    showToast("Selected: " + file.name);
+  }
 
-  const names = files.map(file => file.name).join(", ");
-  $("attachmentInfo").textContent =
-    files.length + " file(s) selected: " + names;
-
-  showToast("Files selected. Upload is not connected yet.");
+  event.target.value = "";
 });
 
-/* LIVE VOICE PAGE */
+/* VOICE PAGE */
 
-$("liveVoiceBtn").addEventListener("click", () => {
-  openPage("voice");
+$("voiceBtn").addEventListener("click", () => {
+  showPage("voicePage");
+});
+
+/* LONG-PRESS MESSAGE MENU */
+
+let pressTimer = null;
+let selectedMessage = null;
+let pressStarted = false;
+
+function hideContextMenu() {
+  $("contextMenu").classList.add("hidden");
+  selectedMessage = null;
+}
+
+function showContextMenu(message, x, y) {
+  selectedMessage = message;
+
+  const menu = $("contextMenu");
+  menu.classList.remove("hidden");
+
+  const menuWidth = 185;
+  const menuHeight = 100;
+
+  const left = Math.max(
+    8,
+    Math.min(x, window.innerWidth - menuWidth - 8)
+  );
+
+  const top = Math.max(
+    8,
+    Math.min(y, window.innerHeight - menuHeight - 8)
+  );
+
+  menu.style.left = left + "px";
+  menu.style.top = top + "px";
+}
+
+document.addEventListener("pointerdown", event => {
+  const messageElement = event.target.closest(".message");
+
+  if (!messageElement) return;
+
+  const chat = getActiveChat();
+  if (!chat) return;
+
+  const content = messageElement.querySelector(".message-content");
+  if (!content) return;
+
+  const messageText = content.textContent;
+
+  const messageIndex = Array.from(
+    messageElement.parentElement.children
+  ).indexOf(messageElement);
+
+  const message = chat.messages[messageIndex];
+  if (!message || message.role !== "user") return;
+
+  pressStarted = true;
+
+  pressTimer = setTimeout(() => {
+    if (!pressStarted) return;
+
+    showContextMenu(
+      {
+        text: messageText,
+        index: messageIndex
+      },
+      event.clientX,
+      event.clientY
+    );
+
+    pressStarted = false;
+  }, 550);
+});
+
+document.addEventListener("pointerup", () => {
+  pressStarted = false;
+  clearTimeout(pressTimer);
+});
+
+document.addEventListener("pointercancel", () => {
+  pressStarted = false;
+  clearTimeout(pressTimer);
+});
+
+document.addEventListener("pointermove", () => {
+  if (pressStarted) {
+    clearTimeout(pressTimer);
+    pressStarted = false;
+  }
+});
+
+/* CONTEXT MENU: COPY */
+
+$("copyMessageBtn").addEventListener("click", () => {
+  if (!selectedMessage) return;
+
+  copyText(selectedMessage.text);
+  hideContextMenu();
+});
+
+/* CONTEXT MENU: EDIT */
+
+$("editMessageBtn").addEventListener("click", () => {
+  if (!selectedMessage) return;
+
+  startEditing(selectedMessage.index);
+  hideContextMenu();
+});
+
+/* CLOSE CONTEXT MENU */
+
+document.addEventListener("click", event => {
+  if (
+    !$("contextMenu").contains(event.target) &&
+    !event.target.closest(".message")
+  ) {
+    hideContextMenu();
+  }
 });
 
 /* ESCAPE KEY */
 
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
+    closeSidebar();
+    hidePages();
     hideContextMenu();
-
-    if (state.currentPage !== "chat") {
-      backToChat();
-    } else {
-      closeSidebar();
-    }
   }
 });
 
-/* INITIAL APP STATE */
+/* START AXON */
 
-renderHistory();
-renderMessages();
+initializeAxon();
 
-console.log("AXON AI frontend initialized.");
-</script>
+                                 </script>
+                                 
 </body>
 </html>
