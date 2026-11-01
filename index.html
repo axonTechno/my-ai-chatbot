@@ -949,40 +949,69 @@ svg {
 const API_DEFAULT = "https://axon-api-staging.axontechno.workers.dev/";
 
 const $ = (id) => document.getElementById(id);
-let selectedImage = null;
+let selectedImages = [];
+
+function renderImagePreviews() {
+  const container = $("previewImages");
+  const preview = $("imagePreview");
+
+  container.innerHTML = "";
+
+  selectedImages.forEach((image, index) => {
+    const item = document.createElement("div");
+    item.className = "image-preview-item";
+
+    const img = document.createElement("img");
+    img.src = image;
+    img.alt = "Selected image";
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "×";
+    remove.setAttribute("aria-label", "Remove image");
+
+    remove.addEventListener("click", () => {
+      selectedImages.splice(index, 1);
+      renderImagePreviews();
+    });
+
+    item.append(img, remove);
+    container.appendChild(item);
+  });
+
+  preview.classList.toggle("hidden", selectedImages.length === 0);
+}
 
 $("fileInput").addEventListener("change", event => {
-  const file = event.target.files[0];
-  if (!file) return;
+  const files = Array.from(event.target.files);
 
-  if (!file.type.startsWith("image/")) {
-    showToast("Please select an image.");
-    event.target.value = "";
-    return;
+  for (const file of files) {
+    if (!file.type.startsWith("image/")) {
+      showToast("Please select an image.");
+      continue;
+    }
+
+    if (selectedImages.length >= 5) {
+      showToast("Maximum 5 images allowed.");
+      break;
+    }
+
+    if (file.size > 4 * 1024 * 1024) {
+      showToast("Each image must be under 4 MB.");
+      continue;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      selectedImages.push(reader.result);
+      renderImagePreviews();
+    };
+
+    reader.readAsDataURL(file);
   }
 
-  if (file.size > 4 * 1024 * 1024) {
-    showToast("Image must be under 4 MB.");
-    event.target.value = "";
-    return;
-  }
-
-  const reader = new FileReader();
-
-  reader.onload = () => {
-    selectedImage = reader.result;
-    $("previewImage").src = selectedImage;
-    $("imagePreview").classList.remove("hidden");
-  };
-
-  reader.readAsDataURL(file);
   event.target.value = "";
-});
-
-$("removeImageBtn").addEventListener("click", () => {
-  selectedImage = null;
-  $("previewImage").src = "";
-  $("imagePreview").classList.add("hidden");
 });
 const appState = {
   chats: [],
