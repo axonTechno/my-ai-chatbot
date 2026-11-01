@@ -956,7 +956,41 @@ svg {
 const API_DEFAULT = "https://axon-api-staging.axontechno.workers.dev/";
 
 const $ = (id) => document.getElementById(id);
+let selectedImage = null;
 
+$("fileInput").addEventListener("change", event => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    showToast("Please select an image.");
+    event.target.value = "";
+    return;
+  }
+
+  if (file.size > 4 * 1024 * 1024) {
+    showToast("Image must be under 4 MB.");
+    event.target.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    selectedImage = reader.result;
+    $("previewImage").src = selectedImage;
+    $("imagePreview").classList.remove("hidden");
+  };
+
+  reader.readAsDataURL(file);
+  event.target.value = "";
+});
+
+$("removeImageBtn").addEventListener("click", () => {
+  selectedImage = null;
+  $("previewImage").src = "";
+  $("imagePreview").classList.add("hidden");
+});
 const appState = {
   chats: [],
   activeChatId: null,
