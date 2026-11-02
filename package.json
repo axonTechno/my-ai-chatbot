@@ -1,0 +1,17 @@
+{
+  "name": "axon-ai",
+  "version": "2.0.0",
+  "description": "AXON AI — personal AI assistant PWA",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "npx --yes serve -l 5173 .",
+    "test": "node tests/smoke.mjs && node tests/features.mjs && node tests/ui.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jsdom": "^30.1.3"
+  }
+}

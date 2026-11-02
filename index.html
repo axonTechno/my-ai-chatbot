@@ -1,2157 +1,633 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff" id="metaThemeColor">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="AXON AI — your personal AI assistant. Chat, attach images, and talk with AXON.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="AXON">
 <title>AXON AI</title>
-
-<style>
-:root {
-  --bg: #ffffff;
-  --surface: #ffffff;
-  --text: #202124;
-  --muted: #777b86;
-  --border: #ececf1;
-  --user: #edf3ff;
-  --purple: #7655e8;
-  --pink: #e58acb;
-  --hover: #f5f4fa;
-  --shadow: 0 8px 30px rgba(30,20,60,.08);
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: Inter, Arial, sans-serif;
-  -webkit-tap-highlight-color: transparent;
-}
-
-button, textarea, input, select {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-  color: inherit;
-}
-
-button:focus-visible,
-textarea:focus-visible,
-input:focus-visible,
-select:focus-visible {
-  outline: 2px solid var(--purple);
-  outline-offset: 2px;
-}
-
-svg {
-  width: 21px;
-  height: 21px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  flex-shrink: 0;
-}
-
-.app {
-  width: 100%;
-  height: 100%;
-  height: 100dvh;
-  display: flex;
-  overflow: hidden;
-  position: relative;
-  background: var(--bg);
-}
-
-/* SIDEBAR */
-
-.sidebar {
-  width: 280px;
-  height: 100%;
-  background: #fbfbfd;
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  padding: 18px 14px;
-  position: absolute;
-  inset: 0 auto 0 0;
-  z-index: 30;
-  transform: translateX(-100%);
-  transition: transform .32s cubic-bezier(.2,.8,.2,1);
-}
-
-.sidebar.open {
-  transform: translateX(0);
-}
-
-.sidebar-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 22px;
-}
-
-.brand {
-  font-size: 21px;
-  font-weight: 750;
-  letter-spacing: 1.5px;
-  background: linear-gradient(100deg,#7554e8,#dc83c6);
-  color: transparent;
-  background-clip: text;
-  -webkit-background-clip: text;
-}
-
-.icon-btn {
-  width: 40px;
-  height: 40px;
-  border: 0;
-  border-radius: 12px;
-  background: transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background .2s, transform .2s;
-}
-
-.icon-btn:hover {
-  background: var(--hover);
-}
-
-.icon-btn:active {
-  transform: scale(.91);
-}
-
-.new-chat {
-  width: 100%;
-  height: 45px;
-  border: 1px solid #e7e1fa;
-  border-radius: 13px;
-  background: linear-gradient(110deg,#f5f1ff,#fff3fb);
-  color: #6849d2;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 0 13px;
-  font-weight: 600;
-  transition: transform .2s, box-shadow .2s;
-}
-
-.new-chat:active {
-  transform: scale(.98);
-}
-
-.history-area {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding-top: 23px;
-}
-
-.section-label {
-  font-size: 11px;
-  color: #9999a4;
-  font-weight: 700;
-  letter-spacing: 1.1px;
-  text-transform: uppercase;
-  margin: 15px 9px 9px;
-}
-
-.history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.history-item {
-  width: 100%;
-  min-height: 39px;
-  padding: 8px 10px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  text-align: left;
-  font-size: 13px;
-  color: #454550;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: background .2s, transform .2s;
-  touch-action: pan-y;
-}
-
-.history-item:hover,
-.history-item.active {
-  background: #f0eef8;
-}
-
-.history-item:active {
-  transform: scale(.985);
-}
-
-.sidebar-bottom {
-  border-top: 1px solid var(--border);
-  padding-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.nav-item {
-  width: 100%;
-  min-height: 43px;
-  padding: 0 10px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  color: #555562;
-  text-align: left;
-  font-size: 14px;
-  transition: background .2s;
-}
-
-.nav-item:hover {
-  background: var(--hover);
-}
-
-/* MAIN AREA */
-
-.main {
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  transition: transform .32s ease;
-}
-
-.topbar {
-  height: 62px;
-  min-height: 62px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 17px;
-  border-bottom: 1px solid #f0eff4;
-  background: rgba(255,255,255,.96);
-  z-index: 5;
-}
-
-.topbar-left,
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.topbar-title {
-  font-size: 14px;
-  font-weight: 650;
-}
-
-.topbar-tag {
-  font-size: 10px;
-  letter-spacing: 1px;
-  color: #8b70dc;
-  background: #f4f0ff;
-  padding: 5px 9px;
-  border-radius: 20px;
-}
-
-/* CHAT AREA */
-
-.chat-area {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scroll-behavior: smooth;
-  padding: 24px 16px 20px;
-  position: relative;
-}
-
-.chat-inner {
-  width: 100%;
-  max-width: 790px;
-  margin: 0 auto;
-}
-
-/* WELCOME SCREEN */
-
-.welcome {
-  min-height: 65%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 25px 10px;
-}
-
-.welcome-logo {
-  display: block;
-  width: 105px;
-  height: 105px;
-  max-width: 30vw;
-  object-fit: contain;
-  object-position: center;
-  flex-shrink: 0;
-  margin: 0 auto 24px;
-
-  /* Static logo: no motion */
-  animation: none !important;
-  transform: none !important;
-}
-
-.welcome h1 {
-  font-size: clamp(25px,5vw,35px);
-  font-weight: 700;
-  letter-spacing: -.8px;
-  line-height: 1.25;
-  margin-bottom: 10px;
-
-  background: linear-gradient(
-    100deg,
-    #7655e8 0%,
-    #a16cdd 48%,
-    #e58acb 100%
-  );
-
-  color: transparent;
-  background-clip: text;
-  -webkit-background-clip: text;
-}
-
-.welcome p {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-.suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 30px;
-  max-width: 520px;
-}
-
-.suggestion {
-  padding: 11px 15px;
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  color: #555565;
-  font-size: 12px;
-  transition: border-color .2s, background .2s;
-}
-
-.suggestion:hover {
-  border-color: #c8b8f7;
-  background: #faf8ff;
-}
-
-/* MESSAGES */
-
-.messages {
-  display: flex;
-  flex-direction: column;
-  gap: 23px;
-}
-
-.message {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  animation: messageIn .22s ease both;
-}
-
-.message.user {
-  align-items: flex-end;
-}
-
-.message.assistant {
-  align-items: flex-start;
-}
-
-.message-content {
-  max-width: min(85%,650px);
-  font-size: 14px;
-  line-height: 1.7;
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
-}
-
-.message.user .message-content {
-  background: var(--user);
-  padding: 11px 16px;
-  border-radius: 18px 18px 5px 18px;
-}
-
-.message.assistant .message-content {
-  max-width: 100%;
-  padding: 2px 0;
-}
-
-.message-actions {
-  display: flex;
-  gap: 5px;
-  margin-top: 8px;
-  opacity: .72;
-}
-
-.message-actions .icon-btn {
-  width: 32px;
-  height: 32px;
-}
-
-.message-actions svg {
-  width: 17px;
-  height: 17px;
-}
-
-.message-actions button.selected {
-  color: var(--purple);
-  background: #f1edff;
-}
-
-/* COMPOSER */
-
-.composer-wrap {
-  padding: 12px 15px 18px;
-  background: linear-gradient(to top,#f7f3ff 0%,#fff 65%);
-}
-
-.composer {
-  width: 100%;
-  max-width: 790px;
-  min-height: 58px;
-  margin: 0 auto;
-  padding: 7px 8px;
-  display: flex;
-  align-items: flex-end;
-  gap: 7px;
-  border: 1px solid #e8e4ef;
-  border-radius: 19px;
-  background: white;
-  box-shadow: 0 5px 22px rgba(50,30,90,.06);
-  transition: border-color .2s, box-shadow .2s;
-}
-
-.composer:focus-within {
-  border-color: #c5b4f3;
-  box-shadow: 0 5px 25px rgba(117,84,232,.11);
-}
-
-.message-input {
-  flex: 1;
-  min-width: 0;
-  min-height: 41px;
-  max-height: 130px;
-  resize: none;
-  overflow-y: auto;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--text);
-  font-size: 14px;
-  line-height: 1.5;
-  padding: 10px 3px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.message-input::placeholder {
-  color: #a2a1ac;
-}
-
-.send-btn {
-  width: 41px;
-  height: 41px;
-  flex-shrink: 0;
-  border: 0;
-  border-radius: 14px;
-  background: linear-gradient(135deg,#7958e8,#b56bd8);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform .2s, filter .2s;
-}
-
-.send-btn:hover {
-  filter: brightness(1.06);
-}
-
-.send-btn:active {
-  transform: scale(.9);
-}
-
-.send-btn:disabled {
-  opacity: .55;
-  cursor: not-allowed;
-}
-
-.voice-btn {
-  color: #7458d5;
-}
-
-.cancel-edit-btn {
-  display: none;
-  color: #777b86;
-}
-
-/* ANIMATIONS */
-
-@keyframes messageIn {
-  from {
-    opacity: 0;
-    transform: translateY(7px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* IMPORTANT: Logo and welcome screen do not move */
-
-.hidden {
-  display: none !important;
-}
-
-/* MOBILE */
-
-@media (max-width: 600px) {
-  .sidebar {
-    width: min(290px,86vw);
-  }
-
-  .topbar {
-    padding: 0 11px;
-  }
-
-  .chat-area {
-    padding: 18px 13px;
-  }
-
-  .composer-wrap {
-    padding: 9px 10px 13px;
-  }
-
-  .message-content {
-    max-width: 91%;
-  }
-
-  .welcome-logo {
-    width: 95px;
-    height: 95px;
-    margin-bottom: 20px;
-  }
-
-  .welcome h1 {
-    font-size: 27px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
-  }
-}
-  .image-preview {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-}
-
-.image-preview img {
-  width: 76px;
-  height: 76px;
-  object-fit: cover;
-  border-radius: 12px;
-}
-
-.image-preview button {
-  border: none;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-  background: #eee;
-  color: #333;
-  font-size: 20px;
-}
-
-.image-preview.hidden {
-  display: none;
-}
-</style>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./assets/axon-icon-192.png">
+<link rel="icon" type="image/png" href="./assets/axon-icon-192.png">
+<script>
+/* Apply the saved theme before first paint to avoid a white flash. */
+(function () {
+  try {
+    var saved = localStorage.getItem("axon_theme") || "light";
+    var dark = saved === "dark" ||
+      (saved === "system" &&
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
+    if (dark) document.documentElement.classList.add("dark-preload");
+    document.documentElement.dataset.theme = saved;
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/chat.css">
+<link rel="stylesheet" href="./css/pages.css">
+<link rel="stylesheet" href="./css/voice.css">
+<link rel="stylesheet" href="./css/extra.css">
+<link rel="stylesheet" href="./css/aurora.css">
 </head>
 
 <body>
+<!-- Icon sprite (Lucide-style, stroke icons) -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+  <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+  <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></symbol>
+  <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 17v5"/><path d="M9 10.8V4h6v6.8l2.5 3.2H6.5z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 2.9-.2-.1a1.7 1.7 0 0 0-1.8.1l-.2.1h-3.4l-.1-.2a1.7 1.7 0 0 0-1.5-1l-.3-.1-2.9 1.1-.1-.2-1.7-2.9.1-.2a1.7 1.7 0 0 0-.1-1.8l-.1-.2.1-.2a1.7 1.7 0 0 0 1.5-1l.3-.1h3.4l.2.1a1.7 1.7 0 0 0 1.8-.1l.2-.1 1.7-2.9.2.1a1.7 1.7 0 0 0 1.5 1l.3.1 2.9-1.1.1.2a1.7 1.7 0 0 0 .1 1.8l.1.2-.1.2a1.7 1.7 0 0 0-1.5 1l-.3.1z" transform="translate(-1.6 0) scale(.92)"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4.5-4.5L7 20"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1 1-1.1 1.8v.5M12 17h.01"/></symbol>
+  <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.6 8.6 0 0 1-3.8-.9L3 21l1.9-5.6a8.4 8.4 0 0 1-.9-3.9A8.4 8.4 0 0 1 12.5 3a8.4 8.4 0 0 1 8.5 8.5z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 21V9M7 14l5-5 5 5M4 3h16"/></symbol>
+  <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18 15.5 19 18l2.5 1-2.5 1-1 2.5-1-2.5L14.5 19l2.5-1z"/></symbol>
+  <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M2 2l20 20"/><path d="M8.5 16.5a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 4-2.4M19 12.9a10 10 0 0 0-3.3-2.2M2 8.8a15 15 0 0 1 5.2-2.6M22 8.8a15 15 0 0 0-8.6-2.7"/><path d="M12 20h.01"/></symbol>
+  <symbol id="i-duplicate" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 21h20z"/><path d="M12 9v5M12 17h.01"/></symbol>
+  <symbol id="i-thumbs-up" viewBox="0 0 24 24"><path d="M7 11v9H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1z"/><path d="M7 11l4.2-7.4A1.6 1.6 0 0 1 14 4.4V9h4.4a2 2 0 0 1 2 2.4l-1.3 6.6A2 2 0 0 1 17.1 20H7"/></symbol>
+  <symbol id="i-thumbs-down" viewBox="0 0 24 24"><path d="M17 13V4h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1z"/><path d="M17 13l-4.2 7.4A1.6 1.6 0 0 1 10 19.6V15H5.6a2 2 0 0 1-2-2.4l1.3-6.6A2 2 0 0 1 6.9 4H17"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 6-3 7-3 7h18s-3-1-3-7"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 4v16M16 4v16"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 8-8 3 3-2 2-2-2-3 3"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M17.5 19a4.5 4.5 0 0 0 .5-9 6 6 0 0 0-11.6-1.5A4 4 0 0 0 6.5 19z"/></symbol>
+  <symbol id="i-cloud-off" viewBox="0 0 24 24"><path d="M2 2l20 20"/><path d="M17.5 19a4.5 4.5 0 0 0 .5-9 6 6 0 0 0-8.4-4.6M6.5 19a4 4 0 0 1-1-7.9"/></symbol>
+  <symbol id="i-smartphone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+</svg>
+
 <div class="app" id="app">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar" aria-label="Chat navigation">
     <div class="sidebar-top">
-      <div class="brand">AXON</div>
-      <button class="icon-btn" id="closeSidebar" aria-label="Close sidebar">
-        <svg viewBox="0 0 24 24">
-          <path d="M6 6l12 12M18 6L6 18"/>
-        </svg>
+      <button class="brand-btn" id="aboutBtn" aria-label="About AXON">
+        <img src="./assets/axon-logo.webp" alt="" class="brand-logo" width="30" height="30">
+        <span class="brand">AXON</span>
+        <span class="brand-version">2.1</span>
       </button>
+      <div class="sidebar-top-actions">
+        <button class="icon-btn" id="accountBtn" aria-label="Account">
+          <svg><use href="#i-user"/></svg>
+        </button>
+        <button class="icon-btn" id="closeSidebar" aria-label="Close sidebar">
+          <svg><use href="#i-x"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-account" id="sidebarAccount">
+      <img id="sidebarAvatar" class="sidebar-avatar" src="./assets/male-avatar.webp" alt="" width="34" height="34">
+      <div class="sidebar-account-text">
+        <span id="sidebarName">Guest</span>
+        <small id="sidebarEmail">Local mode</small>
+      </div>
     </div>
 
     <button class="new-chat" id="newChatBtn">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 5v14M5 12h14"/>
-      </svg>
+      <svg><use href="#i-plus"/></svg>
       <span>New chat</span>
     </button>
 
-    <div class="history-area">
-      <div class="section-label">Your Conversations</div>
-      <div class="history-list" id="historyList"></div>
+    <div class="sidebar-search">
+      <svg class="search-icon"><use href="#i-search"/></svg>
+      <input type="search" id="chatSearch" placeholder="Search chats" aria-label="Search chats" autocomplete="off">
+      <button class="icon-btn small hidden" id="clearSearch" aria-label="Clear search">
+        <svg><use href="#i-x"/></svg>
+      </button>
+    </div>
+
+    <div class="history-area" id="historyArea">
+      <div id="historyList"></div>
+      <div class="history-empty hidden" id="historyEmpty">No conversations yet.</div>
     </div>
 
     <div class="sidebar-bottom">
-      <button class="nav-item" id="profileBtn">
-        <svg viewBox="0 0 24 24">
-          <circle cx="12" cy="8" r="4"/>
-          <path d="M4 21a8 8 0 0 1 16 0"/>
-        </svg>
-        <span>Personal Details</span>
-      </button>
-
       <button class="nav-item" id="settingsBtn">
-        <svg viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 2.9-.2-.1a1.7 1.7 0 0 0-1.8.1l-.2.1h-3.4l-.1-.2a1.7 1.7 0 0 0-1.5-1l-.3-.1-2.9 1.1-.1-.2-1.7-2.9.1-.2a1.7 1.7 0 0 0-.1-1.8l-.1-.2v-3.4l.2-.1a1.7 1.7 0 0 0 1-1.5l.1-.3-1.1-2.9.2-.1 2.9-1.7.2.1a1.7 1.7 0 0 0 1.8-.1l.2-.1h3.4l.1.2a1.7 1.7 0 0 0 1.5 1l.3.1 2.9-1.1.1.2 1.7 2.9-.1.2a1.7 1.7 0 0 0 .1 1.8l.1.2v3.4z"/>
-        </svg>
+        <svg><use href="#i-settings"/></svg>
         <span>Settings</span>
-      </button>
-
-      <button class="nav-item" id="deleteAllBtn">
-        <svg viewBox="0 0 24 24">
-          <path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/>
-        </svg>
-        <span>Delete all chats</span>
       </button>
     </div>
   </aside>
 
-  <!-- MAIN CHAT -->
-  <main class="main">
-
+  <!-- ================= MAIN ================= -->
+  <main class="main" id="main">
     <header class="topbar">
       <div class="topbar-left">
-        <button class="icon-btn" id="menuBtn" aria-label="Open menu">
-          <svg viewBox="0 0 24 24">
-            <path d="M4 7h16M4 12h16M4 17h16"/>
-          </svg>
+        <button class="icon-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+          <svg><use href="#i-menu"/></svg>
         </button>
-
-        <div class="topbar-title">AXON</div>
+        <div class="topbar-title" id="topbarTitle">AXON</div>
       </div>
-
       <div class="topbar-right">
-        <span class="topbar-tag">AI CHAT</span>
+        <span class="topbar-tag" id="modelTag">AI CHAT</span>
+        <button class="icon-btn" id="chatMenuBtn" aria-label="Chat options">
+          <svg><use href="#i-more"/></svg>
+        </button>
       </div>
     </header>
 
-    <section class="chat-area" id="chatArea">
+    <section class="chat-area" id="chatArea" aria-live="polite" aria-relevant="additions text">
       <div class="chat-inner">
 
-        <!-- WELCOME SCREEN -->
         <div class="welcome" id="welcomeScreen">
-          <img
-            src="axon-logo.png"
-            class="welcome-logo"
-            alt="AXON logo"
-          >
-
-          <h1>Hello, How can I help you?</h1>
-          <p>Ask anything. Let's explore ideas together.</p>
+          <img src="./assets/axon-logo.webp" class="welcome-logo" alt="AXON logo" width="105" height="105">
+          <h1 id="welcomeTitle">Hello, how can I help you?</h1>
+          <p>Ask anything. Attach an image or start a voice chat.</p>
 
           <div class="suggestions">
             <button class="suggestion" data-prompt="Explain something interesting about space.">
-              Explore space
+              <svg><use href="#i-sparkles"/></svg><span>Explore space</span>
             </button>
-
             <button class="suggestion" data-prompt="Teach me something new today.">
-              Learn something new
+              <svg><use href="#i-info"/></svg><span>Learn something new</span>
             </button>
-
             <button class="suggestion" data-prompt="Help me write something creative.">
-              Write something
+              <svg><use href="#i-edit"/></svg><span>Write something</span>
+            </button>
+            <button class="suggestion" id="welcomeVoiceBtn">
+              <svg><use href="#i-mic"/></svg><span>Voice chat</span>
             </button>
           </div>
         </div>
 
-        <!-- MESSAGES -->
         <div class="messages hidden" id="messages"></div>
-
-        <!-- TYPING INDICATOR -->
-        <div class="typing-indicator hidden" id="typingIndicator">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-
       </div>
     </section>
 
-    <!-- MESSAGE COMPOSER -->
+    <button class="scroll-bottom hidden" id="scrollBottomBtn" aria-label="Scroll to latest message">
+      <svg><use href="#i-arrow-down"/></svg>
+    </button>
+
     <div class="composer-wrap">
+      <div class="edit-banner hidden" id="editBanner">
+        <svg><use href="#i-edit"/></svg>
+        <span>Editing message — sending will replace everything after it.</span>
+        <button class="icon-btn small" id="cancelEditBtn" aria-label="Cancel edit">
+          <svg><use href="#i-x"/></svg>
+        </button>
+      </div>
+
       <div id="imagePreview" class="image-preview hidden">
-  <div id="previewImages"></div>
+        <div id="previewImages" class="preview-images"></div>
       </div>
+
       <div class="composer" id="composer">
-
-        <button class="icon-btn" id="attachBtn" aria-label="Attach file">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
+        <button class="icon-btn" id="attachBtn" aria-label="Attach images">
+          <svg><use href="#i-image"/></svg>
         </button>
 
-        <textarea
-          id="messageInput"
-          class="message-input"
-          rows="1"
-          placeholder="Message AXON..."
-          aria-label="Write a message"
-        ></textarea>
+        <textarea id="messageInput" class="message-input" rows="1"
+          placeholder="Message AXON..." aria-label="Write a message"></textarea>
 
-        <button
-          class="icon-btn voice-btn"
-          id="voiceBtn"
-          aria-label="Voice mode"
-        >
-          <svg viewBox="0 0 24 24">
-            <rect x="9" y="2" width="6" height="13" rx="3"/>
-            <path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/>
-          </svg>
+        <button class="icon-btn voice-btn" id="voiceBtn" aria-label="Start voice chat">
+          <svg><use href="#i-mic"/></svg>
         </button>
 
-        <button
-          class="send-btn"
-          id="sendBtn"
-          aria-label="Send message"
-        >
-          <svg viewBox="0 0 24 24">
-            <path d="M12 19V5M5 12l7-7 7 7"/>
-          </svg>
+        <button class="send-btn" id="sendBtn" aria-label="Send message">
+          <svg><use href="#i-arrow-up"/></svg>
         </button>
 
+        <button class="send-btn stop-btn hidden" id="stopBtn" aria-label="Stop generating">
+          <svg><use href="#i-stop"/></svg>
+        </button>
       </div>
 
-      <input type="file" id="fileInput" class="hidden"
-  accept="image/*" multiple>
-    </div>
+      <p class="composer-hint">AXON can make mistakes. Check important information.</p>
 
+      <input type="file" id="fileInput" class="hidden" accept="image/*" multiple>
+    </div>
   </main>
 </div>
 
-<!-- SIDEBAR OVERLAY -->
 <div class="sidebar-overlay hidden" id="sidebarOverlay"></div>
 
-<!-- CONTEXT MENU -->
-<div class="context-menu hidden" id="contextMenu">
-  <button id="copyMessageBtn">
-    <svg viewBox="0 0 24 24">
-      <rect x="8" y="8" width="12" height="12" rx="2"/>
-      <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>
-    </svg>
-    <span>Copy message</span>
-  </button>
+<!-- ================= GENERIC SHEET / CONFIRM / MENU ================= -->
+<div class="sheet-overlay hidden" id="sheetOverlay"></div>
 
-  <button id="editMessageBtn">
-    <svg viewBox="0 0 24 24">
-      <path d="M12 20h9"/>
-      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/>
-    </svg>
-    <span>Edit message</span>
-  </button>
+<div class="action-menu hidden" id="actionMenu" role="menu"></div>
+
+<div class="confirm-card hidden" id="confirmCard" role="alertdialog" aria-modal="true">
+  <h3 id="confirmTitle">Are you sure?</h3>
+  <p id="confirmText"></p>
+  <div class="confirm-actions">
+    <button class="btn ghost" id="confirmCancel">Cancel</button>
+    <button class="btn danger" id="confirmOk">Confirm</button>
+  </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast hidden" id="toast"></div>
+<div class="toast hidden" id="toast" role="status"></div>
 
-<!-- SETTINGS PAGE -->
-<section class="full-page hidden" id="settingsPage">
+<!-- ================= IMAGE VIEWER ================= -->
+<div class="viewer hidden" id="imageViewer" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button class="icon-btn viewer-close" id="viewerClose" aria-label="Close image">
+    <svg><use href="#i-x"/></svg>
+  </button>
+  <img id="viewerImage" alt="Full size image">
+</div>
+
+<!-- ================= PAGES ================= -->
+
+<!-- LOGIN -->
+<section class="full-page hidden" id="loginPage" aria-label="Sign in">
+  <div class="auth-shell">
+    <img src="./assets/axon-logo.webp" class="auth-logo" alt="AXON logo" width="82" height="82">
+    <h1 class="auth-title">Welcome to AXON</h1>
+    <p class="auth-sub" id="authSub">Sign in with your email to sync your chats across devices. No password needed.</p>
+
+    <div class="auth-step" id="authStepEmail">
+      <label class="field-label" for="authEmail">Email address</label>
+      <div class="input-wrap">
+        <svg><use href="#i-mail"/></svg>
+        <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email" inputmode="email">
+      </div>
+      <button class="btn primary block" id="authSendCodeBtn">Send verification code</button>
+      <p class="auth-note" id="authServiceNote"></p>
+    </div>
+
+    <div class="auth-step hidden" id="authStepCode">
+      <label class="field-label" for="authCode">Enter the 6-digit code sent to <b id="authCodeEmail"></b></label>
+      <div class="input-wrap">
+        <svg><use href="#i-lock"/></svg>
+        <input type="text" id="authCode" placeholder="000000" inputmode="numeric" autocomplete="one-time-code" maxlength="8">
+      </div>
+      <button class="btn primary block" id="authVerifyBtn">Verify &amp; continue</button>
+      <div class="auth-row">
+        <button class="link-btn" id="authResendBtn">Resend code</button>
+        <button class="link-btn" id="authChangeEmail">Change email</button>
+      </div>
+      <p class="auth-note" id="authCodeNote"></p>
+    </div>
+
+    <p class="auth-status" id="authStatus" role="status"></p>
+
+    <button class="link-btn auth-skip" id="authSkipBtn">Continue without an account</button>
+  </div>
+</section>
+
+<!-- ACCOUNT -->
+<section class="full-page hidden" id="accountPage" aria-label="Account">
   <header class="page-header">
-    <button class="icon-btn" data-back aria-label="Back">
-      <svg viewBox="0 0 24 24">
-        <path d="M19 12H5m7 7-7-7 7-7"/>
-      </svg>
-    </button>
+    <button class="icon-btn" data-back aria-label="Back"><svg><use href="#i-arrow-left"/></svg></button>
+    <h2>Account</h2>
+  </header>
+  <div class="page-content">
+    <div class="account-head">
+      <img id="accountAvatarImg" class="account-avatar" src="./assets/male-avatar.webp" alt="Your avatar" width="72" height="72">
+      <div>
+        <div class="account-name" id="accountName">Guest</div>
+        <div class="account-email" id="accountEmail">Not signed in</div>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <h3>Choose your avatar</h3>
+      <p>Pick the avatar shown next to your messages.</p>
+      <div class="profile-avatars">
+        <button class="avatar-option" data-avatar="male" aria-label="Male avatar">
+          <img src="./assets/male-avatar.webp" alt="Male avatar" width="76" height="76">
+        </button>
+        <button class="avatar-option" data-avatar="female" aria-label="Female avatar">
+          <img src="./assets/female-avatar.webp" alt="Female avatar" width="76" height="76">
+        </button>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <h3>Your name</h3>
+      <p>Used in greetings and sent along with your messages.</p>
+      <input type="text" id="profileNameInput" placeholder="Your name" autocomplete="name">
+      <button class="btn primary" id="saveProfileBtn">Save details</button>
+    </div>
+
+    <div class="setting-group">
+      <h3>Cloud sync</h3>
+      <p id="syncNote">Chats on this device only.</p>
+      <div class="status-row">
+        <span class="sync-badge local" id="syncBadge"><svg><use href="#i-smartphone"/></svg><span>Local</span></span>
+        <span id="syncDetail" class="sync-detail">No account connected</span>
+      </div>
+      <button class="btn ghost" id="syncNowBtn"><svg><use href="#i-refresh"/></svg><span>Sync now</span></button>
+    </div>
+
+    <div class="setting-group">
+      <h3>Email address</h3>
+      <p id="accountEmailNote">Sign in to sync your chats across devices.</p>
+      <button class="btn ghost" id="accountSignInBtn">Sign in with email</button>
+    </div>
+
+    <div class="setting-group">
+      <h3>Session</h3>
+      <p id="sessionNote">You are using AXON locally on this device.</p>
+      <button class="btn danger" id="logoutBtn">
+        <svg><use href="#i-logout"/></svg><span>Log out</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section class="full-page hidden" id="settingsPage" aria-label="Settings">
+  <header class="page-header">
+    <button class="icon-btn" data-back aria-label="Back"><svg><use href="#i-arrow-left"/></svg></button>
     <h2>Settings</h2>
   </header>
-
   <div class="page-content">
+
     <div class="setting-group">
       <h3>Language</h3>
-      <p>Choose the language AXON should use in chats.</p>
-
+      <p>Language AXON should reply in.</p>
       <select id="languageSelect">
         <option value="English">English</option>
         <option value="Hindi">Hindi</option>
+        <option value="Hinglish">Hinglish</option>
         <option value="Korean">Korean</option>
         <option value="Tamil">Tamil</option>
         <option value="Urdu">Urdu</option>
-        <option value="Hinglish">Hinglish</option>
       </select>
     </div>
 
     <div class="setting-group">
-      <h3>Appearance</h3>
-      <p>Choose how AXON looks on your device.</p>
+      <h3>Theme</h3>
+      <p>Choose how AXON looks.</p>
+      <div class="segmented" id="themeSegmented" role="radiogroup" aria-label="Theme">
+        <button data-theme-choice="light" role="radio"><svg><use href="#i-sun"/></svg><span>Light</span></button>
+        <button data-theme-choice="dark" role="radio"><svg><use href="#i-moon"/></svg><span>Dark</span></button>
+        <button data-theme-choice="system" role="radio"><svg><use href="#i-monitor"/></svg><span>System</span></button>
+      </div>
+    </div>
 
-      <select id="themeSelect">
-        <option value="light">Light</option>
-        <option value="dark">Dark</option>
+    <div class="setting-group">
+      <h3>Text size</h3>
+      <p>Size of AI replies and messages.</p>
+      <div class="segmented" id="textSizeSegmented" role="radiogroup" aria-label="Text size">
+        <button data-size-choice="sm" role="radio"><span>Small</span></button>
+        <button data-size-choice="md" role="radio"><span>Default</span></button>
+        <button data-size-choice="lg" role="radio"><span>Large</span></button>
+        <button data-size-choice="xl" role="radio"><span>Extra large</span></button>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <h3>AI response preferences</h3>
+      <p>How detailed AXON's answers should be.</p>
+      <select id="responseStyleSelect">
+        <option value="balanced">Balanced</option>
+        <option value="concise">Concise</option>
+        <option value="detailed">Detailed</option>
       </select>
     </div>
 
     <div class="setting-group">
-      <h3>AI connection</h3>
-      <p>Worker URL used to connect AXON to its AI service.</p>
+      <h3>Enter to send</h3>
+      <p>When off, use the send button (Enter adds a new line).</p>
+      <label class="switch-row">
+        <span>Send with Enter</span>
+        <input type="checkbox" id="enterToSendToggle" class="switch">
+      </label>
+    </div>
 
-      <input
-        type="url"
-        id="workerUrlInput"
-        placeholder="Enter Worker URL"
-      >
+    <div class="setting-group">
+      <h3>AI model</h3>
+      <p>AXON tries another available free model automatically if the selected one is unavailable.</p>
+      <select id="modelSelect"></select>
+    </div>
 
-      <button class="page-action-btn" id="saveWorkerUrlBtn">
-        Save connection
+    <div class="setting-group">
+      <h3>Streaming</h3>
+      <p>Show the answer word by word as it arrives.</p>
+      <label class="switch-row">
+        <span>Stream responses</span>
+        <input type="checkbox" id="streamToggle" class="switch">
+      </label>
+      <label class="switch-row">
+        <span>Read answers aloud</span>
+        <input type="checkbox" id="speakRepliesToggle" class="switch">
+      </label>
+    </div>
+
+    <div class="setting-group">
+      <h3>Worker connection</h3>
+      <p>AXON is preconfigured to talk to its Cloudflare Worker. No URL entry is needed.</p>
+      <div class="status-row">
+        <span class="status-dot" id="workerStatusDot"></span>
+        <span id="workerStatusText">Not checked yet</span>
+      </div>
+      <ul class="info-list">
+        <li><span>Endpoint</span><b id="connectionUrl">—</b></li>
+        <li><span>Model</span><b id="connectionModel">—</b></li>
+      </ul>
+      <button class="btn ghost" id="testConnectionBtn">
+        <svg><use href="#i-refresh"/></svg><span>Test connection</span>
       </button>
+      <details class="advanced">
+        <summary>Advanced connection settings</summary>
+        <label class="field-label" for="workerUrlInput">Worker URL override (leave empty for default)</label>
+        <input type="url" id="workerUrlInput" placeholder="https://your-worker.workers.dev/">
+        <button class="btn ghost" id="saveWorkerUrlBtn">Save connection</button>
+      </details>
+    </div>
+
+    <div class="setting-group">
+      <h3>Account</h3>
+      <p id="settingsAccountNote">Not signed in — chats are stored on this device only.</p>
+      <button class="btn ghost" id="settingsAccountBtn">Open account</button>
+    </div>
+
+    <div class="setting-group">
+      <h3>Data &amp; privacy</h3>
+      <p>Your conversations are stored locally on this device. Nothing is sent anywhere except your AI request.</p>
+      <button class="btn ghost" id="exportAllBtn"><svg><use href="#i-download"/></svg><span>Export all chats</span></button>
+      <button class="btn ghost" id="deleteAllBtn"><svg><use href="#i-trash"/></svg><span>Delete all chats</span></button>
     </div>
 
     <div class="setting-group">
       <h3>About AXON</h3>
-      <p>Designer: Rachit</p>
-      <p>AI Model: Meta</p>
-      <p>Product: AXON AI Chat</p>
-    </div>
-  </div>
-</section>
-
-<!-- PERSONAL DETAILS PAGE -->
-<section class="full-page hidden" id="profilePage">
-  <header class="page-header">
-    <button class="icon-btn" data-back aria-label="Back">
-      <svg viewBox="0 0 24 24">
-        <path d="M19 12H5m7 7-7-7 7-7"/>
-      </svg>
-    </button>
-    <h2>Personal Details</h2>
-  </header>
-
-  <div class="page-content">
-    <div class="profile-avatars">
-      <button class="avatar-option" data-avatar="male-avatar.png">
-        <img src="male-avatar.png" alt="Avatar option one">
-      </button>
-
-      <button class="avatar-option" data-avatar="female-avatar.png">
-        <img src="female-avatar.png" alt="Avatar option two">
-      </button>
+      <p>Version, model information and credits.</p>
+      <button class="btn ghost" id="aboutFromSettings"><svg><use href="#i-info"/></svg><span>About AXON</span></button>
     </div>
 
     <div class="setting-group">
-      <h3>Profile name</h3>
-      <input
-        type="text"
-        id="profileNameInput"
-        placeholder="Your name"
-      >
+      <h3>Help &amp; issues</h3>
+      <p>Report a problem or send feedback.</p>
+      <p id="helpServiceNote" class="auth-note"></p>
+      <button class="btn ghost" id="helpBtn"><svg><use href="#i-help"/></svg><span>Help &amp; issues</span></button>
     </div>
 
-    <button class="page-action-btn" id="saveProfileBtn">
-      Save details
-    </button>
+    <div class="setting-group">
+      <h3>Reset</h3>
+      <p>Restore default preferences. Chats are not deleted.</p>
+      <button class="btn ghost" id="resetSettingsBtn">Reset settings</button>
+    </div>
+
   </div>
 </section>
 
-<!-- LOGIN PAGE -->
-<section class="full-page hidden" id="loginPage">
+<!-- ABOUT -->
+<section class="full-page hidden" id="aboutPage" aria-label="About AXON">
   <header class="page-header">
-    <button class="icon-btn" data-back aria-label="Back">
-      <svg viewBox="0 0 24 24">
-        <path d="M19 12H5m7 7-7-7 7-7"/>
-      </svg>
-    </button>
-    <h2>Account</h2>
+    <button class="icon-btn" data-back aria-label="Back"><svg><use href="#i-arrow-left"/></svg></button>
+    <h2>About AXON</h2>
   </header>
-
   <div class="page-content">
-    <h3>Account access</h3>
-    <p>Account features are not connected yet.</p>
-  </div>
-</section>
-
-<!-- VOICE PAGE -->
-<section class="full-page hidden" id="voicePage">
-  <header class="page-header">
-    <button class="icon-btn" data-back aria-label="Back">
-      <svg viewBox="0 0 24 24">
-        <path d="M19 12H5m7 7-7-7 7-7"/>
-      </svg>
-    </button>
-    <h2>Voice mode</h2>
-  </header>
-
-  <div class="voice-screen">
-    <div class="voice-orb">
-      <svg viewBox="0 0 24 24">
-        <rect x="9" y="2" width="6" height="13" rx="3"/>
-        <path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/>
-      </svg>
+    <div class="about-hero">
+      <img src="./assets/axon-logo.webp" alt="AXON logo" width="88" height="88">
+      <h2>AXON AI</h2>
+      <p>Your personal AI assistant for ideas, answers and conversations.</p>
     </div>
 
-    <h2>AXON Voice</h2>
-    <p>Voice mode interface preview</p>
-    <p class="voice-note">Live voice conversation is not connected yet.</p>
+    <div class="setting-group">
+      <h3>What AXON does</h3>
+      <p>AXON is a fast, private chat assistant. Ask questions, attach images, and switch to voice mode.
+        Conversations stay on your device unless you sign in to sync them.</p>
+    </div>
+
+    <div class="setting-group">
+      <h3>Product information</h3>
+      <ul class="info-list">
+        <li><span>Product</span><b>AXON AI Chat</b></li>
+        <li><span>Designer</span><b>Rachit</b></li>
+        <li><span>AI model</span><b id="aboutModel">Meta</b></li>
+        <li><span>App version</span><b id="aboutVersion">2.1.0</b></li>
+        <li><span>AI service</span><b>Cloudflare Worker</b></li>
+        <li><span>Account sync</span><b id="aboutBackend">Not connected</b></li>
+        <li><span>Support inbox</span><b id="aboutSupport">Not connected</b></li>
+      </ul>
+    </div>
+
+    <div class="setting-group">
+      <h3>Privacy</h3>
+      <p>Messages are sent only to the AXON AI Worker to generate replies. No analytics, no tracking,
+        no third-party scripts. You can delete all chats at any time in Settings.</p>
+    </div>
+
+    <div class="setting-group">
+      <h3>Help &amp; issues</h3>
+      <button class="btn ghost" id="aboutHelpBtn"><svg><use href="#i-help"/></svg><span>Open Help &amp; issues</span></button>
+    </div>
   </div>
 </section>
 
-<script>
-/* =====================================
-   AXON AI — PART 3: CORE JAVASCRIPT
-===================================== */
-
-const API_DEFAULT = "https://axon-api-staging.axontechno.workers.dev/";
-
-const $ = (id) => document.getElementById(id);
-let selectedImages = [];
-
-function renderImagePreviews() {
-  const container = $("previewImages");
-  const preview = $("imagePreview");
-
-  container.innerHTML = "";
-
-  selectedImages.forEach((image, index) => {
-    const item = document.createElement("div");
-    item.className = "image-preview-item";
-
-    const img = document.createElement("img");
-    img.src = image;
-    img.alt = "Selected image";
-
-    const remove = document.createElement("button");
-    remove.type = "button";
-    remove.textContent = "×";
-    remove.setAttribute("aria-label", "Remove image");
-
-    remove.addEventListener("click", () => {
-      selectedImages.splice(index, 1);
-      renderImagePreviews();
-    });
-
-    item.append(img, remove);
-    container.appendChild(item);
-  });
-
-  preview.classList.toggle("hidden", selectedImages.length === 0);
-}
-
-$("fileInput").addEventListener("change", event => {
-  const files = Array.from(event.target.files);
-
-  for (const file of files) {
-    if (!file.type.startsWith("image/")) {
-      showToast("Please select an image.");
-      continue;
-    }
-
-    if (selectedImages.length >= 5) {
-      showToast("Maximum 5 images allowed.");
-      break;
-    }
-
-    if (file.size > 4 * 1024 * 1024) {
-      showToast("Each image must be under 4 MB.");
-      continue;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      selectedImages.push(reader.result);
-      renderImagePreviews();
-    };
-
-    reader.readAsDataURL(file);
-  }
-
-  event.target.value = "";
-});
-const appState = {
-  chats: [],
-  activeChatId: null,
-  workerUrl: localStorage.getItem("axon_worker_url") || API_DEFAULT,
-  language: localStorage.getItem("axon_language") || "English",
-  theme: localStorage.getItem("axon_theme") || "light",
-  profileName: localStorage.getItem("axon_profile_name") || "",
-  avatar: localStorage.getItem("axon_user_avatar") || "",
-  busy: false,
-  editingIndex: null
-};
-
-/* SAFE LOCAL STORAGE */
-
-function saveChats() {
-  localStorage.setItem("axon_chats", JSON.stringify(appState.chats));
-}
-
-function loadChats() {
-  try {
-    const saved = JSON.parse(localStorage.getItem("axon_chats") || "[]");
-    appState.chats = Array.isArray(saved) ? saved : [];
-  } catch {
-    appState.chats = [];
-  }
-
-  if (appState.chats.length > 0) {
-    appState.activeChatId = appState.chats[0].id;
-  }
-}
-
-/* CURRENT CHAT */
-
-function getActiveChat() {
-  return appState.chats.find(
-    chat => chat.id === appState.activeChatId
-  ) || null;
-}
-
-function createNewChat() {
-  const chat = {
-    id: Date.now().toString(),
-    title: "New chat",
-    messages: [],
-    createdAt: Date.now()
-  };
-
-  appState.chats.unshift(chat);
-  appState.activeChatId = chat.id;
-  appState.editingIndex = null;
-
-  saveChats();
-  renderHistory();
-  renderMessages();
-}
-
-/* CHAT HISTORY */
-
-function renderHistory() {
-  const list = $("historyList");
-  if (!list) return;
-
-  list.replaceChildren();
-
-  appState.chats.forEach(chat => {
-    const button = document.createElement("button");
-    button.className = "history-item";
-    button.textContent = chat.title || "New chat";
-    button.dataset.chatId = chat.id;
-
-    if (chat.id === appState.activeChatId) {
-      button.classList.add("active");
-    }
-
-    button.addEventListener("click", () => {
-      appState.activeChatId = chat.id;
-      appState.editingIndex = null;
-      renderHistory();
-      renderMessages();
-      closeSidebar();
-    });
-
-    list.appendChild(button);
-  });
-}
-
-/* MESSAGE ELEMENT */
-
-function createMessageElement(message, index) {
-  const wrapper = document.createElement("article");
-  wrapper.className = `message ${message.role}`;
-
-  const content = document.createElement("div");
-  content.className = "message-content";
-  content.textContent = message.content || "";
-
-  wrapper.appendChild(content);
-
-  const actions = document.createElement("div");
-  actions.className = "message-actions";
-
-  const copyButton = document.createElement("button");
-  copyButton.className = "icon-btn";
-  copyButton.type = "button";
-  copyButton.setAttribute("aria-label", "Copy message");
-  copyButton.innerHTML = `
-    <svg viewBox="0 0 24 24">
-      <rect x="8" y="8" width="12" height="12" rx="2"/>
-      <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>
-    </svg>
-  `;
-
-  copyButton.addEventListener("click", () => {
-    copyText(message.content || "");
-  });
-
-  actions.appendChild(copyButton);
-
-  if (message.role === "user") {
-    const editButton = document.createElement("button");
-    editButton.className = "icon-btn";
-    editButton.type = "button";
-    editButton.setAttribute("aria-label", "Edit message");
-    editButton.innerHTML = `
-      <svg viewBox="0 0 24 24">
-        <path d="M12 20h9"/>
-        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/>
-      </svg>
-    `;
-
-    editButton.addEventListener("click", () => {
-      startEditing(index);
-    });
-
-    actions.appendChild(editButton);
-  }
-
-  wrapper.appendChild(actions);
-
-  return wrapper;
-}
-
-/* RENDER MESSAGES */
-
-function renderMessages() {
-  const chat = getActiveChat();
-  const welcome = $("welcomeScreen");
-  const messagesBox = $("messages");
-
-  if (!welcome || !messagesBox) return;
-
-  messagesBox.replaceChildren();
-
-  if (!chat || chat.messages.length === 0) {
-    welcome.classList.remove("hidden");
-    messagesBox.classList.add("hidden");
-  } else {
-    welcome.classList.add("hidden");
-    messagesBox.classList.remove("hidden");
-
-    chat.messages.forEach((message, index) => {
-      messagesBox.appendChild(
-        createMessageElement(message, index)
-      );
-    });
-  }
-
-  scrollToBottom();
-}
-
-/* SCROLL */
-
-function scrollToBottom() {
-  const area = $("chatArea");
-  if (!area) return;
-
-  requestAnimationFrame(() => {
-    area.scrollTop = area.scrollHeight;
-  });
-}
-
-/* COPY TEXT */
-
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast("Copied");
-  } catch {
-    showToast("Copy not available");
-  }
-}
-
-/* TOAST MESSAGE */
-
-let toastTimer;
-
-function showToast(message) {
-  const toast = $("toast");
-  if (!toast) return;
-
-  toast.textContent = message;
-  toast.classList.remove("hidden");
-
-  clearTimeout(toastTimer);
-
-  toastTimer = setTimeout(() => {
-    toast.classList.add("hidden");
-  }, 2200);
-}
-
-/* EDIT USER MESSAGE */
-
-function startEditing(index) {
-  const chat = getActiveChat();
-  if (!chat) return;
-
-  const message = chat.messages[index];
-  if (!message || message.role !== "user") return;
-
-  appState.editingIndex = index;
-
-  const input = $("messageInput");
-  if (!input) return;
-
-  input.value = message.content;
-  input.focus();
-
-  showToast("Edit your message, then send it");
-}
-
-/* UPDATE CHAT TITLE */
-
-function updateChatTitle(chat, firstMessage) {
-  if (!chat || chat.messages.length > 1) return;
-
-  const cleanTitle = firstMessage.trim().replace(/\s+/g, " ");
-  chat.title = cleanTitle.length >  30
-    ? cleanTitle.slice(0, 30) + "..."
-    : cleanTitle || "New chat";
-}
-
-/* SHOW TYPING STATUS */
-
-function setTyping(show) {
-  const indicator = $("typingIndicator");
-  if (!indicator) return;
-
-  indicator.classList.toggle("hidden", !show);
-
-  if (show) {
-    scrollToBottom();
-  }
-}
-
-/* AI REQUEST */
-
-async function requestAxonAI(userText, onChunk) {
-  const chat = getActiveChat();
-  if (!chat) throw new Error("No active chat");
-
-  const conversation = chat.messages.map(message => ({
-    role: message.role,
-    content: message.content
-  }));
-
-  let response;
-let lastError;
-
-for (let attempt = 1; attempt <= 2; attempt++) {
-  const controller = new AbortController();
-
-  const timeout = setTimeout(() => {
-    controller.abort();
-  }, 90000);
-
-  try {
-    response = await fetch(appState.workerUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        message: userText,
-        messages: conversation,
-        language: appState.language,
-        images: selectedImages
-      })
-    });
-
-    if (
-      !response.ok &&
-      [502, 503, 504].includes(response.status) &&
-      attempt < 2
-    ) {
-      throw new Error("Temporary server error: " + response.status);
-    }
-
-    if (!response.ok) {
-      throw new Error("AI connection failed: " + response.status);
-    }
-
-    break;
-
-  } catch (error) {
-    lastError = error;
-
-    if (attempt === 2) {
-      throw error;
-    }
-
-    if (
-      error.name === "AbortError" ||
-      error.message.includes("Temporary server error") ||
-      error instanceof TypeError
-    ) {
-      continue;
-    }
-
-    throw error;
-
-  } finally {
-    clearTimeout(timeout);
-  }
-      }
-
-  const reader = response.body.getReader();
-const decoder = new TextDecoder();
-
-let answer = "";
-let buffer = "";
-
-while (true) {
-  const { value, done } = await reader.read();
-
-  if (done) break;
-
-  buffer += decoder.decode(value, { stream: true });
-
-  const lines = buffer.split("\n");
-  buffer = lines.pop() || "";
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-
-    if (!trimmed.startsWith("data:")) continue;
-
-    const payload = trimmed.slice(5).trim();
-
-    if (!payload || payload === "[DONE]") continue;
-
-    try {
-      const chunk = JSON.parse(payload);
-      const piece =
-  chunk.response ||
-  chunk.result?.response ||
-  chunk.choices?.[0]?.delta?.content ||
-  "";
-
-if (piece) {
-  answer += piece;
-
-  if (typeof onChunk === "function") {
-    onChunk(piece);
-  }
-    }
-    } catch {
-      console.warn("AXON stream chunk could not be parsed.");
-    }
-  }
-}
-
-answer += decoder.decode();
-
-if (!answer.trim()) {
-  throw new Error("AI returned an empty response");
-}
-
-return answer.trim();
-    }
-
-/* SEND MESSAGE */
-
-async function sendMessage() {
-  if (appState.busy) return;
-
-  const input = $("messageInput");
-  if (!input) return;
-
-  const text = input.value.trim();
-  const imagesToSend = [...selectedImages];
-
-  if (!text && imagesToSend.length === 0) return;
-
-  if (!getActiveChat()) {
-    createNewChat();
-  }
-
-  const chat = getActiveChat();
-  if (!chat) return;
-
-  const editingIndex = appState.editingIndex;
-
-  if (editingIndex !== null) {
-    const oldMessage = chat.messages[editingIndex];
-
-    if (!oldMessage || oldMessage.role !== "user") {
-      appState.editingIndex = null;
-      return;
-    }
-
-    chat.messages = chat.messages.slice(0, editingIndex);
-    appState.editingIndex = null;
-  }
-
-  const messageText = text ||
-    `Please analyze these ${imagesToSend.length} images.`;
-
-  const userMessage = {
-    role: "user",
-    content: imagesToSend.length
-      ? `${messageText} [${imagesToSend.length} images attached]`
-      : messageText
-  };
-
-  chat.messages.push(userMessage);
-  updateChatTitle(chat, messageText);
-
-  input.value = "";
-  input.style.height = "41px";
-
-  appState.busy = true;
-  $("sendBtn").disabled = true;
-
-  saveChats();
-  renderHistory();
-  renderMessages();
-  setTyping(true);
-
-  try {
-    const assistantMessage = {
-  role: "assistant",
-  content: ""
-};
-
-chat.messages.push(assistantMessage);
-
-const answer = await requestAxonAI(messageText, (chunk) => {
-  assistantMessage.content += chunk;
-  renderMessages();
-});
-
-assistantMessage.content = answer;
-
-    selectedImages = [];
-    renderImagePreviews();
-
-  } catch (error) {
-  const lastMessage = chat.messages[chat.messages.length - 1];
-
-  if (lastMessage?.role === "assistant") {
-    lastMessage.content = lastMessage.content
-      ? lastMessage.content + "\n\n[Response interrupted. Please try again.]"
-      : "I couldn't connect right now. Please check the AI connection and try again.";
-  } else {
-    chat.messages.push({
-      role: "assistant",
-      content: "I couldn't connect right now. Please check the AI connection and try again."
-    });
-  }
-
-  console.error("AXON request error:", error);
-
-  } finally {
-    appState.busy = false;
-    $("sendBtn").disabled = false;
-
-    setTyping(false);
-    saveChats();
-    renderHistory();
-    renderMessages();
-    input.focus();
-  }
-                    }
-
-/* INITIAL LOAD */
-
-function initializeAxon() {
-  loadChats();
-
-  if (!getActiveChat()) {
-    createNewChat();
-  }
-
-  renderHistory();
-  renderMessages();
-
-  if ($("workerUrlInput")) {
-    $("workerUrlInput").value = appState.workerUrl;
-  }
-
-  if ($("languageSelect")) {
-    $("languageSelect").value = appState.language;
-  }
-
-  if ($("themeSelect")) {
-    $("themeSelect").value = appState.theme;
-  }
-
-  applyTheme();
-}
-
-  </script>
- 
-<style>
-/* EXTRA PAGE STYLES */
-
-.full-page {
-  position: absolute;
-  inset: 62px 0 0;
-  z-index: 20;
-  background: var(--bg);
-  overflow-y: auto;
-}
-
-.page-header {
-  height: 58px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 16px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-}
-
-.page-header h2 {
-  font-size: 17px;
-}
-
-.page-content {
-  width: 100%;
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 24px 18px 40px;
-}
-
-.page-content > h3 {
-  margin-bottom: 10px;
-}
-
-.page-content > p {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.setting-group {
-  padding: 18px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.setting-group h3 {
-  font-size: 15px;
-  margin-bottom: 7px;
-}
-
-.setting-group p {
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.6;
-  margin-bottom: 9px;
-}
-
-.setting-group input,
-.setting-group select {
-  width: 100%;
-  min-height: 43px;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  background: var(--surface);
-  color: var(--text);
-  padding: 0 12px;
-  margin-top: 7px;
-}
-
-.page-action-btn {
-  min-height: 42px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 11px;
-  background: linear-gradient(110deg,#7958e8,#bd75d8);
-  color: white;
-  font-weight: 600;
-  margin-top: 12px;
-}
-
-.profile-avatars {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 24px;
-}
-
-.avatar-option {
-  width: 76px;
-  height: 76px;
-  overflow: hidden;
-  border: 2px solid var(--border);
-  border-radius: 50%;
-  background: var(--surface);
-}
-
-.avatar-option.selected {
-  border-color: var(--purple);
-}
-
-.avatar-option img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.sidebar-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 25;
-  background: rgba(20,15,35,.25);
-}
-
-.context-menu {
-  position: fixed;
-  z-index: 100;
-  min-width: 175px;
-  padding: 6px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
-}
-
-.context-menu button {
-  width: 100%;
-  min-height: 40px;
-  padding: 0 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text);
-  text-align: left;
-  font-size: 13px;
-}
-
-.context-menu button:hover {
-  background: var(--hover);
-}
-
-.context-menu svg {
-  width: 17px;
-  height: 17px;
-}
-
-.toast {
-  position: fixed;
-  z-index: 110;
-  left: 50%;
-  bottom: 90px;
-  transform: translateX(-50%);
-  padding: 10px 16px;
-  border-radius: 20px;
-  background: #292536;
-  color: white;
-  font-size: 13px;
-  box-shadow: var(--shadow);
-}
-
-.typing-indicator {
-  display: flex;
-  gap: 5px;
-  padding: 12px 4px;
-}
-
-.typing-indicator span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #987de8;
-  animation: typingPulse 1s infinite ease-in-out;
-}
-
-.typing-indicator span:nth-child(2) {
-  animation-delay: .15s;
-}
-
-.typing-indicator span:nth-child(3) {
-  animation-delay: .3s;
-}
-
-@keyframes typingPulse {
-  0%, 60%, 100% { opacity: .35; }
-  30% { opacity: 1; }
-}
-
-.voice-screen {
-  min-height: 75%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 25px;
-}
-
-.voice-orb {
-  width: 100px;
-  height: 100px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  color: white;
-  background: linear-gradient(135deg,#7958e8,#d77acb);
-  margin-bottom: 22px;
-}
-
-.voice-orb svg {
-  width: 35px;
-  height: 35px;
-}
-
-.voice-screen h2 {
-  font-size: 22px;
-  margin-bottom: 8px;
-}
-
-.voice-screen p {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.voice-screen .voice-note {
-  margin-top: 12px;
-  font-size: 12px;
-}
-
-/* DARK THEME */
-
-body.dark {
-  --bg: #17151e;
-  --surface: #211e2a;
-  --text: #f3f0f8;
-  --muted: #aaa4b5;
-  --border: #383342;
-  --user: #302b45;
-  --hover: #302b3a;
-  --shadow: 0 8px 30px rgba(0,0,0,.25);
-}
-
-body.dark .sidebar {
-  background: #1d1a25;
-}
-
-body.dark .topbar {
-  background: #211e2a;
-  border-color: var(--border);
-}
-
-body.dark .composer {
-  background: #211e2a;
-  border-color: var(--border);
-}
-
-body.dark .composer-wrap {
-  background: linear-gradient(to top,#211e2a 0%,#17151e 65%);
-}
-
-body.dark .suggestion,
-body.dark .new-chat {
-  background: #292437;
-  color: #ded5ff;
-  border-color: #403750;
-}
-
-body.dark .history-item {
-  color: var(--text);
-}
-
-body.dark .history-item:hover,
-body.dark .history-item.active {
-  background: #302b3a;
-}
-</style>
-
-<script>
-/* =====================================
-   AXON AI — PART 4: EVENT HANDLERS
-===================================== */
-
-/* SIDEBAR */
-
-function openSidebar() {
-  $("sidebar").classList.add("open");
-  $("sidebarOverlay").classList.remove("hidden");
-}
-
-function closeSidebar() {
-  $("sidebar").classList.remove("open");
-  $("sidebarOverlay").classList.add("hidden");
-}
-
-$("menuBtn").addEventListener("click", openSidebar);
-$("closeSidebar").addEventListener("click", closeSidebar);
-$("sidebarOverlay").addEventListener("click", closeSidebar);
-
-/* NEW CHAT */
-
-$("newChatBtn").addEventListener("click", () => {
-  createNewChat();
-  closeSidebar();
-  $("messageInput").focus();
-});
-
-/* SEND BUTTON */
-
-$("sendBtn").addEventListener("click", sendMessage);
-
-/* ENTER SENDS, SHIFT + ENTER ADDS NEW LINE */
-
-$("messageInput").addEventListener("keydown", event => {
-  if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
-    event.preventDefault();
-    sendMessage();
-  }
-});
-
-/* NATURAL TEXTAREA GROWTH */
-
-$("messageInput").addEventListener("input", () => {
-  const input = $("messageInput");
-
-  input.style.height = "41px";
-  input.style.height = Math.min(input.scrollHeight, 130) + "px";
-});
-
-/* SUGGESTED PROMPTS */
-
-document.querySelectorAll("[data-prompt]").forEach(button => {
-  button.addEventListener("click", () => {
-    $("messageInput").value = button.dataset.prompt;
-    sendMessage();
-  });
-});
-
-/* SETTINGS PAGE */
-
-function showPage(pageId) {
-  document.querySelectorAll(".full-page").forEach(page => {
-    page.classList.add("hidden");
-  });
-
-  const page = $(pageId);
-  if (page) page.classList.remove("hidden");
-
-  closeSidebar();
-}
-
-function hidePages() {
-  document.querySelectorAll(".full-page").forEach(page => {
-    page.classList.add("hidden");
-  });
-}
-
-$("settingsBtn").addEventListener("click", () => {
-  showPage("settingsPage");
-});
-
-$("profileBtn").addEventListener("click", () => {
-  showPage("profilePage");
-  $("profileNameInput").value = appState.profileName;
-});
-
-document.querySelectorAll("[data-back]").forEach(button => {
-  button.addEventListener("click", hidePages);
-});
-
-/* LANGUAGE SETTING */
-
-$("languageSelect").addEventListener("change", event => {
-  appState.language = event.target.value;
-  localStorage.setItem("axon_language", appState.language);
-  showToast("Language saved");
-});
-
-/* THEME SETTING */
-
-function applyTheme() {
-  document.body.classList.toggle("dark", appState.theme === "dark");
-
-  const selector = $("themeSelect");
-  if (selector) selector.value = appState.theme;
-}
-
-$("themeSelect").addEventListener("change", event => {
-  appState.theme = event.target.value;
-  localStorage.setItem("axon_theme", appState.theme);
-  applyTheme();
-});
-
-/* WORKER URL */
-
-$("saveWorkerUrlBtn").addEventListener("click", () => {
-  const value = $("workerUrlInput").value.trim();
-
-  if (!value) {
-    showToast("Enter a Worker URL");
-    return;
-  }
-
-  try {
-    const parsed = new URL(value);
-
-    if (parsed.protocol !== "https:") {
-      showToast("Use a secure HTTPS URL");
-      return;
-    }
-
-    appState.workerUrl = value.replace(/\/+$/, "") + "/";
-    localStorage.setItem("axon_worker_url", appState.workerUrl);
-    showToast("Connection saved");
-
-  } catch {
-    showToast("Enter a valid URL");
-  }
-});
-
-/* PROFILE AVATAR */
-
-document.querySelectorAll("[data-avatar]").forEach(button => {
-  button.addEventListener("click", () => {
-    appState.avatar = button.dataset.avatar;
-
-    document.querySelectorAll("[data-avatar]").forEach(item => {
-      item.classList.remove("selected");
-    });
-
-    button.classList.add("selected");
-  });
-});
-
-/* SAVE PROFILE */
-
-$("saveProfileBtn").addEventListener("click", () => {
-  appState.profileName = $("profileNameInput").value.trim();
-
-  localStorage.setItem("axon_profile_name", appState.profileName);
-
-  if (appState.avatar) {
-    localStorage.setItem("axon_user_avatar", appState.avatar);
-  }
-
-  showToast("Personal details saved");
-});
-
-/* DELETE ALL CHATS */
-
-$("deleteAllBtn").addEventListener("click", () => {
-  const confirmed = confirm("Delete all conversations?");
-
-  if (!confirmed) return;
-
-  appState.chats = [];
-  appState.activeChatId = null;
-  appState.editingIndex = null;
-
-  saveChats();
-  createNewChat();
-  renderHistory();
-  renderMessages();
-  closeSidebar();
-
-  showToast("All chats deleted");
-});
-
-/* ATTACHMENT PICKER */
-
-$("attachBtn").addEventListener("click", () => {
-  $("fileInput").click();
-});
-
-$("fileInput").addEventListener("change", event => {
-  const file = event.target.files[0];
-
-  if (file) {
-    showToast("Selected: " + file.name);
-  }
-
-  event.target.value = "";
-});
-
-/* VOICE PAGE */
-
-$("voiceBtn").addEventListener("click", () => {
-  showPage("voicePage");
-});
-
-/* LONG-PRESS MESSAGE MENU */
-
-let pressTimer = null;
-let selectedMessage = null;
-let pressStarted = false;
-
-function hideContextMenu() {
-  $("contextMenu").classList.add("hidden");
-  selectedMessage = null;
-}
-
-function showContextMenu(message, x, y) {
-  selectedMessage = message;
-
-  const menu = $("contextMenu");
-  menu.classList.remove("hidden");
-
-  const menuWidth = 185;
-  const menuHeight = 100;
-
-  const left = Math.max(
-    8,
-    Math.min(x, window.innerWidth - menuWidth - 8)
-  );
-
-  const top = Math.max(
-    8,
-    Math.min(y, window.innerHeight - menuHeight - 8)
-  );
-
-  menu.style.left = left + "px";
-  menu.style.top = top + "px";
-}
-
-document.addEventListener("pointerdown", event => {
-  const messageElement = event.target.closest(".message");
-
-  if (!messageElement) return;
-
-  const chat = getActiveChat();
-  if (!chat) return;
-
-  const content = messageElement.querySelector(".message-content");
-  if (!content) return;
-
-  const messageText = content.textContent;
-
-  const messageIndex = Array.from(
-    messageElement.parentElement.children
-  ).indexOf(messageElement);
-
-  const message = chat.messages[messageIndex];
-  if (!message || message.role !== "user") return;
-
-  pressStarted = true;
-
-  pressTimer = setTimeout(() => {
-    if (!pressStarted) return;
-
-    showContextMenu(
-      {
-        text: messageText,
-        index: messageIndex
-      },
-      event.clientX,
-      event.clientY
-    );
-
-    pressStarted = false;
-  }, 550);
-});
-
-document.addEventListener("pointerup", () => {
-  pressStarted = false;
-  clearTimeout(pressTimer);
-});
-
-document.addEventListener("pointercancel", () => {
-  pressStarted = false;
-  clearTimeout(pressTimer);
-});
-
-document.addEventListener("pointermove", () => {
-  if (pressStarted) {
-    clearTimeout(pressTimer);
-    pressStarted = false;
-  }
-});
-
-/* CONTEXT MENU: COPY */
-
-$("copyMessageBtn").addEventListener("click", () => {
-  if (!selectedMessage) return;
-
-  copyText(selectedMessage.text);
-  hideContextMenu();
-});
-
-/* CONTEXT MENU: EDIT */
-
-$("editMessageBtn").addEventListener("click", () => {
-  if (!selectedMessage) return;
-
-  startEditing(selectedMessage.index);
-  hideContextMenu();
-});
-
-/* CLOSE CONTEXT MENU */
-
-document.addEventListener("click", event => {
-  if (
-    !$("contextMenu").contains(event.target) &&
-    !event.target.closest(".message")
-  ) {
-    hideContextMenu();
-  }
-});
-
-/* ESCAPE KEY */
-
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape") {
-    closeSidebar();
-    hidePages();
-    hideContextMenu();
-  }
-});
-
-/* START AXON */
-
-initializeAxon();
-
-                                 </script>
-                                 
+<!-- HELP & ISSUES -->
+<section class="full-page hidden" id="helpPage" aria-label="Help and issues">
+  <header class="page-header">
+    <button class="icon-btn" data-back aria-label="Back"><svg><use href="#i-arrow-left"/></svg></button>
+    <h2>Help &amp; issues</h2>
+  </header>
+  <div class="page-content">
+    <div class="setting-group">
+      <h3>Describe your issue</h3>
+      <p>Tell us what went wrong. Include what you expected and what happened.</p>
+      <textarea id="issueInput" class="report-input" rows="5" maxlength="2000"
+        placeholder="e.g. My messages fail to send when I attach two images."></textarea>
+      <div class="report-row">
+        <span class="char-count" id="issueCount">0 / 2000</span>
+        <button class="btn primary" id="issueSendBtn"><svg><use href="#i-send"/></svg><span>Send issue</span></button>
+      </div>
+      <p class="report-status" id="issueStatus" role="status"></p>
+    </div>
+
+    <div class="setting-group">
+      <h3>Send feedback</h3>
+      <p>Ideas, praise or feature requests — anything helps.</p>
+      <textarea id="feedbackInput" class="report-input" rows="4" maxlength="2000"
+        placeholder="What would make AXON better for you?"></textarea>
+      <div class="report-row">
+        <span class="char-count" id="feedbackCount">0 / 2000</span>
+        <button class="btn primary" id="feedbackSendBtn"><svg><use href="#i-send"/></svg><span>Send feedback</span></button>
+      </div>
+      <p class="report-status" id="feedbackStatus" role="status"></p>
+    </div>
+
+    <div class="setting-group">
+      <h3>Submission history</h3>
+      <p>Requests saved on this device. They are only delivered once a support endpoint is connected.</p>
+      <div id="reportHistory" class="report-history"></div>
+    </div>
+
+    <div class="setting-group">
+      <h3>Quick fixes</h3>
+      <ul class="info-list">
+        <li><span>AI not replying</span><b>Settings → Test connection</b></li>
+        <li><span>Old data stuck</span><b>Reload the app</b></li>
+        <li><span>Voice not working</span><b>Allow microphone access</b></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- VOICE (full screen) -->
+<section class="voice-screen hidden" id="voiceScreen" aria-label="Live voice chat">
+  <div class="voice-bg" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <div class="voice-topbar">
+    <div class="voice-brand">
+      <img src="./assets/axon-logo.webp" alt="" width="26" height="26">
+      <span>AXON Voice</span>
+    </div>
+    <button class="icon-btn voice-close" id="voiceCloseBtn" aria-label="End voice mode">
+      <svg><use href="#i-x"/></svg>
+    </button>
+  </div>
+
+  <div class="voice-center">
+    <div class="voice-orb" id="voiceOrb">
+      <span class="orb-ring ring-1"></span>
+      <span class="orb-ring ring-2"></span>
+      <span class="orb-ring ring-3"></span>
+      <img src="./assets/axon-logo.webp" alt="AXON" class="orb-logo" width="86" height="86">
+    </div>
+    <p class="voice-state" id="voiceState">Tap the microphone to speak</p>
+    <p class="voice-transcript" id="voiceTranscript"></p>
+    <p class="voice-reply" id="voiceReply"></p>
+  </div>
+
+  <div class="voice-controls">
+    <button class="voice-mic" id="voiceMicBtn" aria-label="Start listening">
+      <svg><use href="#i-mic"/></svg>
+    </button>
+    <p class="voice-hint" id="voiceHint">Voice replies use your device speech engine.</p>
+  </div>
+</section>
+
+<script type="module" src="./js/main.js"></script>
 </body>
 </html>

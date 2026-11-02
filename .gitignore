@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Editor / tooling backups — never publish these
+.base/
+.polydev/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
