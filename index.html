@@ -1269,7 +1269,7 @@ function setTyping(show) {
 
 /* AI REQUEST */
 
-async function requestAxonAI(userText) {
+async function requestAxonAI(userText, onChunk) {
   const chat = getActiveChat();
   if (!chat) throw new Error("No active chat");
 
