@@ -1366,7 +1366,19 @@ while (true) {
 
     try {
       const chunk = JSON.parse(payload);
-      answer += chunk.response || "";
+      const piece =
+  chunk.response ||
+  chunk.result?.response ||
+  chunk.choices?.[0]?.delta?.content ||
+  "";
+
+if (piece) {
+  answer += piece;
+
+  if (typeof onChunk === "function") {
+    onChunk(piece);
+  }
+    }
     } catch {
       console.warn("AXON stream chunk could not be parsed.");
     }
@@ -1441,23 +1453,38 @@ async function sendMessage() {
   setTyping(true);
 
   try {
-    const answer = await requestAxonAI(messageText);
+    const assistantMessage = {
+  role: "assistant",
+  content: ""
+};
 
-    chat.messages.push({
-      role: "assistant",
-      content: answer
-    });
+chat.messages.push(assistantMessage);
+
+const answer = await requestAxonAI(messageText, (chunk) => {
+  assistantMessage.content += chunk;
+  renderMessages();
+});
+
+assistantMessage.content = answer;
 
     selectedImages = [];
     renderImagePreviews();
 
   } catch (error) {
+  const lastMessage = chat.messages[chat.messages.length - 1];
+
+  if (lastMessage?.role === "assistant") {
+    lastMessage.content = lastMessage.content
+      ? lastMessage.content + "\n\n[Response interrupted. Please try again.]"
+      : "I couldn't connect right now. Please check the AI connection and try again.";
+  } else {
     chat.messages.push({
       role: "assistant",
       content: "I couldn't connect right now. Please check the AI connection and try again."
     });
+  }
 
-    console.error("AXON request error:", error);
+  console.error("AXON request error:", error);
 
   } finally {
     appState.busy = false;
