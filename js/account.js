@@ -148,6 +148,7 @@ export function initAccount() {
   });
 
   $("#saveProfileBtn")?.addEventListener("click", saveProfile);
+  $("#cancelProfileBtn")?.addEventListener("click", closeAccountPage);
   $("#logoutBtn")?.addEventListener("click", doLogout);
   $("#syncNowBtn")?.addEventListener("click", async () => {
     const btn = $("#syncNowBtn");

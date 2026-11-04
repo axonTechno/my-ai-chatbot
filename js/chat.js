@@ -216,14 +216,6 @@ function buildActions(message, chat) {
         onClick: () => shareMessage(message)
       })
     );
-    actions.appendChild(
-      actionButton({
-        iconId: "i-trash",
-        label: "Delete message",
-        danger: true,
-        onClick: () => deleteMessage(chat, message.id)
-      })
-    );
   }
 
   if (!message.error) actions.appendChild(el("span", "msg-time", formatTime(message.time)));
@@ -707,22 +699,7 @@ export function cancelEdit() {
   document.dispatchEvent(new CustomEvent("axon:edit-mode", { detail: { on: false } }));
 }
 
-export async function deleteMessage(chat, messageId) {
-  const msg = chat.messages.find((m) => m.id === messageId);
-  if (!msg) return;
-  const ok = await confirmDialog({
-    title: "Delete this message?",
-    text: "The message will be removed from this conversation on this device.",
-    okLabel: "Delete"
-  });
-  if (!ok) return;
-  chat.messages = chat.messages.filter((m) => m.id !== messageId);
-  touchChat(chat);
-  persistChats();
-  renderMessages();
-  document.dispatchEvent(new CustomEvent("axon:chat-updated"));
-  toast("Message deleted");
-}
+
 
 /* ================= OFFLINE QUEUE ================= */
 

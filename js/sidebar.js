@@ -3,28 +3,39 @@
    Sidebar, conversation history (Pinned / Recent), search,
    per-chat menus, chat top-bar menu, About entry point.
    ========================================================= */
+
 import { store, sortedChats, getChat, deleteChat, togglePin, renameChat, duplicateChat, createChat } from "./state.js";
 import { $, $$, toast, openMenu, confirmDialog, promptDialog, haptic, formatDay } from "./ui.js";
 import { setActiveChat, activeChat, exportChat, exportChatJSON, shareChat, getState } from "./chat.js";
 import { queueOutbox, isSignedIn } from "./backend.js";
+
 let searchTerm = "";
+
 export function isSidebarOpen() {
   return $("#sidebar")?.classList.contains("open");
 }
+
 export function openSidebar() {
   $("#sidebar")?.classList.add("open");
   $("#sidebarOverlay")?.classList.remove("hidden");
   $("#menuBtn")?.setAttribute("aria-expanded", "true");
+  // Add scroll lock to body to prevent background scrolling on mobile
+  document.body.style.overflow = "hidden";
 }
+
 export function closeSidebar() {
   $("#sidebar")?.classList.remove("open");
   $("#sidebarOverlay")?.classList.add("hidden");
   $("#menuBtn")?.setAttribute("aria-expanded", "false");
+  // Restore body scroll
+  document.body.style.overflow = "";
 }
+
 export function toggleSidebar() {
   if (isSidebarOpen()) closeSidebar();
   else openSidebar();
 }
+
 function highlight(title, term) {
   if (!term) return document.createTextNode(title);
   const frag = document.createDocumentFragment();
@@ -41,18 +52,21 @@ function highlight(title, term) {
   frag.appendChild(document.createTextNode(title.slice(idx + term.length)));
   return frag;
 }
+
 function chatMatches(chat, term) {
   if (!term) return true;
   const t = term.toLowerCase();
   if (chat.title.toLowerCase().includes(t)) return true;
   return chat.messages.some((m) => (m.content || "").toLowerCase().includes(t));
 }
+
 function historyItem(chat) {
   const item = document.createElement("button");
   item.type = "button";
   item.className = "history-item";
   item.dataset.id = chat.id;
   if (chat.id === getState().activeChatId) item.classList.add("active");
+
   const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   icon.setAttribute("class", "hi-icon");
   icon.setAttribute("aria-hidden", "true");
@@ -60,10 +74,12 @@ function historyItem(chat) {
   use.setAttribute("href", chat.pinned ? "#i-pin" : "#i-message");
   icon.appendChild(use);
   item.appendChild(icon);
+
   const title = document.createElement("span");
   title.className = "hi-title";
   title.appendChild(highlight(chat.title, searchTerm));
   item.appendChild(title);
+
   const more = document.createElement("span");
   more.className = "hi-more";
   more.setAttribute("role", "button");
@@ -76,8 +92,10 @@ function historyItem(chat) {
   moreIcon.appendChild(moreUse);
   more.appendChild(moreIcon);
   item.appendChild(more);
+
   let pressTimer = null;
   let longPressed = false;
+
   const startPress = () => {
     longPressed = false;
     clearTimeout(pressTimer);
@@ -88,6 +106,7 @@ function historyItem(chat) {
     }, 480);
   };
   const endPress = () => clearTimeout(pressTimer);
+
   item.addEventListener("pointerdown", startPress);
   item.addEventListener("pointerup", endPress);
   item.addEventListener("pointerleave", endPress);
@@ -96,6 +115,7 @@ function historyItem(chat) {
     e.preventDefault();
     openChatMenu(chat, item);
   });
+
   item.addEventListener("click", (e) => {
     if (longPressed) {
       e.preventDefault();
@@ -108,14 +128,17 @@ function historyItem(chat) {
     setActiveChat(chat.id);
     closeSidebar();
   });
+
   more.addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       openChatMenu(chat, more);
     }
   });
+
   return item;
 }
+
 export function openChatMenu(chat, anchor) {
   openMenu(
     [
@@ -139,6 +162,7 @@ export function openChatMenu(chat, anchor) {
     anchor
   );
 }
+
 export async function renameChatFlow(chat) {
   const value = await promptDialog({
     title: "Rename conversation",
@@ -152,6 +176,7 @@ export async function renameChatFlow(chat) {
   document.dispatchEvent(new CustomEvent("axon:chat-updated"));
   toast("Renamed");
 }
+
 function duplicateChatFlow(chat) {
   const copy = duplicateChat(chat.id);
   if (!copy) return;
@@ -159,6 +184,7 @@ function duplicateChatFlow(chat) {
   setActiveChat(copy.id);
   toast("Conversation duplicated");
 }
+
 export async function deleteChatFlow(chat) {
   const ok = await confirmDialog({
     title: "Delete conversation?",
@@ -179,6 +205,7 @@ export async function deleteChatFlow(chat) {
   }
   toast("Conversation deleted");
 }
+
 function section(label, iconId, chats, container) {
   if (!chats.length) return;
   const head = document.createElement("div");
@@ -191,18 +218,22 @@ function section(label, iconId, chats, container) {
   head.appendChild(svg);
   head.appendChild(document.createTextNode(label));
   container.appendChild(head);
+
   const list = document.createElement("div");
   list.className = "history-list";
   chats.forEach((c) => list.appendChild(historyItem(c)));
   container.appendChild(list);
 }
+
 export function renderHistory() {
   const container = $("#historyList");
   const empty = $("#historyEmpty");
   if (!container) return;
+
   const term = searchTerm.trim();
   const all = sortedChats().filter((c) => chatMatches(c, term));
   container.replaceChildren();
+
   if (!all.length) {
     if (empty) {
       empty.classList.remove("hidden");
@@ -211,13 +242,17 @@ export function renderHistory() {
     return;
   }
   if (empty) empty.classList.add("hidden");
+
   if (term) {
     section(`Results (${all.length})`, "i-search", all, container);
     return;
   }
+
   const pinned = all.filter((c) => c.pinned);
   const recent = all.filter((c) => !c.pinned);
+
   section("Pinned", "i-pin", pinned, container);
+
   /* group recent chats by day bucket */
   const groups = new Map();
   recent.forEach((c) => {
@@ -229,12 +264,14 @@ export function renderHistory() {
     section(label, "i-message", chats, container);
   });
 }
+
 export function setSearch(term) {
   searchTerm = term;
   const clear = $("#clearSearch");
   if (clear) clear.classList.toggle("hidden", !term);
   renderHistory();
 }
+
 export function refreshAccountChip() {
   const name = $("#sidebarName");
   const email = $("#sidebarEmail");
@@ -251,16 +288,19 @@ export function refreshAccountChip() {
     avatar.src = store.profile.avatar === "female" ? "./assets/female-avatar.webp" : "./assets/male-avatar.webp";
   }
 }
+
 export function initSidebar() {
   $("#menuBtn")?.addEventListener("click", toggleSidebar);
   $("#closeSidebar")?.addEventListener("click", closeSidebar);
   $("#sidebarOverlay")?.addEventListener("click", closeSidebar);
+
   $("#newChatBtn")?.addEventListener("click", () => {
     const chat = createChat();
     setActiveChat(chat.id);
     closeSidebar();
     $("#messageInput")?.focus();
   });
+
   $("#chatSearch")?.addEventListener("input", (e) => setSearch(e.target.value));
   $("#clearSearch")?.addEventListener("click", () => {
     const input = $("#chatSearch");
@@ -268,6 +308,7 @@ export function initSidebar() {
     setSearch("");
     input?.focus();
   });
+
   $("#chatMenuBtn")?.addEventListener("click", (e) => {
     const chat = activeChat();
     if (!chat || !chat.messages.length) {
@@ -276,6 +317,7 @@ export function initSidebar() {
     }
     openChatMenu(chat, e.currentTarget);
   });
+
   document.addEventListener("axon:chat-updated", () => {
     renderHistory();
     updateTopbarTitle();
@@ -284,10 +326,12 @@ export function initSidebar() {
     renderHistory();
     updateTopbarTitle();
   });
+
   renderHistory();
   refreshAccountChip();
   updateTopbarTitle();
 }
+
 export function updateTopbarTitle() {
   const chat = activeChat();
   const title = $("#topbarTitle");
