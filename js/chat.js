@@ -91,12 +91,6 @@ function icon(id, cls = "") {
 function buildHead(message) {
   const head = el("div", "msg-head");
   if (message.role === "user") {
-    const img = el("img");
-    img.src = avatarSrc(store.profile.avatar);
-    img.alt = "";
-    img.width = 22;
-    img.height = 22;
-    head.appendChild(img);
     head.appendChild(el("span", null, store.profile.name || "You"));
   } else {
     const mark = el("span", "ai-mark");
@@ -219,17 +213,6 @@ function buildActions(message, chat) {
   }
 
   if (!message.error) actions.appendChild(el("span", "msg-time", formatTime(message.time)));
-  if (message.role === "assistant" && !message.error && message.content) {
-    actions.appendChild(
-      actionButton({
-        iconId: "i-volume",
-        label: "Read answer aloud",
-        onClick: () => {
-          document.dispatchEvent(new CustomEvent("axon:speak", { detail: { text: message.content } }));
-        }
-      })
-    );
-  }
   return actions;
 }
 
