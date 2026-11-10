@@ -94,9 +94,6 @@ function paintSettings() {
   const stream = $("#streamToggle");
   if (stream) stream.checked = store.settings.stream !== false;
 
-  const speak = $("#speakRepliesToggle");
-  if (speak) speak.checked = !!store.settings.speakReplies;
-
   const workerInput = $("#workerUrlInput");
   if (workerInput) workerInput.value = store.settings.workerUrl || "";
 
@@ -352,10 +349,6 @@ export function initSettings() {
   });
   $("#streamToggle")?.addEventListener("change", (e) => {
     store.settings.stream = e.target.checked;
-    persistSettings();
-  });
-  $("#speakRepliesToggle")?.addEventListener("change", (e) => {
-    store.settings.speakReplies = e.target.checked;
     persistSettings();
   });
 

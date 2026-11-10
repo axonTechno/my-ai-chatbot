@@ -151,13 +151,15 @@ body.dark .welcome h1 {
 }
 
 .msg.user .msg-body {
-  background: #e6f2ff; /* very light blue */
+  background: rgba(190, 220, 255, 0.42); /* very light blue glass */
   color: #000000; /* black text */
-  border: none;
-  border-radius: 12px;
-  padding: 10px 14px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 16px;
+  padding: 12px 16px;
   white-space: pre-wrap;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .msg.ai .msg-body { padding: 0 2px; }
@@ -648,4 +650,30 @@ body.dark .welcome h1 {
 @media (max-width: 380px) {
   .suggestions { grid-template-columns: 1fr; }
   .msg-images img { width: 92px; height: 92px; }
+}
+
+/* sending status styling */
+.send-status-wrapper {
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.send-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.04);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.send-status.failed {
+  background: rgba(255,0,0,0.08);
+  color: var(--danger);
 }

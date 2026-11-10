@@ -26,8 +26,7 @@ export const DEFAULT_SETTINGS = {
   enterToSend: true,
   stream: true,
   model: "auto",
-  workerUrl: "",
-  speakReplies: false
+  workerUrl: ""
 };
 
 export const DEFAULT_PROFILE = {

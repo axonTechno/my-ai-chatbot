@@ -255,6 +255,19 @@ function buildMessage(chat, message) {
     const images = buildImages(message);
     if (images) body.appendChild(images);
     if (message.content) body.appendChild(el("div", "user-text", message.content));
+  } else if (message.error) {
+    body.appendChild(buildErrorCard(chat, message));
+  } else if (message.thinking) {
+    body.appendChild(thinkingNode());
+  } else {
+    body.appendChild(renderMarkdown(message.content));
+  }
+
+  wrap.appendChild(body);
+  
+  // Add sending status as separate element below the message
+  if (message.pending || message.failed) {
+    const statusWrap = el("div", "send-status-wrapper");
     if (message.pending) {
       const status = el("div", "send-status");
       status.appendChild(icon("i-refresh"));
@@ -265,22 +278,16 @@ function buildMessage(chat, message) {
             ? "Sending image…"
             : "Sending...";
       status.appendChild(el("span", null, label));
-      body.appendChild(status);
+      statusWrap.appendChild(status);
     } else if (message.failed) {
       const status = el("div", "send-status failed");
       status.appendChild(icon("i-alert"));
       status.appendChild(el("span", null, "Not sent"));
-      body.appendChild(status);
+      statusWrap.appendChild(status);
     }
-  } else if (message.error) {
-    body.appendChild(buildErrorCard(chat, message));
-  } else if (message.thinking) {
-    body.appendChild(thinkingNode());
-  } else {
-    body.appendChild(renderMarkdown(message.content));
+    wrap.appendChild(statusWrap);
   }
-
-  wrap.appendChild(body);
+  
   wrap.appendChild(buildActions(message, chat));
   return wrap;
 }
@@ -469,9 +476,6 @@ async function runGeneration(chat, { assistantMessage, history, message, images 
     flushSaveChats();
     renderMessages();
     maybeAutoScroll();
-    if (store.settings.speakReplies && assistantMessage.content) {
-      document.dispatchEvent(new CustomEvent("axon:speak", { detail: { text: assistantMessage.content } }));
-    }
     document.dispatchEvent(new CustomEvent("axon:chat-updated"));
     return true;
   } catch (err) {
