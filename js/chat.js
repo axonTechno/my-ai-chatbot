@@ -91,7 +91,7 @@ function icon(id, cls = "") {
 function buildHead(message) {
   const head = el("div", "msg-head");
   if (message.role === "user") {
-    head.appendChild(el("span", null, store.profile.name || "You"));
+    // No user avatar or label for user messages
   } else {
     const mark = el("span", "ai-mark");
     mark.appendChild(icon("i-sparkles"));
