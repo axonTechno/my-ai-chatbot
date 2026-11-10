@@ -89,16 +89,7 @@ function icon(id, cls = "") {
 }
 
 function buildHead(message) {
-  const head = el("div", "msg-head");
-  if (message.role === "user") {
-    // No user avatar or label for user messages
-  } else {
-    const mark = el("span", "ai-mark");
-    mark.appendChild(icon("i-sparkles"));
-    head.appendChild(mark);
-    head.appendChild(el("span", null, "AXON"));
-  }
-  return head;
+  return el("div", "msg-head");
 }
 
 function buildImages(message) {
@@ -186,35 +177,33 @@ function buildActions(message, chat) {
       }
     }
   } else {
-    const menu = el("div", "user-action-menu");
-    menu.appendChild(
+    actions.appendChild(
       actionButton({
         iconId: "i-copy",
-        label: "Copy message", text: "Copy",
+        label: "Copy message",
         onClick: async () => {
           const ok = await copyText(message.content);
           toast(ok ? "Copied to clipboard" : "Could not copy", ok ? "" : "error");
         }
       })
     );
-    menu.appendChild(
+    actions.appendChild(
       actionButton({
         iconId: "i-edit",
-        label: "Edit message", text: "Edit",
+        label: "Edit message",
         onClick: () => startEdit(chat, message.id)
       })
     );
-    menu.appendChild(
+    actions.appendChild(
       actionButton({
         iconId: "i-share",
-        label: "Share message", text: "Share",
+        label: "Share message",
         onClick: () => shareMessage(message)
       })
     );
-    actions.appendChild(menu);
   }
 
-  if (!message.error) actions.appendChild(el("span", "msg-time", formatTime(message.time)));
+
   return actions;
 }
 
@@ -256,7 +245,31 @@ function buildMessage(chat, message) {
   if (message.role === "user") {
     const images = buildImages(message);
     if (images) body.appendChild(images);
-    if (message.content) body.appendChild(el("div", "user-text", message.content));
+    if (message.content) {
+      const text = el("div", "user-text", message.content);
+      body.appendChild(text);
+
+      requestAnimationFrame(() => {
+        const lineHeight = parseFloat(getComputedStyle(text).lineHeight);
+        const maxHeight = lineHeight * 5;
+
+        if (text.scrollHeight <= maxHeight + 2) return;
+
+        text.classList.add("is-collapsed");
+
+        const toggle = el("button", "user-text-toggle", "Show more");
+        toggle.type = "button";
+        toggle.setAttribute("aria-expanded", "false");
+
+        toggle.addEventListener("click", () => {
+          const expanded = text.classList.toggle("is-collapsed");
+          toggle.textContent = expanded ? "Show more" : "Show less";
+          toggle.setAttribute("aria-expanded", String(!expanded));
+        });
+
+        body.appendChild(toggle);
+      });
+    }
   } else if (message.error) {
     body.appendChild(buildErrorCard(chat, message));
   } else if (message.thinking) {
@@ -290,12 +303,7 @@ function buildMessage(chat, message) {
     wrap.appendChild(statusWrap);
   }
   
-  const actions = buildActions(message, chat);
-  if (message.role === "user") {
-    const menu = actions.querySelector(".user-action-menu");
-    if (menu) body.appendChild(menu);
-  }
-  wrap.appendChild(actions);
+  wrap.appendChild(buildActions(message, chat));
   return wrap;
 }
 
@@ -513,71 +521,7 @@ async function runGeneration(chat, { assistantMessage, history, message, images 
   } finally {
     state.controller = null;
     document.dispatchEvent(new CustomEvent("axon:stream-state", { detail: { streaming: false } }));
-    /* Long-press and right-click menu for user messages */
-  const messages = $("#messages");
-  if (messages && !messages.dataset.userMenuReady) {
-    messages.dataset.userMenuReady = "1";
-    let pressTimer = null;
-    let pressedMessage = null;
-    let startX = 0;
-    let startY = 0;
-
-    const closeUserMenus = () => {
-      messages.querySelectorAll(".msg.user.menu-open").forEach((item) => {
-        item.classList.remove("menu-open");
-      });
-    };
-
-    const openUserMenu = (item) => {
-      closeUserMenus();
-      item.classList.add("menu-open");
-    };
-
-    const clearPress = () => {
-      if (pressTimer) clearTimeout(pressTimer);
-      pressTimer = null;
-      pressedMessage = null;
-    };
-
-    messages.addEventListener("pointerdown", (e) => {
-      if (e.target.closest(".user-action-menu")) return;
-      const item = e.target.closest(".msg.user");
-      closeUserMenus();
-      clearPress();
-      if (!item) return;
-      pressedMessage = item;
-      startX = e.clientX;
-      startY = e.clientY;
-      pressTimer = setTimeout(() => {
-        if (pressedMessage === item) openUserMenu(item);
-        pressTimer = null;
-      }, 500);
-    });
-
-    document.addEventListener("pointermove", (e) => {
-      if (!pressedMessage) return;
-      if (Math.abs(e.clientX - startX) > 10 ||
-          Math.abs(e.clientY - startY) > 10) clearPress();
-    });
-
-    document.addEventListener("pointerup", clearPress);
-    document.addEventListener("pointercancel", clearPress);
-
-    messages.addEventListener("contextmenu", (e) => {
-      const item = e.target.closest(".msg.user");
-      if (!item || e.target.closest(".user-action-menu")) return;
-      e.preventDefault();
-      clearPress();
-      openUserMenu(item);
-    });
-
-    document.addEventListener("pointerdown", (e) => {
-      if (e.target.closest(".msg.user")) return;
-      closeUserMenus();
-    });
-  }
-
-  syncComposerButtons();
+    syncComposerButtons();
   }
 }
 
@@ -654,7 +598,7 @@ export async function sendMessage({ text, images = [], editingId = null }) {
   };
   chat.messages.push(assistantMessage);
 
-  if (chat.autoTitle) {
+  if (chat.autoTitle && chat.messages.filter((message) => message.role === "user").length === 1) {
     chat.title = titleFromText(content, images);
   }
   touchChat(chat);
@@ -781,7 +725,9 @@ function queueOfflineSend(payload) {
     error: null,
     pending: "offline"
   });
-  if (chat.autoTitle && payload.text) chat.title = titleFromText(payload.text, payload.images);
+  if (chat.autoTitle && payload.text && chat.messages.filter((message) => message.role === "user").length === 1) {
+    chat.title = titleFromText(payload.text, payload.images);
+  }
   touchChat(chat);
   persistChats();
   renderMessages();
