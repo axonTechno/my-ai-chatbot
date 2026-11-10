@@ -186,30 +186,32 @@ function buildActions(message, chat) {
       }
     }
   } else {
-    actions.appendChild(
+    const menu = el("div", "user-action-menu");
+    menu.appendChild(
       actionButton({
         iconId: "i-copy",
-        label: "Copy message",
+        label: "Copy message", text: "Copy",
         onClick: async () => {
           const ok = await copyText(message.content);
           toast(ok ? "Copied to clipboard" : "Could not copy", ok ? "" : "error");
         }
       })
     );
-    actions.appendChild(
+    menu.appendChild(
       actionButton({
         iconId: "i-edit",
-        label: "Edit message",
+        label: "Edit message", text: "Edit",
         onClick: () => startEdit(chat, message.id)
       })
     );
-    actions.appendChild(
+    menu.appendChild(
       actionButton({
         iconId: "i-share",
-        label: "Share message",
+        label: "Share message", text: "Share",
         onClick: () => shareMessage(message)
       })
     );
+    actions.appendChild(menu);
   }
 
   if (!message.error) actions.appendChild(el("span", "msg-time", formatTime(message.time)));
@@ -288,7 +290,12 @@ function buildMessage(chat, message) {
     wrap.appendChild(statusWrap);
   }
   
-  wrap.appendChild(buildActions(message, chat));
+  const actions = buildActions(message, chat);
+  if (message.role === "user") {
+    const menu = actions.querySelector(".user-action-menu");
+    if (menu) body.appendChild(menu);
+  }
+  wrap.appendChild(actions);
   return wrap;
 }
 
@@ -506,7 +513,71 @@ async function runGeneration(chat, { assistantMessage, history, message, images 
   } finally {
     state.controller = null;
     document.dispatchEvent(new CustomEvent("axon:stream-state", { detail: { streaming: false } }));
-    syncComposerButtons();
+    /* Long-press and right-click menu for user messages */
+  const messages = $("#messages");
+  if (messages && !messages.dataset.userMenuReady) {
+    messages.dataset.userMenuReady = "1";
+    let pressTimer = null;
+    let pressedMessage = null;
+    let startX = 0;
+    let startY = 0;
+
+    const closeUserMenus = () => {
+      messages.querySelectorAll(".msg.user.menu-open").forEach((item) => {
+        item.classList.remove("menu-open");
+      });
+    };
+
+    const openUserMenu = (item) => {
+      closeUserMenus();
+      item.classList.add("menu-open");
+    };
+
+    const clearPress = () => {
+      if (pressTimer) clearTimeout(pressTimer);
+      pressTimer = null;
+      pressedMessage = null;
+    };
+
+    messages.addEventListener("pointerdown", (e) => {
+      if (e.target.closest(".user-action-menu")) return;
+      const item = e.target.closest(".msg.user");
+      closeUserMenus();
+      clearPress();
+      if (!item) return;
+      pressedMessage = item;
+      startX = e.clientX;
+      startY = e.clientY;
+      pressTimer = setTimeout(() => {
+        if (pressedMessage === item) openUserMenu(item);
+        pressTimer = null;
+      }, 500);
+    });
+
+    document.addEventListener("pointermove", (e) => {
+      if (!pressedMessage) return;
+      if (Math.abs(e.clientX - startX) > 10 ||
+          Math.abs(e.clientY - startY) > 10) clearPress();
+    });
+
+    document.addEventListener("pointerup", clearPress);
+    document.addEventListener("pointercancel", clearPress);
+
+    messages.addEventListener("contextmenu", (e) => {
+      const item = e.target.closest(".msg.user");
+      if (!item || e.target.closest(".user-action-menu")) return;
+      e.preventDefault();
+      clearPress();
+      openUserMenu(item);
+    });
+
+    document.addEventListener("pointerdown", (e) => {
+      if (e.target.closest(".msg.user")) return;
+      closeUserMenus();
+    });
+  }
+
+  syncComposerButtons();
   }
 }
 

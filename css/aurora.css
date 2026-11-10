@@ -416,3 +416,63 @@ body.dark::before {
     transform: none;
   }
 }
+
+/* User message floating action menu */
+.msg.user .msg-body {
+  position: relative;
+}
+
+.msg.user .user-action-menu {
+  display: none;
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 112px;
+  padding: 6px;
+  background: #ffffff;
+  color: #111111;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 5px 22px rgba(0, 0, 0, 0.16);
+}
+
+.msg.user .user-action-menu button {
+  display: flex;
+  width: 100%;
+  min-height: 34px;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #111111;
+  font-size: 13px;
+  text-align: left;
+}
+
+.msg.user .user-action-menu button:hover {
+  background: #f1f1f1;
+  color: #000000;
+}
+
+.msg.user .user-action-menu button svg {
+  width: 16px;
+  height: 16px;
+  stroke: #111111;
+}
+
+.msg.user .msg-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+
+.msg.user.menu-open .user-action-menu {
+  display: flex;
+}
