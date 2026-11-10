@@ -177,30 +177,26 @@ function buildActions(message, chat) {
       }
     }
   } else {
-    actions.appendChild(
-      actionButton({
-        iconId: "i-copy",
-        label: "Copy message",
-        onClick: async () => {
-          const ok = await copyText(message.content);
-          toast(ok ? "Copied to clipboard" : "Could not copy", ok ? "" : "error");
-        }
-      })
-    );
-    actions.appendChild(
-      actionButton({
-        iconId: "i-edit",
-        label: "Edit message",
-        onClick: () => startEdit(chat, message.id)
-      })
-    );
-    actions.appendChild(
-      actionButton({
-        iconId: "i-share",
-        label: "Share message",
-        onClick: () => shareMessage(message)
-      })
-    );
+    const menu = el("div", "user-action-menu");
+    menu.appendChild(actionButton({
+      iconId: "i-copy",
+      label: "Copy message",
+      onClick: async () => {
+        const ok = await copyText(message.content);
+        toast(ok ? "Copied to clipboard" : "Could not copy", ok ? "" : "error");
+      }
+    }));
+    menu.appendChild(actionButton({
+      iconId: "i-edit",
+      label: "Edit message",
+      onClick: () => startEdit(chat, message.id)
+    }));
+    menu.appendChild(actionButton({
+      iconId: "i-share",
+      label: "Share message",
+      onClick: () => shareMessage(message)
+    }));
+    actions.appendChild(menu);
   }
 
 
@@ -330,6 +326,101 @@ function setThinkingLabel(label) {
   span.textContent = label;
 }
 
+let userMenuEventsBound = false;
+let userPressTimer = null;
+let userPressTarget = null;
+let userPressStart = null;
+let suppressContextMenuUntil = 0;
+
+function closeUserActionMenus() {
+  document.querySelectorAll(".user-action-menu.menu-open").forEach((menu) => {
+    menu.classList.remove("menu-open");
+    menu.style.left = "";
+    menu.style.top = "";
+  });
+}
+
+function openUserActionMenu(item) {
+  closeUserActionMenus();
+  const menu = item.querySelector(".user-action-menu");
+  const body = item.querySelector(".msg-body");
+  const area = document.querySelector("#chatArea");
+  if (!menu || !body || !area) return;
+
+  menu.classList.add("menu-open");
+  const bodyRect = body.getBoundingClientRect();
+  const areaRect = area.getBoundingClientRect();
+  const menuRect = menu.getBoundingClientRect();
+  const pad = 8;
+
+  const leftMin = Math.max(pad, areaRect.left + pad);
+  const leftMax = Math.min(window.innerWidth - menuRect.width - pad, areaRect.right - menuRect.width - pad);
+  const left = Math.max(leftMin, Math.min(bodyRect.right - menuRect.width, leftMax));
+
+  const topMin = Math.max(pad, areaRect.top + pad);
+  const topMax = Math.min(window.innerHeight - menuRect.height - pad, areaRect.bottom - menuRect.height - pad);
+  const above = bodyRect.top - menuRect.height - 8;
+  const below = bodyRect.bottom + 8;
+  let top = above >= topMin ? above : below;
+  if (above < topMin && below > topMax) {
+    top = bodyRect.top - topMin > topMax - bodyRect.bottom ? above : below;
+  }
+  top = Math.max(topMin, Math.min(top, topMax));
+  menu.style.left = Math.max(pad, left) + "px";
+  menu.style.top = Math.max(pad, top) + "px";
+}
+
+function bindUserActionMenu(list) {
+  if (userMenuEventsBound) return;
+  userMenuEventsBound = true;
+
+  list.addEventListener("pointerdown", (event) => {
+    const item = event.target.closest(".msg.user");
+    if (!item || event.target.closest(".user-action-menu") || event.pointerType !== "touch") return;
+    clearTimeout(userPressTimer);
+    userPressTarget = item;
+    userPressStart = { x: event.clientX, y: event.clientY };
+    userPressTimer = setTimeout(() => {
+      if (userPressTarget === item) {
+        openUserActionMenu(item);
+        suppressContextMenuUntil = Date.now() + 900;
+        userPressTarget = null;
+      }
+    }, 500);
+  });
+
+  list.addEventListener("pointermove", (event) => {
+    if (!userPressTarget || !userPressStart) return;
+    if (Math.abs(event.clientX - userPressStart.x) > 10 || Math.abs(event.clientY - userPressStart.y) > 10) {
+      clearTimeout(userPressTimer);
+      userPressTarget = null;
+    }
+  });
+
+  ["pointerup", "pointercancel"].forEach((name) => {
+    list.addEventListener(name, () => {
+      clearTimeout(userPressTimer);
+      userPressTarget = null;
+      userPressStart = null;
+    });
+  });
+
+  list.addEventListener("contextmenu", (event) => {
+    const item = event.target.closest(".msg.user");
+    if (!item) return;
+    event.preventDefault();
+    if (Date.now() < suppressContextMenuUntil) return;
+    openUserActionMenu(item);
+  });
+
+  document.addEventListener("pointerdown", (event) => {
+    if (!event.target.closest(".user-action-menu")) closeUserActionMenus();
+  }, true);
+
+  document.querySelector("#chatArea")?.addEventListener("scroll", closeUserActionMenus, { passive: true });
+  window.addEventListener("resize", closeUserActionMenus);
+}
+
 export function renderMessages() {
   const chat = activeChat();
   const list = $("#messages");
@@ -348,6 +439,7 @@ export function renderMessages() {
   const frag = document.createDocumentFragment();
   chat.messages.forEach((m) => frag.appendChild(buildMessage(chat, m)));
   list.replaceChildren(frag);
+  bindUserActionMenu(list);
 
   if (state.autoScroll) scrollToBottom(false);
 }

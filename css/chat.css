@@ -702,3 +702,33 @@ body.dark .welcome h1 {
   text-align: right;
   cursor: pointer;
 }
+
+/* User message contextual actions */
+.msg-actions:has(.user-action-menu) {
+  margin: 0;
+}
+
+.user-action-menu {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  align-items: center;
+  gap: 5px;
+  padding: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: 13px;
+  background: var(--surface);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.user-action-menu.menu-open {
+  display: flex;
+}
+
+.user-action-menu button {
+  min-width: 38px;
+  height: 36px;
+  justify-content: center;
+}
