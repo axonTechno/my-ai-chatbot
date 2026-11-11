@@ -1,3 +1,579 @@
+<<<<<<< LOCAL (Your changes)
+/* =========================================================
+   AXON AI — aurora.css
+   The visible redesign layer. Loaded AFTER the base sheets,
+   so it restyles the shell without touching behaviour.
+   ========================================================= */
+
+:root {
+  --ax-accent: #2585ed;
+  --ax-accent-2: #22d3ee;
+  --ax-accent-3: #8bd5ff;
+  --ax-glow: rgba(37, 133, 237, .35);
+  --ax-ring: rgba(37, 133, 237, .18);
+  --ax-glass: rgba(255, 255, 255, .72);
+  --ax-glass-2: rgba(255, 255, 255, .92);
+  --ax-hair: rgba(20, 16, 40, .08);
+  --ax-radius: 20px;
+  --ax-radius-sm: 14px;
+  --ax-ease: cubic-bezier(.22, 1, .36, 1);
+}
+
+body.dark {
+  --ax-glass: rgba(28, 24, 40, .72);
+  --ax-glass-2: rgba(30, 26, 44, .94);
+  --ax-hair: rgba(255, 255, 255, .09);
+  --ax-glow: rgba(124, 92, 255, .45);
+}
+
+/* ---------- animated aurora backdrop ---------- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 32% at 18% 12%, rgba(124, 92, 255, .22), transparent 70%),
+    radial-gradient(34% 30% at 82% 8%, rgba(34, 211, 238, .18), transparent 70%),
+    radial-gradient(42% 36% at 70% 88%, rgba(244, 114, 182, .16), transparent 72%),
+    radial-gradient(30% 28% at 12% 82%, rgba(124, 92, 255, .14), transparent 70%);
+  filter: blur(18px);
+  animation: auroraDrift 26s var(--ax-ease) infinite alternate;
+  will-change: transform;
+}
+
+body.dark::before {
+  background:
+    radial-gradient(38% 32% at 18% 12%, rgba(124, 92, 255, .30), transparent 70%),
+    radial-gradient(34% 30% at 82% 8%, rgba(34, 211, 238, .20), transparent 70%),
+    radial-gradient(42% 36% at 70% 88%, rgba(244, 114, 182, .18), transparent 72%),
+    radial-gradient(30% 28% at 12% 82%, rgba(124, 92, 255, .20), transparent 70%);
+}
+
+@keyframes auroraDrift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(-3%, 2%, 0) scale(1.06); }
+  100% { transform: translate3d(2%, -2%, 0) scale(1.02); }
+}
+
+/* keep the shell above the backdrop */
+.app,
+.sidebar-overlay,
+.viewer,
+.confirm-card,
+.toast,
+.sheet-overlay {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- glass shell ---------- */
+.app {
+  background: transparent;
+}
+
+.main {
+  background: transparent;
+}
+
+/* ---------- topbar ---------- */
+.topbar {
+  background: var(--ax-glass);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-bottom: 1px solid var(--ax-hair);
+  height: 58px;
+}
+
+.topbar-title {
+  font-weight: 700;
+  letter-spacing: -.02em;
+  font-size: 16.5px;
+}
+
+.topbar-tag {
+  background: linear-gradient(135deg, var(--ax-accent), var(--ax-accent-2));
+  color: #fff;
+  border: 0;
+  font-weight: 650;
+  letter-spacing: .02em;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px var(--ax-glow);
+  cursor: pointer;
+  transition: transform .18s var(--ax-ease), box-shadow .18s var(--ax-ease);
+}
+
+.topbar-tag:active {
+  transform: scale(.94);
+}
+
+/* ---------- welcome / hero ---------- */
+.welcome {
+  animation: heroIn .55s var(--ax-ease) both;
+}
+
+@keyframes heroIn {
+  from { opacity: 0; transform: translate3d(0, 14px, 0) scale(.985); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+.welcome-logo {
+  filter: drop-shadow(0 18px 34px var(--ax-glow));
+  animation: logoFloat 7s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -8px, 0); }
+}
+
+#welcomeTitle {
+  font-size: clamp(24px, 6vw, 34px);
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.3;
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  -webkit-text-fill-color: #000;
+  color: #000;
+}
+
+.welcome p {
+  color: var(--muted);
+  font-size: 14.5px;
+}
+
+/* suggestion cards → glass tiles with a lift */
+.suggestions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 15px;
+  border-radius: var(--ax-radius-sm);
+  background: var(--ax-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--ax-hair);
+  color: var(--text);
+  font-size: 13.5px;
+  font-weight: 550;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(30, 20, 60, .05);
+  transition: transform .2s var(--ax-ease), box-shadow .2s var(--ax-ease), border-color .2s var(--ax-ease);
+}
+
+.suggestion:hover {
+  transform: translate3d(0, -2px, 0);
+  border-color: rgba(37, 133, 237, .35);
+  box-shadow: 0 10px 26px var(--ax-glow);
+}
+
+.suggestion:active {
+  transform: scale(.975);
+}
+
+.suggestion svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  color: var(--ax-accent);
+  stroke-width: 2;
+}
+
+/* ---------- messages ---------- */
+.msg {
+  animation: msgIn .32s var(--ax-ease) both;
+}
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translate3d(0, 10px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+.msg.assistant .msg-body {
+  /* AI messages should not have a colored bubble or boxed card
+     per requirements: display directly on the chat background */
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.msg.user .msg-body {
+  background: rgba(190, 220, 255, 0.42);
+  color: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 16px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 16px rgba(33, 150, 243, 0.10);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.msg.user .user-text {
+  color: #000000;
+}
+
+.msg.user .msg-time {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* ---------- composer ---------- */
+.composer-wrap {
+  background: linear-gradient(to top, var(--bg) 42%, transparent);
+  padding-bottom: calc(12px + var(--safe-bottom));
+}
+
+.composer {
+  background: var(--ax-glass-2);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(140, 203, 255, .32);
+  border-radius: 26px;
+  box-shadow: 0 10px 34px rgba(30, 20, 60, .10);
+  transition: border-color .2s var(--ax-ease), box-shadow .2s var(--ax-ease);
+}
+
+.composer .message-input,
+.composer .message-input:focus,
+.composer .message-input:focus-visible {
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.composer:focus-within {
+  border-color: rgba(140, 203, 255, .45);
+  box-shadow: 0 8px 28px rgba(140, 203, 255, .20);
+}
+
+.send-btn {
+  background: linear-gradient(135deg, #55B6FF, #287DEB);
+  box-shadow: 0 6px 18px rgba(85, 182, 255, .22);
+  transition: transform .16s var(--ax-ease), box-shadow .16s var(--ax-ease), opacity .16s;
+}
+
+.send-btn:active {
+  transform: scale(.92);
+}
+
+.send-btn:disabled {
+  opacity: .4;
+  box-shadow: none;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar {
+  background: var(--ax-glass-2);
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  border-right: 1px solid var(--ax-hair);
+}
+
+.new-chat {
+  background: #0D8CFF;
+  color: #fff;
+  border: 0;
+  border-radius: var(--ax-radius-sm);
+  font-weight: 650;
+  box-shadow: 0 8px 22px var(--ax-glow);
+  transition: transform .16s var(--ax-ease), box-shadow .16s var(--ax-ease);
+}
+
+.new-chat:active {
+  transform: scale(.97);
+}
+
+.sidebar-search input {
+  background: var(--surface-2);
+  border: 1px solid var(--ax-hair);
+  border-radius: 12px;
+}
+
+.history-item {
+  border-radius: 12px;
+  transition: background .16s var(--ax-ease), transform .16s var(--ax-ease);
+}
+
+.history-item.active {
+  background: linear-gradient(135deg, rgba(124, 92, 255, .16), rgba(34, 211, 238, .10));
+  box-shadow: inset 0 0 0 1px rgba(124, 92, 255, .28);
+}
+
+/* ---------- buttons / pages ---------- */
+.btn.primary {
+  background: #0D8CFF;
+  border: 0;
+  box-shadow: 0 8px 22px var(--ax-glow);
+  font-weight: 650;
+  transition: transform .16s var(--ax-ease), box-shadow .16s var(--ax-ease);
+}
+
+.btn.primary:active {
+  transform: scale(.97);
+}
+
+.full-page {
+  background: var(--bg);
+}
+
+.page-header {
+  background: var(--ax-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--ax-hair);
+}
+
+.setting-group {
+  background: var(--ax-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--ax-hair);
+  border-radius: var(--ax-radius);
+  box-shadow: 0 6px 22px rgba(30, 20, 60, .05);
+}
+
+.segmented {
+  background: var(--surface-2);
+  border: 1px solid var(--ax-hair);
+  border-radius: 12px;
+}
+
+.segmented button.active {
+  background: #0D8CFF;
+  color: #fff;
+  box-shadow: 0 4px 14px var(--ax-glow);
+}
+
+/* ---------- toast ---------- */
+.toast {
+  background: var(--ax-glass-2);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--ax-hair);
+  border-radius: 14px;
+  box-shadow: 0 14px 40px rgba(30, 20, 60, .18);
+  font-weight: 550;
+}
+
+/* ---------- scrollbar ---------- */
+.chat-area::-webkit-scrollbar,
+.page-content::-webkit-scrollbar,
+.history-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-area::-webkit-scrollbar-thumb,
+.page-content::-webkit-scrollbar-thumb,
+.history-area::-webkit-scrollbar-thumb {
+  background: rgba(124, 92, 255, .28);
+  border-radius: 999px;
+}
+
+/* ---------- sidebar brand ---------- */
+.brand-version {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 2px 6px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ax-accent), var(--ax-accent-2));
+  box-shadow: 0 3px 10px var(--ax-glow);
+  transform: translateY(-1px);
+}
+
+.brand {
+  font-weight: 750;
+  letter-spacing: -.02em;
+}
+
+.brand-logo {
+  filter: drop-shadow(0 4px 10px var(--ax-glow));
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  .welcome-logo,
+  .welcome,
+  .msg {
+    animation: none !important;
+  }
+  .suggestion:hover,
+  .btn.primary:active,
+  .send-btn:active,
+  .new-chat:active {
+    transform: none;
+  }
+}
+
+/* Clean chat header */
+.topbar {
+  height: 58px;
+  min-height: 58px;
+  padding: var(--safe-top) 12px 0;
+  justify-content: flex-start;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Keep hamburger visible on every screen size */
+#menuBtn {
+  display: inline-flex !important;
+  flex-shrink: 0;
+}
+
+/* Hide sidebar settings while chat search is focused */
+.sidebar:has(#chatSearch:focus) .sidebar-bottom {
+  display: none;
+}
+
+/* Hide owner-only Worker controls from Settings UI */
+#workerConnectionGroup { display: none !important; }
+
+/* Hide scrollbars throughout AXON without disabling scrolling */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* AXON: soft light-blue glow only at the top */
+body::before {
+  inset: 0 0 auto 0;
+  width: 100%;
+  height: 360px;
+  background: radial-gradient(
+    ellipse 80% 100% at 50% 0%,
+    rgba(139, 213, 255, .28),
+    transparent 75%
+  );
+  filter: blur(18px);
+  animation: none;
+  will-change: auto;
+  opacity: 1;
+  transition: opacity .35s ease;
+}
+
+body.dark::before {
+  background: radial-gradient(
+    ellipse 80% 100% at 50% 0%,
+    rgba(100, 180, 255, .22),
+    transparent 75%
+  );
+}
+
+body.has-messages::before {
+  opacity: 0;
+}
+
+/* AXON: soft light-blue glow from the full bottom edge */
+body::before {
+  inset: auto 0 0 0;
+  width: 100%;
+  height: 360px;
+  background:
+    radial-gradient(ellipse 65% 100% at 0% 100%, rgba(139, 213, 255, .25), transparent 75%),
+    radial-gradient(ellipse 65% 100% at 100% 100%, rgba(139, 213, 255, .25), transparent 75%);
+  filter: blur(18px);
+  animation: none;
+  will-change: auto;
+  opacity: 1;
+  transition: opacity .35s ease;
+}
+
+body.dark::before {
+  background:
+    radial-gradient(ellipse 65% 100% at 0% 100%, rgba(100, 180, 255, .22), transparent 75%),
+    radial-gradient(ellipse 65% 100% at 100% 100%, rgba(100, 180, 255, .22), transparent 75%);
+}
+
+body.has-messages::before {
+  opacity: 0;
+}
+cat >> css/aurora.css <<'EOF'
+
+/* AXON: soft light-blue glow from the full bottom edge */
+body::before {
+  inset: auto 0 0 0;
+  width: 100%;
+  height: 360px;
+  background:
+    radial-gradient(ellipse 65% 100% at 0% 100%, rgba(139, 213, 255, .25), transparent 75%),
+    radial-gradient(ellipse 65% 100% at 100% 100%, rgba(139, 213, 255, .25), transparent 75%);
+  filter: blur(18px);
+  animation: none;
+  will-change: auto;
+  opacity: 1;
+  transition: opacity .35s ease;
+}
+
+body.dark::before {
+  background:
+    radial-gradient(ellipse 65% 100% at 0% 100%, rgba(100, 180, 255, .22), transparent 75%),
+    radial-gradient(ellipse 65% 100% at 100% 100%, rgba(100, 180, 255, .22), transparent 75%);
+}
+
+body.has-messages::before {
+  opacity: 0;
+}
+
+/* Continuous soft blue glow across the entire bottom */
+body::before {
+  inset: auto 0 0 0;
+  width: 100%;
+  height: 48vh;
+  background: radial-gradient(
+    ellipse 110% 100% at 50% 100%,
+    rgba(139, 213, 255, .30) 0%,
+    rgba(139, 213, 255, .16) 48%,
+    transparent 100%
+  );
+  filter: blur(18px);
+  animation: none;
+  opacity: 1;
+  transition: opacity .35s ease;
+}
+
+body.dark::before {
+  background: radial-gradient(
+    ellipse 110% 100% at 50% 100%,
+    rgba(100, 180, 255, .24) 0%,
+    rgba(100, 180, 255, .12) 48%,
+    transparent 100%
+  );
+}
+
+body.has-messages::before {
+  opacity: 0;
+}
+
+=======
 /* =========================================================
    AXON AI — aurora.css
    The visible redesign layer. Loaded AFTER the base sheets,
@@ -435,3 +1011,5 @@ body.dark::before {
   display: inline-flex !important;
   flex-shrink: 0;
 }
+
+>>>>>>> REMOTE (Changes from GitHub)
