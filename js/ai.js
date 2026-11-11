@@ -149,9 +149,16 @@ export function buildSystemPrompt() {
   const { language, responseStyle } = store.settings;
   const name = store.profile.name ? store.profile.name.trim() : "";
   const style = RESPONSE_STYLES[responseStyle] || RESPONSE_STYLES.balanced;
+  const now = new Date();
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const localDateTime = now.toLocaleString("en-GB", {
+    dateStyle: "full",
+    timeStyle: "long"
+  });
 
   return [
     "You are AXON, a friendly, accurate and helpful AI assistant.",
+    `CURRENT REAL-TIME CONTEXT: Local date and time: ${localDateTime}. Timezone: ${timeZone}. Current local year: ${now.getFullYear()}. UTC timestamp: ${now.toISOString()}. Treat this timestamp as authoritative. Never assume the year is 2024 or use an outdated fixed date. For changing facts, do not pretend this timestamp gives you live news or internet access.`,
     `Always reply in ${language}.`,
     style,
     "Use Markdown for structure: short paragraphs, bullet lists, headings when useful, and fenced code blocks with a language tag for code.",
@@ -492,3 +499,107 @@ export async function testConnection() {
 export function currentModelLabel() {
   return modelInfo(store.settings.model).label;
 }
+
+/* ---------- image generation ---------- */
+export async function generateImage({ prompt, signal } = {}) {
+  const cleanPrompt = String(prompt || "").trim();
+
+  if (!cleanPrompt) {
+    throw new AIError("Please enter an image prompt.", { code: "invalid_prompt" });
+  }
+
+  const response = await fetch(workerUrl("generate-image"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({ prompt: cleanPrompt }),
+    signal,
+    mode: "cors",
+    credentials: "omit",
+    cache: "no-store"
+  });
+
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new AIError("The image service returned an invalid response.", {
+      code: "invalid_response",
+      status: response.status
+    });
+  }
+
+  if (!response.ok) {
+    throw new AIError(data.error || httpMessage(response.status), {
+      code: "image_generation_failed",
+      status: response.status,
+      retryable: response.status >= 500 || response.status === 429
+    });
+  }
+
+  if (!data.image || !String(data.image).startsWith("data:image/")) {
+    throw new AIError("The image service did not return a valid image.", {
+      code: "missing_image"
+    });
+  }
+
+  return { image: data.image, model: data.model || "image-generation" };
+}
+
+/* ---------- image editing ---------- */
+export async function editImage({ prompt, image, signal } = {}) {
+  const cleanPrompt = String(prompt || "").trim();
+
+  if (!cleanPrompt) {
+    throw new AIError("Please enter an editing prompt.", { code: "invalid_prompt" });
+  }
+  if (typeof image !== "string" || !image.startsWith("data:image/")) {
+    throw new AIError("A valid source image is required.", { code: "invalid_image" });
+  }
+
+  const response = await fetch(workerUrl("edit-image"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({ prompt: cleanPrompt, image }),
+    signal,
+    mode: "cors",
+    credentials: "omit",
+    cache: "no-store"
+  });
+
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new AIError("The image editing service returned an invalid response.", {
+      code: "invalid_response",
+      status: response.status
+    });
+  }
+
+  if (!response.ok) {
+    throw new AIError(data.error || httpMessage(response.status), {
+      code: "image_editing_failed",
+      status: response.status,
+      retryable: response.status >= 500 || response.status === 429
+    });
+  }
+
+  if (!data.image || !String(data.image).startsWith("data:image/")) {
+    throw new AIError("The image editing service did not return a valid image.", {
+      code: "missing_image"
+    });
+  }
+
+  return {
+    image: data.image,
+    model: data.model || "@cf/black-forest-labs/flux-2-klein-4b"
+  };
+}
+
+/* ---------- image editing ---------- */

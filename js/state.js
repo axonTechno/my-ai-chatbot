@@ -164,7 +164,8 @@ export function persistChats() {
       ...c,
       messages: c.messages.map((m) => ({
         ...m,
-        images: m.images.map((i) => ({ ...i, dataUrl: i.dataUrl ? "" : "" }))
+        images: (m.images || []).map((i) => ({ ...i, dataUrl: "" })),
+        generatedImage: m.generatedImage ? "" : m.generatedImage
       }))
     }));
     writeJSON(K.chats, slim);

@@ -7,7 +7,7 @@
    ========================================================= */
 
 import { store, uid, getChat, createChat, touchChat, persistChats, scheduleSaveChats, flushSaveChats } from "./state.js";
-import { sendChat, AIError, buildHistory } from "./ai.js";
+import { sendChat, generateImage, editImage, AIError, buildHistory } from "./ai.js";
 import { modelInfo } from "./config.js";
 import { renderMarkdown, setMarkdown } from "./markdown.js";
 import { $, toast, copyText, confirmDialog, openImageViewer, formatTime, haptic, downloadFile } from "./ui.js";
@@ -268,6 +268,30 @@ function buildMessage(chat, message) {
     }
   } else if (message.error) {
     body.appendChild(buildErrorCard(chat, message));
+  } else if (message.imageGeneration) {
+    const panel = el("div", "generated-image-panel");
+    if (message.imageStatus === "generating") {
+      panel.appendChild(thinkingNode("AXON is generating your image…"));
+    } else if (message.generatedImage) {
+      const image = el("img", "generated-image");
+      image.src = message.generatedImage;
+      image.alt = message.imagePrompt || "Generated image";
+      image.addEventListener("click", () => openImageViewer(message.generatedImage, image.alt, {
+        onDownload: () => downloadGeneratedImage(message),
+        onShare: () => shareGeneratedImage(message),
+        onRegenerate: () => regenerateImage(chat, message)
+      }));
+      panel.appendChild(image);
+      const actions = el("div", "generated-image-actions");
+      actions.appendChild(actionButton({iconId:"i-download",label:"Download image",onClick:()=>downloadGeneratedImage(message)}));
+      actions.appendChild(actionButton({iconId:"i-share",label:"Share image",onClick:()=>shareGeneratedImage(message)}));
+      actions.appendChild(actionButton({iconId:"i-refresh",label:"Regenerate image",onClick:()=>regenerateImage(chat,message)}));
+      panel.appendChild(actions);
+    } else if (message.imageStatus === "error") {
+      panel.appendChild(el("p", "generated-image-error", message.imageError || "Image generation failed."));
+      panel.appendChild(actionButton({iconId:"i-refresh",label:"Try again",onClick:()=>regenerateImage(chat,message)}));
+    }
+    body.appendChild(panel);
   } else if (message.thinking) {
     body.appendChild(thinkingNode());
   } else {
@@ -487,6 +511,21 @@ function setThinking(chat, message, on) {
   maybeAutoScroll();
 }
 
+
+function isImageGenerationRequest(text, images = []) {
+  if (images.length) return false;
+
+  const value = String(text || "").toLowerCase().trim();
+  if (!value || /^(how|what|why|can you explain|kaise|kya hota)/i.test(value)) {
+    return false;
+  }
+
+  const imageWord = /\b(image|picture|photo|illustration|artwork|wallpaper|drawing|poster|logo)\b|इमेज|तस्वीर|फोटो|चित्र|तसवीर/i.test(value);
+  const createWord = /\b(create|generate|draw|make|design|paint|illustrate|banao|bana|banado|bana do|tayyar karo)\b|बनाओ|बना दो|बनाना|तैयार करो/i.test(value);
+
+  return imageWord && createWord;
+}
+
 /* ================= SEND / STREAM ================= */
 
 export function setActiveChat(id) {
@@ -680,6 +719,19 @@ export async function sendMessage({ text, images = [], editingId = null }) {
   chat.messages.push(userMessage);
 
   const history = buildHistory(chat.messages);
+  const previousGeneratedImage = [...chat.messages].reverse().find((m) =>
+    m.role === "assistant" &&
+    m.imageGeneration &&
+    m.imageStatus === "done" &&
+    typeof m.generatedImage === "string" &&
+    m.generatedImage.startsWith("data:image/")
+  );
+
+  const editImageRequest = Boolean(
+    !images.length && previousGeneratedImage && isImageEditRequest(content)
+  );
+  const makeImage = !editImageRequest && isImageGenerationRequest(content, images);
+
   const assistantMessage = {
     id: uid("m"),
     role: "assistant",
@@ -688,7 +740,14 @@ export async function sendMessage({ text, images = [], editingId = null }) {
     time: Date.now(),
     rating: null,
     error: null,
-    thinking: true
+    thinking: !makeImage && !editImageRequest,
+    ...(makeImage || editImageRequest ? {
+      imageGeneration: true,
+      imageEdit: editImageRequest,
+      ...(editImageRequest ? { sourceImageId: previousGeneratedImage.id } : {}),
+      imageStatus: "generating",
+      imagePrompt: content
+    } : {})
   };
   chat.messages.push(assistantMessage);
 
@@ -704,12 +763,28 @@ export async function sendMessage({ text, images = [], editingId = null }) {
   scrollToBottom(false);
   document.dispatchEvent(new CustomEvent("axon:chat-updated"));
 
-  await runGeneration(chat, {
-    assistantMessage,
-    history,
-    message: content,
-    images: images.map((i) => i.dataUrl).filter(Boolean)
-  });
+  if (editImageRequest) {
+    await runImageGeneration(chat, assistantMessage, content, previousGeneratedImage.generatedImage);
+  } else if (makeImage) {
+    await runImageGeneration(chat, assistantMessage, content);
+  } else {
+    const requestImages = images.map((i) => i.dataUrl).filter(Boolean);
+
+    if (
+      previousGeneratedImage &&
+      requestImages.length < 5 &&
+      !requestImages.includes(previousGeneratedImage.generatedImage)
+    ) {
+      requestImages.push(previousGeneratedImage.generatedImage);
+    }
+
+    await runGeneration(chat, {
+      assistantMessage,
+      history,
+      message: content,
+      images: requestImages
+    });
+  }
 
   if (isSignedIn()) queueOutbox({ kind: "chat", chatId: chat.id });
 }
@@ -718,6 +793,7 @@ export async function regenerate(chat, messageId) {
   if (state.streaming) return;
   const target = chat.messages.find((m) => m.id === messageId);
   if (!target || target.role !== "assistant") return;
+  if (target.imageGeneration) return regenerateImage(chat, target);
 
   const idx = chat.messages.indexOf(target);
   const before = chat.messages.slice(0, idx);
@@ -752,6 +828,122 @@ async function retryMessage(chat, messageId) {
   const msg = chat.messages.find((m) => m.id === messageId);
   if (!msg) return;
   await regenerate(chat, messageId);
+}
+
+
+/* ================= GENERATED IMAGE ACTIONS ================= */
+
+async function downloadGeneratedImage(message) {
+  if (!message?.generatedImage) return;
+  try {
+    const blob = await fetch(message.generatedImage).then((r) => r.blob());
+    const ok = downloadFile("axon-generated-image.png", blob, blob.type || "image/png");
+    if (!ok) throw new Error("Download could not start.");
+    toast("Image download started");
+  } catch (err) {
+    toast(err.message || "Could not download image.", "error");
+  }
+}
+
+async function shareGeneratedImage(message) {
+  if (!message?.generatedImage) return;
+  try {
+    const blob = await fetch(message.generatedImage).then((r) => r.blob());
+    const file = new File([blob], "axon-generated-image.png", {
+      type: blob.type || "image/png"
+    });
+
+    if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+      await navigator.share({ files: [file], title: "AXON generated image" });
+    } else {
+      downloadFile("axon-generated-image.png", blob, blob.type || "image/png");
+      toast("Image sharing is unavailable here; download started.");
+    }
+  } catch (err) {
+    if (err?.name !== "AbortError") {
+      toast(err.message || "Could not share image.", "error");
+    }
+  }
+}
+
+async function runImageGeneration(chat, message, prompt, sourceImage = null) {
+  if (state.streaming) return false;
+
+  state.streaming = true;
+  state.controller = new AbortController();
+  const controller = state.controller;
+
+  message.imageGeneration = true;
+  message.imagePrompt = prompt;
+  message.imageStatus = "generating";
+  message.generatedImage = "";
+  message.imageError = "";
+  message.thinking = false;
+  message.error = null;
+
+  const lastUser = [...chat.messages].reverse().find((m) => m.role === "user");
+  if (lastUser) lastUser.pending = false;
+
+  touchChat(chat);
+  persistChats();
+  renderMessages();
+  scrollToBottom(false);
+  document.dispatchEvent(new CustomEvent("axon:stream-state", {
+    detail: { streaming: true }
+  }));
+
+  try {
+    const result = sourceImage
+      ? await editImage({
+          prompt,
+          image: await resizeSourceImageForEdit(sourceImage),
+          signal: controller.signal
+        })
+      : await generateImage({ prompt, signal: controller.signal });
+    message.generatedImage = result.image;
+    message.imageModel = result.model;
+    message.imageStatus = "done";
+    message.imageError = "";
+    touchChat(chat);
+    flushSaveChats();
+    renderMessages();
+    maybeAutoScroll();
+    document.dispatchEvent(new CustomEvent("axon:chat-updated"));
+    return true;
+  } catch (err) {
+    const aborted = err?.name === "AbortError" || err?.code === "aborted";
+    message.imageStatus = "error";
+    message.imageError = aborted ? "Generation stopped. Tap retry to try again." :
+      (err?.message || "Image generation failed.");
+    touchChat(chat);
+    flushSaveChats();
+    renderMessages();
+    document.dispatchEvent(new CustomEvent("axon:chat-updated"));
+    if (!aborted) toast(message.imageError, "error");
+    return false;
+  } finally {
+    if (state.controller === controller) state.controller = null;
+    state.streaming = false;
+    document.dispatchEvent(new CustomEvent("axon:stream-state", {
+      detail: { streaming: false }
+    }));
+    syncComposerButtons();
+  }
+}
+
+async function regenerateImage(chat, message) {
+  if (state.streaming || !message?.imagePrompt) return;
+
+  if (message.imageEdit) {
+    const source = chat.messages.find((m) => m.id === message.sourceImageId);
+    if (!source?.generatedImage) {
+      toast("Original image for this edit could not be found.", "error");
+      return;
+    }
+    return runImageGeneration(chat, message, message.imagePrompt, source.generatedImage);
+  }
+
+  return runImageGeneration(chat, message, message.imagePrompt);
 }
 
 /* ================= MESSAGE ACTIONS ================= */
@@ -1016,3 +1208,31 @@ export function exportAllChats() {
 
 export { setMarkdown };
 
+
+/* ---------- FLUX image editing helpers ---------- */
+function isImageEditRequest(text) {
+  const value = String(text || "").toLowerCase().trim();
+  if (!value || /^(how|what|why|can you explain|kaise|kya hota|is this|what is)/i.test(value)) return false;
+
+  return /\b(edit|change|modify|remove|erase|replace|add|insert|put|make it|turn it|convert|transform|background|lighting|colour|color|sky|moon|sunset|sunrise|night|daytime|blur|sharpen|crop|redesign)\b|badal|badlo|jodo|hatao|lagao|kar do|bana do/i.test(value);
+}
+
+async function resizeSourceImageForEdit(dataUrl) {
+  const img = new Image();
+  await new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = () => reject(new Error("Could not open the source image for editing."));
+    img.src = dataUrl;
+  });
+
+  const scale = Math.min(1, 511 / Math.max(img.naturalWidth, img.naturalHeight));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.floor(img.naturalWidth * scale));
+  canvas.height = Math.max(1, Math.floor(img.naturalHeight * scale));
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Image editing is not supported by this browser.");
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  return canvas.toDataURL("image/jpeg", 0.88);
+}

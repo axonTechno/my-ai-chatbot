@@ -249,12 +249,26 @@ export function promptDialog({ title = "Rename", value = "", okLabel = "Save", p
 
 /* ---------- image viewer ---------- */
 
-export function openImageViewer(src, alt = "Image") {
+export function openImageViewer(src, alt = "Image", actions = null) {
   const viewer = $("#imageViewer");
   const img = $("#viewerImage");
   if (!viewer || !img) return;
+
   img.src = src;
   img.alt = alt;
+
+  const bar = $("#viewerImageActions");
+  const download = $("#viewerDownload");
+  const share = $("#viewerShare");
+  const regenerate = $("#viewerRegenerate");
+
+  if (bar) {
+    bar.classList.toggle("hidden", !actions);
+    if (download) download.onclick = actions?.onDownload || null;
+    if (share) share.onclick = actions?.onShare || null;
+    if (regenerate) regenerate.onclick = actions?.onRegenerate || null;
+  }
+
   viewer.classList.remove("hidden");
   document.addEventListener("keydown", closeOnEscape);
 }
@@ -263,8 +277,18 @@ export function closeImageViewer() {
   const viewer = $("#imageViewer");
   const img = $("#viewerImage");
   if (!viewer) return;
+
   viewer.classList.add("hidden");
   if (img) img.removeAttribute("src");
+
+  const bar = $("#viewerImageActions");
+  if (bar) bar.classList.add("hidden");
+
+  ["viewerDownload", "viewerShare", "viewerRegenerate"].forEach((id) => {
+    const button = $("#" + id);
+    if (button) button.onclick = null;
+  });
+
   document.removeEventListener("keydown", closeOnEscape);
 }
 

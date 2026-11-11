@@ -734,3 +734,62 @@ body.dark .welcome h1 {
   justify-content: center;
 }
 
+
+/* AXON generated image panel */
+.generated-image-panel {
+  width: 100%;
+  max-width: min(100%, 720px);
+  margin-top: 8px;
+}
+
+.generated-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 14px;
+  cursor: zoom-in;
+  background: var(--surface);
+}
+
+.generated-image-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.generated-image-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(59, 130, 246, .2);
+  border-radius: 10px;
+  color: #2585ed;
+  background: rgba(59, 130, 246, .11);
+  transition: background .16s, transform .16s;
+}
+
+.generated-image-actions button:hover {
+  color: #1670dc;
+  background: rgba(59, 130, 246, .2);
+}
+
+.generated-image-actions button:active {
+  transform: scale(.92);
+}
+
+.generated-image-actions button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.generated-image-error {
+  color: var(--danger);
+  margin: 8px 0;
+}
