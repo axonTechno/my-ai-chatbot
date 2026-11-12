@@ -169,7 +169,23 @@ export function closeMenu() {
 
 let confirmResolve = null;
 
-export function confirmDialog({ title = "Are you sure?", text = "", okLabel = "Confirm", danger = true } = {}) {
+function mountSidebarDialog(card, inline) {
+  if (!inline) return () => {};
+  const slot = $("#historyDialogSlot");
+  if (!slot) return () => {};
+  const parent = card.parentNode;
+  const next = card.nextSibling;
+  slot.classList.remove("hidden");
+  slot.appendChild(card);
+  card.classList.add("sidebar-inline");
+  return () => {
+    card.classList.remove("sidebar-inline");
+    if (parent) parent.insertBefore(card, next && next.parentNode === parent ? next : null);
+    slot.classList.add("hidden");
+  };
+}
+
+export function confirmDialog({ title = "Are you sure?", text = "", okLabel = "Confirm", danger = true, inline = false } = {}) {
   const card = $("#confirmCard");
   const overlay = $("#sheetOverlay");
   if (!card || !overlay) return Promise.resolve(false);
@@ -181,16 +197,18 @@ export function confirmDialog({ title = "Are you sure?", text = "", okLabel = "C
   ok.textContent = okLabel;
   ok.className = `btn ${danger ? "danger" : "primary"}`;
 
+  const restoreCard = mountSidebarDialog(card, inline);
   card.classList.remove("hidden");
-  overlay.classList.remove("hidden");
+  if (!inline) overlay.classList.remove("hidden");
   setTimeout(() => ok.focus(), 30);
 
   const finish = (result) => {
     card.classList.add("hidden");
-    overlay.classList.add("hidden");
+    if (!inline) overlay.classList.add("hidden");
+    restoreCard();
     ok.removeEventListener("click", onOk);
     cancel.removeEventListener("click", onCancel);
-    overlay.removeEventListener("click", onCancel);
+    if (!inline) overlay.removeEventListener("click", onCancel);
     document.removeEventListener("keydown", onKey);
     confirmResolve = null;
     return result;
@@ -205,7 +223,7 @@ export function confirmDialog({ title = "Are you sure?", text = "", okLabel = "C
 
   ok.addEventListener("click", onOk);
   cancel.addEventListener("click", onCancel);
-  overlay.addEventListener("click", onCancel);
+  if (!inline) overlay.addEventListener("click", onCancel);
   document.addEventListener("keydown", onKey);
 
   return new Promise((resolve) => {
@@ -215,7 +233,7 @@ export function confirmDialog({ title = "Are you sure?", text = "", okLabel = "C
 
 /* ---------- prompt dialog (rename etc.) ---------- */
 
-export function promptDialog({ title = "Rename", value = "", okLabel = "Save", placeholder = "" } = {}) {
+export function promptDialog({ title = "Rename", value = "", okLabel = "Save", placeholder = "", inline = false } = {}) {
   return new Promise((resolve) => {
     const card = $("#confirmCard");
     const overlay = $("#sheetOverlay");
@@ -238,8 +256,9 @@ export function promptDialog({ title = "Rename", value = "", okLabel = "Save", p
     textEl.appendChild(input);
     ok.textContent = okLabel;
     ok.className = "btn primary";
+    const restoreCard = mountSidebarDialog(card, inline);
     card.classList.remove("hidden");
-    overlay.classList.remove("hidden");
+    if (!inline) overlay.classList.remove("hidden");
     setTimeout(() => {
       input.focus();
       input.select();
@@ -247,10 +266,11 @@ export function promptDialog({ title = "Rename", value = "", okLabel = "Save", p
 
     const finish = (result) => {
       card.classList.add("hidden");
-      overlay.classList.add("hidden");
+      if (!inline) overlay.classList.add("hidden");
+      restoreCard();
       ok.removeEventListener("click", onOk);
       cancel.removeEventListener("click", onCancel);
-      overlay.removeEventListener("click", onCancel);
+      if (!inline) overlay.removeEventListener("click", onCancel);
       document.removeEventListener("keydown", onKey);
       resolve(result);
     };
@@ -265,7 +285,7 @@ export function promptDialog({ title = "Rename", value = "", okLabel = "Save", p
     };
     ok.addEventListener("click", onOk);
     cancel.addEventListener("click", onCancel);
-    overlay.addEventListener("click", onCancel);
+    if (!inline) overlay.addEventListener("click", onCancel);
     document.addEventListener("keydown", onKey);
   });
 }
