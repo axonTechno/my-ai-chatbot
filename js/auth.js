@@ -133,7 +133,7 @@ async function sendCode() {
 async function verify() {
   if (ui.busy) return;
   const code = ($("#authCode")?.value || "").trim();
-  if (!/^\d{4,8}$/.test(code)) {
+  if (!/^\d{6}$/.test(code)) {
     setStatus("Enter the code from your email.", "error");
     return;
   }
@@ -217,10 +217,6 @@ export function initAuth() {
   $("#authChangeEmail")?.addEventListener("click", () => {
     showStep("email");
     setStatus("");
-  });
-  $("#authSkipBtn")?.addEventListener("click", () => {
-    closeAuthPage();
-    toast("Using AXON locally on this device");
   });
   $("#authEmail")?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {

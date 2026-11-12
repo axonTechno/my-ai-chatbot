@@ -62,8 +62,8 @@ export const AI_ROUTES = {
 /* Optional account / sync backend (Supabase-compatible REST contract).
    Empty = local-only mode, no fake logins. See BACKEND.md. */
 export const BACKEND = {
-  baseUrl: "",
-  authBase: "",
+  baseUrl: DEFAULT_WORKER_URL,
+  authBase: DEFAULT_WORKER_URL,
   storageKey: "axon_session_v1"
 };
 

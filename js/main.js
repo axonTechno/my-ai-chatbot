@@ -24,7 +24,7 @@ import { initAccount, openAccountPage } from "./account.js";
 import { initAuth, openAuthPage } from "./auth.js";
 import { initVoice } from "./voice.js";
 import { initPWA, initNetworkWatcher } from "./pwa.js";
-import { flushOutbox, isSignedIn, backendConfigured } from "./backend.js";
+import { flushOutbox, isSignedIn, backendConfigured, refreshSession } from "./backend.js";
 import { currentModelLabel } from "./ai.js";
 import { closeShareSheet } from "./share.js";
 
@@ -131,16 +131,14 @@ async function boot() {
     });
   });
 
-  /* first launch: offer the account screen (skippable, never blocking) */
-  const seen = localStorage.getItem("axon_seen_welcome");
-  if (!seen) {
-    try {
-      localStorage.setItem("axon_seen_welcome", "1");
-    } catch (e) {}
-    if (!store.profile.email && backendConfigured()) {
-      setTimeout(() => openAuthPage(), 700);
+  /* AXON account gate */
+  setTimeout(async () => {
+    if (backendConfigured() && isSignedIn()) {
+      const restored = await refreshSession();
+      if (restored) return;
     }
-  }
+    openAuthPage();
+  }, 700);
 
   /* keyboard shortcuts */
   document.addEventListener("keydown", (e) => {
