@@ -211,6 +211,7 @@ await checkAsync("chat menu Rename, Share, and Delete options execute", async ()
   share.click();
   await new Promise((resolve) => setTimeout(resolve, 5));
   if (!document.querySelector(".share-sheet")) throw new Error("Share sheet did not open");
+  await new Promise((resolve) => setTimeout(resolve, 15));
   const shareMod = await mod("js/share.js");
   shareMod.closeShareSheet();
 
