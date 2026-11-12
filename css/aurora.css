@@ -57,12 +57,10 @@ body.dark::before {
 }
 
 /* keep the shell above the backdrop */
-.app,
-.sidebar-overlay,
-.viewer,
-.confirm-card,
-.toast,
-.sheet-overlay {
+/* Keep only the app shell above the decorative backdrop.
+   Overlays, dialogs, viewers and toasts retain their own fixed positioning
+   and stacking order from the component stylesheets. */
+.app {
   position: relative;
   z-index: 1;
 }
