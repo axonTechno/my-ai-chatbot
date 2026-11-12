@@ -5,6 +5,8 @@
    ========================================================= */
 
 import { loadAll, store, persistChats, flushSaveChats, createChat, sortedChats } from "./state.js";
+import { migrateLegacyImages } from "./image-store.js";
+import { initGallery } from "./gallery.js";
 import { $, $$, toast, copyText, closeMenu, closeImageViewer } from "./ui.js";
 import {
   initChatComposer,
@@ -26,8 +28,17 @@ import { flushOutbox, isSignedIn, backendConfigured } from "./backend.js";
 import { currentModelLabel } from "./ai.js";
 import { closeShareSheet } from "./share.js";
 
-function boot() {
+async function boot() {
   loadAll();
+  try {
+    const migratedImages = await migrateLegacyImages(store.chats);
+    if (migratedImages) {
+      persistChats();
+      console.info(`[axon] Migrated ${migratedImages} legacy images to local storage.`);
+    }
+  } catch (error) {
+    console.error("[axon] Image migration failed", error);
+  }
 
   /* Keep the app fitted to Android visible viewport */
   const viewport = window.visualViewport;
@@ -47,6 +58,7 @@ function boot() {
   applyTextSize();
 
   initSidebar();
+  initGallery();
   initSettings();
   initAccount();
   initAuth();

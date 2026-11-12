@@ -7,6 +7,7 @@
    ========================================================= */
 
 import { store, uid, getChat, createChat, touchChat, persistChats, scheduleSaveChats, flushSaveChats } from "./state.js";
+import { saveImage, getImageBlob, getImageURL } from "./image-store.js";
 import { sendChat, generateImage, editImage, AIError, buildHistory } from "./ai.js";
 import { modelInfo } from "./config.js";
 import { renderMarkdown, setMarkdown } from "./markdown.js";
@@ -27,6 +28,29 @@ const state = {
   lastSent: null
 };
 
+async function resolveImageData(image) {
+  if (!image) return "";
+  if (typeof image === "string") return image;
+  if (image.dataUrl) return image.dataUrl;
+  if (!image.imageId) return "";
+  const blob = await getImageBlob(image.imageId);
+  if (!blob) throw new Error("Saved image could not be loaded.");
+  return await new Promise((resolve,reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("Could not read saved image."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function resolveMessageImages(messages) {
+  const history = buildHistory(messages);
+  const eligible = messages.filter(m => ((m.content && m.content.trim()) || (m.images && m.images.length)) && !m.error);
+  for (let i=0; i<history.length; i++) {
+    if (eligible[i]?.images?.length) history[i].images = (await Promise.all(eligible[i].images.map(resolveImageData))).filter(Boolean);
+  }
+  return history;
+}
 export function getState() {
   return state;
 }
@@ -94,19 +118,37 @@ function buildHead(message) {
 
 function buildImages(message) {
   if (!message.images || !message.images.length) return null;
+
   const wrap = el("div", "msg-images");
+
   message.images.forEach((img) => {
-    if (!img || !img.dataUrl) return;
+    if (!img || (!img.dataUrl && !img.imageId)) return;
+
     const thumb = el("img");
-    thumb.src = img.dataUrl;
     thumb.alt = "Attached image";
     thumb.loading = "lazy";
-    thumb.addEventListener("click", () => openImageViewer(img.dataUrl, "Attached image"));
+
+    const showImage = (src) => {
+      if (!src) return;
+      thumb.src = src;
+      thumb.addEventListener("click", () => {
+        openImageViewer(src, "Attached image");
+      });
+    };
+
+    if (img.dataUrl) {
+      showImage(img.dataUrl);
+    } else {
+      getImageURL(img.imageId).then(showImage).catch((error) => {
+        console.warn("[axon] Attached image load failed", error);
+      });
+    }
+
     wrap.appendChild(thumb);
   });
+
   return wrap.children.length ? wrap : null;
 }
-
 function actionButton({ iconId, label, onClick, active = false, danger = false, text = "" }) {
   const btn = el("button");
   btn.type = "button";
@@ -272,21 +314,34 @@ function buildMessage(chat, message) {
     const panel = el("div", "generated-image-panel");
     if (message.imageStatus === "generating") {
       panel.appendChild(thinkingNode("AXON is generating your image…"));
-    } else if (message.generatedImage) {
+    } else if (message.generatedImage || message.generatedImageId) {
       const image = el("img", "generated-image");
-      image.src = message.generatedImage;
       image.alt = message.imagePrompt || "Generated image";
-      image.addEventListener("click", () => openImageViewer(message.generatedImage, image.alt, {
-        onDownload: () => downloadGeneratedImage(message),
-        onShare: () => shareGeneratedImage(message),
-        onRegenerate: () => regenerateImage(chat, message)
-      }));
       panel.appendChild(image);
+
+      (async () => {
+        try {
+          const src = message.generatedImage ||
+            (message.generatedImageId ? await getImageURL(message.generatedImageId) : "");
+          if (src && image.isConnected) {
+            image.src = src;
+            image.addEventListener("click", () => openImageViewer(src, image.alt, {
+              onDownload: () => downloadGeneratedImage(message),
+              onShare: () => shareGeneratedImage(message),
+              onRegenerate: () => regenerateImage(chat, message)
+            }));
+          }
+        } catch (error) {
+          console.error("[axon] Could not load generated image", error);
+        }
+      })();
+
       const actions = el("div", "generated-image-actions");
       actions.appendChild(actionButton({iconId:"i-download",label:"Download image",onClick:()=>downloadGeneratedImage(message)}));
       actions.appendChild(actionButton({iconId:"i-share",label:"Share image",onClick:()=>shareGeneratedImage(message)}));
       actions.appendChild(actionButton({iconId:"i-refresh",label:"Regenerate image",onClick:()=>regenerateImage(chat,message)}));
       panel.appendChild(actions);
+
     } else if (message.imageStatus === "error") {
       panel.appendChild(el("p", "generated-image-error", message.imageError || "Image generation failed."));
       panel.appendChild(actionButton({iconId:"i-refresh",label:"Try again",onClick:()=>regenerateImage(chat,message)}));
@@ -710,7 +765,7 @@ export async function sendMessage({ text, images = [], editingId = null }) {
     id: uid("m"),
     role: "user",
     content,
-    images: images.map((i) => ({ dataUrl: i.dataUrl, name: i.name || "" })),
+    images: [],
     time: Date.now(),
     rating: null,
     error: null,
@@ -718,13 +773,27 @@ export async function sendMessage({ text, images = [], editingId = null }) {
   };
   chat.messages.push(userMessage);
 
-  const history = buildHistory(chat.messages);
+  for (const image of images) {
+    try {
+      const imageId = await saveImage(image.dataUrl, {
+        chatId: chat.id,
+        messageId: userMessage.id,
+        category: "uploaded",
+        name: image.name || ""
+      });
+      userMessage.images.push({ imageId, name: image.name || "" });
+    } catch (error) {
+      console.warn("[axon] Upload image storage failed", error);
+      userMessage.images.push({ dataUrl: image.dataUrl, name: image.name || "" });
+    }
+  }
+
+  const history = await resolveMessageImages(chat.messages);
   const previousGeneratedImage = [...chat.messages].reverse().find((m) =>
     m.role === "assistant" &&
     m.imageGeneration &&
     m.imageStatus === "done" &&
-    typeof m.generatedImage === "string" &&
-    m.generatedImage.startsWith("data:image/")
+    (typeof m.generatedImage === "string" && m.generatedImage.startsWith("data:image/")) || m.generatedImageId
   );
 
   const editImageRequest = Boolean(
@@ -764,18 +833,18 @@ export async function sendMessage({ text, images = [], editingId = null }) {
   document.dispatchEvent(new CustomEvent("axon:chat-updated"));
 
   if (editImageRequest) {
-    await runImageGeneration(chat, assistantMessage, content, previousGeneratedImage.generatedImage);
+    await runImageGeneration(chat, assistantMessage, content, await resolveImageData({ dataUrl: previousGeneratedImage.generatedImage, imageId: previousGeneratedImage.generatedImageId }));
   } else if (makeImage) {
     await runImageGeneration(chat, assistantMessage, content);
   } else {
-    const requestImages = images.map((i) => i.dataUrl).filter(Boolean);
+    const requestImages = (await Promise.all(images.map(resolveImageData))).filter(Boolean);
 
     if (
       previousGeneratedImage &&
       requestImages.length < 5 &&
       !requestImages.includes(previousGeneratedImage.generatedImage)
     ) {
-      requestImages.push(previousGeneratedImage.generatedImage);
+      requestImages.push(await resolveImageData({ dataUrl: previousGeneratedImage.generatedImage, imageId: previousGeneratedImage.generatedImageId }));
     }
 
     await runGeneration(chat, {
@@ -800,7 +869,7 @@ export async function regenerate(chat, messageId) {
   const lastUser = [...before].reverse().find((m) => m.role === "user");
 
   chat.messages = before;
-  const history = buildHistory(chat.messages);
+  const history = await resolveMessageImages(chat.messages);
   const assistantMessage = {
     id: uid("m"),
     role: "assistant",
@@ -820,7 +889,7 @@ export async function regenerate(chat, messageId) {
     assistantMessage,
     history,
     message: lastUser ? lastUser.content : "",
-    images: lastUser && lastUser.images ? lastUser.images.map((i) => i.dataUrl) : []
+    images: lastUser && lastUser.images ? (await Promise.all(lastUser.images.map(resolveImageData))).filter(Boolean) : []
   });
 }
 
@@ -833,10 +902,20 @@ async function retryMessage(chat, messageId) {
 
 /* ================= GENERATED IMAGE ACTIONS ================= */
 
+async function getGeneratedImageBlob(message) {
+  if (message?.generatedImageId) {
+    const blob = await getImageBlob(message.generatedImageId);
+    if (blob) return blob;
+  }
+  if (message?.generatedImage) {
+    return fetch(message.generatedImage).then((r) => r.blob());
+  }
+  throw new Error("Image could not be found.");
+}
+
 async function downloadGeneratedImage(message) {
-  if (!message?.generatedImage) return;
   try {
-    const blob = await fetch(message.generatedImage).then((r) => r.blob());
+    const blob = await getGeneratedImageBlob(message);
     const ok = downloadFile("axon-generated-image.png", blob, blob.type || "image/png");
     if (!ok) throw new Error("Download could not start.");
     toast("Image download started");
@@ -846,13 +925,11 @@ async function downloadGeneratedImage(message) {
 }
 
 async function shareGeneratedImage(message) {
-  if (!message?.generatedImage) return;
   try {
-    const blob = await fetch(message.generatedImage).then((r) => r.blob());
+    const blob = await getGeneratedImageBlob(message);
     const file = new File([blob], "axon-generated-image.png", {
       type: blob.type || "image/png"
     });
-
     if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
       await navigator.share({ files: [file], title: "AXON generated image" });
     } else {
@@ -900,7 +977,19 @@ async function runImageGeneration(chat, message, prompt, sourceImage = null) {
           signal: controller.signal
         })
       : await generateImage({ prompt, signal: controller.signal });
-    message.generatedImage = result.image;
+    try {
+      message.generatedImageId = await saveImage(result.image, {
+        chatId: chat.id,
+        messageId: message.id,
+        category: "generated",
+        prompt
+      });
+      message.generatedImage = "";
+    } catch (storageError) {
+      console.warn("[axon] IndexedDB save failed; keeping image in message", storageError);
+      message.generatedImage = result.image;
+      message.generatedImageId = "";
+    }
     message.imageModel = result.model;
     message.imageStatus = "done";
     message.imageError = "";
@@ -936,11 +1025,15 @@ async function regenerateImage(chat, message) {
 
   if (message.imageEdit) {
     const source = chat.messages.find((m) => m.id === message.sourceImageId);
-    if (!source?.generatedImage) {
+    if (!source?.generatedImage && !source?.generatedImageId) {
       toast("Original image for this edit could not be found.", "error");
       return;
     }
-    return runImageGeneration(chat, message, message.imagePrompt, source.generatedImage);
+    const sourceImage = await resolveImageData({
+      dataUrl: source.generatedImage,
+      imageId: source.generatedImageId
+    });
+    return runImageGeneration(chat, message, message.imagePrompt, sourceImage);
   }
 
   return runImageGeneration(chat, message, message.imagePrompt);

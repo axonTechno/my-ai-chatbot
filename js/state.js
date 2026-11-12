@@ -70,13 +70,17 @@ export function uid(prefix = "id") {
 function normalizeMessage(m, chatId) {
   const msg = m && typeof m === "object" ? m : {};
   const images = Array.isArray(msg.images)
-    ? msg.images.filter((i) => i && (typeof i === "string" || i.dataUrl))
+    ? msg.images.filter((i) => i && (typeof i === "string" || i.dataUrl || i.imageId))
     : [];
   return {
+    ...msg,
     id: msg.id || uid("m"),
     role: msg.role === "user" ? "user" : "assistant",
     content: typeof msg.content === "string" ? msg.content : "",
     images: images.map((i) => (typeof i === "string" ? { dataUrl: i } : i)),
+    generatedImage: typeof msg.generatedImage === "string" ? msg.generatedImage : "",
+    generatedImageId: msg.generatedImageId || "",
+    imagePrompt: msg.imagePrompt || "",
     time: Number(msg.time) || Date.now(),
     rating: msg.rating === "like" || msg.rating === "dislike" ? msg.rating : null,
     error: msg.error || null,
@@ -84,7 +88,6 @@ function normalizeMessage(m, chatId) {
     chatId: msg.chatId || chatId
   };
 }
-
 function normalizeChat(c) {
   const chat = c && typeof c === "object" ? c : {};
   const id = chat.id || uid("c");
@@ -157,20 +160,7 @@ export function loadAll() {
 }
 
 export function persistChats() {
-  const ok = writeJSON(K.chats, store.chats);
-  if (!ok) {
-    /* Last-resort: drop base64 image payloads so text history survives. */
-    const slim = store.chats.map((c) => ({
-      ...c,
-      messages: c.messages.map((m) => ({
-        ...m,
-        images: (m.images || []).map((i) => ({ ...i, dataUrl: "" })),
-        generatedImage: m.generatedImage ? "" : m.generatedImage
-      }))
-    }));
-    writeJSON(K.chats, slim);
-  }
-  return ok;
+  return writeJSON(K.chats, store.chats);
 }
 
 export function persistSettings() {

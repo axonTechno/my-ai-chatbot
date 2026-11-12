@@ -118,6 +118,10 @@
       </div>
     </div>
 
+    <button class="nav-item" id="yourImagesBtn">
+      <svg><use href="#i-image"/></svg>
+      <span>Your Images</span>
+    </button>
     <button class="new-chat" id="newChatBtn">
       <svg><use href="#i-plus"/></svg>
       <span>New chat</span>
@@ -257,10 +261,36 @@
     <button class="icon-btn" id="viewerRegenerate" aria-label="Regenerate image" title="Regenerate">
       <svg><use href="#i-refresh"/></svg>
     </button>
+    <button class="icon-btn" id="viewerDelete" aria-label="Delete image" title="Delete">
+      <svg><use href="#i-trash"/></svg>
+    </button>
   </div>
 </div>
 
 <!-- ================= PAGES ================= -->
+
+<!-- YOUR IMAGES -->
+<section class="full-page hidden" id="galleryPage" aria-label="Your Images">
+  <header class="page-header">
+    <button class="icon-btn" id="galleryBackBtn" aria-label="Back">
+      <svg style="transform:rotate(180deg)"><use href="#i-chevron-right"/></svg>
+    </button>
+    <h2>Your Images</h2>
+    <span class="gallery-count" id="galleryCount">0 images</span>
+  </header>
+  <div class="gallery-tabs" role="tablist" aria-label="Image category">
+    <button class="gallery-tab active" type="button" role="tab" aria-selected="true" data-gallery-filter="generated">Generated Images</button>
+    <button class="gallery-tab" type="button" role="tab" aria-selected="false" data-gallery-filter="uploaded">Uploaded Images</button>
+  </div>
+  <div class="page-content gallery-content">
+    <div class="gallery-grid" id="galleryGrid"></div>
+    <div class="gallery-empty" id="galleryEmpty">
+      <svg><use href="#i-image"/></svg>
+      <strong>No images yet</strong>
+      <p>Images you generate or attach in chats will appear here.</p>
+    </div>
+  </div>
+</section>
 
 <!-- LOGIN -->
 <section class="full-page hidden" id="loginPage" aria-label="Sign in">

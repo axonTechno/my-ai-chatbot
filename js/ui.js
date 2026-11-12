@@ -261,12 +261,14 @@ export function openImageViewer(src, alt = "Image", actions = null) {
   const download = $("#viewerDownload");
   const share = $("#viewerShare");
   const regenerate = $("#viewerRegenerate");
+  const remove = $("#viewerDelete");
 
   if (bar) {
     bar.classList.toggle("hidden", !actions);
     if (download) download.onclick = actions?.onDownload || null;
     if (share) share.onclick = actions?.onShare || null;
     if (regenerate) regenerate.onclick = actions?.onRegenerate || null;
+    if (remove) remove.onclick = actions?.onDelete || null;
   }
 
   viewer.classList.remove("hidden");
@@ -284,7 +286,7 @@ export function closeImageViewer() {
   const bar = $("#viewerImageActions");
   if (bar) bar.classList.add("hidden");
 
-  ["viewerDownload", "viewerShare", "viewerRegenerate"].forEach((id) => {
+  ["viewerDownload", "viewerShare", "viewerRegenerate", "viewerDelete"].forEach((id) => {
     const button = $("#" + id);
     if (button) button.onclick = null;
   });
