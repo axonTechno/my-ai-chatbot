@@ -71,8 +71,7 @@ let menuCleanup = null;
 export function openMenu(items, anchor) {
   closeMenu();
   const menu = $("#actionMenu");
-  const overlay = $("#sheetOverlay");
-  if (!menu || !overlay) return;
+  if (!menu) return;
 
   menu.replaceChildren();
   items.forEach((item) => {
@@ -97,7 +96,6 @@ export function openMenu(items, anchor) {
   });
 
   menu.classList.remove("hidden");
-  overlay.classList.remove("hidden");
 
   /* Keep chat actions inside the open hamburger sidebar on phones. */
   const rect = anchor && anchor.getBoundingClientRect ? anchor.getBoundingClientRect() : null;
@@ -141,14 +139,15 @@ export function openMenu(items, anchor) {
   const onKey = (e) => {
     if (e.key === "Escape") closeMenu();
   };
-  overlay.addEventListener("click", closeMenu);
+  /* No full-screen overlay: it blocks taps on the composer and other controls.
+     Outside pointerdown closes the popup while the original tap still reaches
+     the control underneath. */
   setTimeout(() => document.addEventListener("pointerdown", onDocClick), 0);
   document.addEventListener("keydown", onKey);
   menuCleanup = () => {
     document.removeEventListener("pointerdown", onDocClick);
     document.removeEventListener("keydown", onKey);
-    overlay.removeEventListener("click", closeMenu);
-  };
+   };
 }
 
 export function closeMenu() {
