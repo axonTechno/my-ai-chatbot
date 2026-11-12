@@ -640,3 +640,25 @@ body.dark .new-chat {
   }
 }
 
+
+
+/* Sidebar-local Rename/Delete confirmations above Recent Chats. */
+.history-dialog-slot { padding: 8px 0 12px; }
+.confirm-card.sidebar-inline {
+  position: relative;
+  z-index: 1;
+  left: auto;
+  top: auto;
+  transform: none;
+  width: 100%;
+  max-width: none;
+  padding: 14px 12px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  animation: menuIn .18s ease both;
+}
+.confirm-card.sidebar-inline h3 { font-size: 14.5px; }
+.confirm-card.sidebar-inline p { font-size: 12.5px; overflow-wrap: anywhere; }
+.confirm-card.sidebar-inline .confirm-actions { gap: 7px; margin-top: 12px; }
+.confirm-card.sidebar-inline .confirm-actions .btn { min-height: 36px; padding: 7px 11px; }
