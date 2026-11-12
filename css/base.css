@@ -485,7 +485,7 @@ body.dark .new-chat {
 
 .action-menu {
   position: fixed;
-  z-index: 100;
+  z-index: 100002;
   min-width: 200px;
   max-width: min(280px, 92vw);
   padding: 6px;
@@ -541,33 +541,33 @@ body.dark .new-chat {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: min(340px, calc(100vw - 32px));
-  max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 32px);
+  width: min(300px, calc(100vw - 40px));
+  max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 40px);
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 20px 18px 16px;
-  border-radius: 18px;
+  padding: 16px 14px 13px;
+  border-radius: 16px;
   background: var(--surface);
   box-shadow: var(--shadow-lg);
   animation: confirmDialogIn .18s ease both;
 }
 
 .confirm-card h3 {
-  font-size: 16.5px;
-  margin-bottom: 8px;
+  font-size: 15.5px;
+  margin-bottom: 7px;
 }
 
 .confirm-card p {
-  font-size: 13.5px;
+  font-size: 12.5px;
   color: var(--muted);
-  line-height: 1.55;
+  line-height: 1.45;
 }
 
 .confirm-actions {
   display: flex;
-  gap: 9px;
+  gap: 8px;
   justify-content: flex-end;
-  margin-top: 18px;
+  margin-top: 14px;
 }
 
 .toast {
