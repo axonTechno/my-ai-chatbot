@@ -101,14 +101,20 @@ export function openMenu(items, anchor) {
 
   /* position near the anchor, clamped to the viewport */
   const rect = anchor && anchor.getBoundingClientRect ? anchor.getBoundingClientRect() : null;
+  const viewport = window.visualViewport;
+  const vw = viewport?.width || window.innerWidth;
+  const vh = viewport?.height || window.innerHeight;
+  const vx = viewport?.offsetLeft || 0;
+  const vy = viewport?.offsetTop || 0;
+  menu.style.maxHeight = `${Math.max(120, vh - 16)}px`;
+  menu.style.overflowY = "auto";
   const mw = menu.offsetWidth;
   const mh = menu.offsetHeight;
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  let left = rect ? rect.right - mw : (vw - mw) / 2;
-  let top = rect ? rect.bottom + 6 : vh / 2 - mh / 2;
-  left = Math.max(8, Math.min(left, vw - mw - 8));
-  if (top + mh > vh - 8) top = Math.max(8, (rect ? rect.top : vh / 2) - mh - 6);
+  let left = rect ? rect.right - mw : vx + (vw - mw) / 2;
+  let top = rect ? rect.bottom + 6 : vy + vh / 2 - mh / 2;
+  left = Math.max(vx + 8, Math.min(left, vx + vw - mw - 8));
+  if (top + mh > vy + vh - 8) top = (rect ? rect.top - mh - 6 : vy + vh - mh - 8);
+  top = Math.max(vy + 8, Math.min(top, vy + vh - Math.min(mh, vh - 16) - 8));
   menu.style.left = `${left}px`;
   menu.style.top = `${top}px`;
 
