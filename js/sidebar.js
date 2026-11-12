@@ -168,7 +168,8 @@ export async function renameChatFlow(chat) {
     title: "Rename conversation",
     value: chat.title,
     okLabel: "Save",
-    placeholder: "Conversation name"
+    placeholder: "Conversation name",
+    inline: true
   });
   if (value == null) return;
   renameChat(chat.id, value);
@@ -189,7 +190,8 @@ export async function deleteChatFlow(chat) {
   const ok = await confirmDialog({
     title: "Delete conversation?",
     text: `“${chat.title}” will be permanently deleted from this device. This cannot be undone.`,
-    okLabel: "Delete"
+    okLabel: "Delete",
+    inline: true
   });
   if (!ok) return;
   deleteChat(chat.id);
@@ -252,6 +254,12 @@ export function renderHistory() {
   const recent = all.filter((c) => !c.pinned);
 
   section("Pinned", "i-pin", pinned, container);
+
+  /* Inline Rename/Delete dialogs appear immediately above Recent Chats. */
+  const dialogSlot = document.createElement("div");
+  dialogSlot.id = "historyDialogSlot";
+  dialogSlot.className = "history-dialog-slot hidden";
+  container.appendChild(dialogSlot);
 
   /* group recent chats by day bucket */
   const groups = new Map();
