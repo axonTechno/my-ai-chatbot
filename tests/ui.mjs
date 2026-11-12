@@ -42,6 +42,14 @@ const check = (name, fn) => {
     results.push(["FAIL", name, e.message]);
   }
 };
+const checkAsync = async (name, fn) => {
+  try {
+    await fn();
+    results.push(["PASS", name]);
+  } catch (e) {
+    results.push(["FAIL", name, e.message]);
+  }
+};
 const mod = (p) => import("file://" + path.join(root, p));
 
 /* ---------- boot the real app ---------- */
@@ -148,6 +156,31 @@ check("search filters history", () => {
   if (items.length === 0) throw new Error("search returned nothing");
   sidebar.setSearch("");
   state.deleteChat(chat.id);
+});
+
+/* ---------- action menu interaction regression ---------- */
+const ui = await mod("js/ui.js");
+
+await checkAsync("action menu works without blocking underlying inputs", async () => {
+  const anchor = document.createElement("button");
+  document.body.appendChild(anchor);
+  let chosen = false;
+  ui.openMenu([{ label: "Run menu action", onClick: () => { chosen = true; } }], anchor);
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  if (visible("#sheetOverlay")) throw new Error("action menu activated the blocking overlay");
+  if (!visible("#actionMenu")) throw new Error("action menu did not open");
+  document.querySelector("#actionMenu button").click();
+  if (!chosen) throw new Error("menu item action did not execute");
+
+  ui.openMenu([{ label: "Outside tap test", onClick: () => {} }], anchor);
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  const input = document.querySelector("#messageInput");
+  let inputReceivedTap = false;
+  input.addEventListener("pointerdown", () => { inputReceivedTap = true; }, { once: true });
+  input.dispatchEvent(new window.Event("pointerdown", { bubbles: true }));
+  if (visible("#actionMenu")) throw new Error("outside tap did not close the menu");
+  if (!inputReceivedTap) throw new Error("underlying input did not receive the tap");
+  anchor.remove();
 });
 
 /* ---------- composer ---------- */
