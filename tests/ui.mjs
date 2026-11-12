@@ -99,6 +99,40 @@ check("account page opens", () => {
 
 /* ---------- settings persistence ---------- */
 const state = await mod("js/state.js");
+await checkAsync("account avatar selection previews and saves both choices", async () => {
+  const account = await mod("js/account.js");
+  const original = state.store.profile.avatar;
+  const profileKey = "axon_profile";
+  const female = document.querySelector('[data-avatar="female"]');
+  const male = document.querySelector('[data-avatar="male"]');
+
+  state.store.profile.avatar = "male";
+  state.persistProfile();
+  account.paintAccount();
+  female.click();
+  if (!female.classList.contains("active")) throw new Error("female avatar was not selected");
+  if (male.classList.contains("active")) throw new Error("male avatar remained selected");
+  if (!document.querySelector("#accountAvatarImg").src.endsWith("female-avatar.webp")) {
+    throw new Error("female avatar preview did not update");
+  }
+
+  document.querySelector("#saveProfileBtn").click();
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  if (state.store.profile.avatar !== "female") throw new Error("female avatar was not saved to profile state");
+  const savedFemale = JSON.parse(localStorage.getItem(profileKey) || "{}");
+  if (savedFemale.avatar !== "female") throw new Error("female avatar was not persisted");
+
+  male.click();
+  if (!male.classList.contains("active")) throw new Error("male avatar could not be selected");
+  document.querySelector("#saveProfileBtn").click();
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  if (state.store.profile.avatar !== "male") throw new Error("male avatar could not be saved");
+
+  state.store.profile.avatar = original === "female" ? "female" : "male";
+  state.persistProfile();
+  account.paintAccount();
+});
+
 
 check("theme change persists and applies", () => {
   const before = state.store.settings.theme;
