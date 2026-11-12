@@ -473,7 +473,7 @@ body.dark .new-chat {
 .sheet-overlay {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: 100000;
   background: rgba(16, 12, 28, .42);
   animation: fadeIn .18s ease both;
 }
@@ -526,11 +526,14 @@ body.dark .new-chat {
 
 .confirm-card {
   position: fixed;
-  z-index: 110;
+  z-index: 100001;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: min(340px, 90vw);
+  width: min(340px, calc(100vw - 32px));
+  max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 20px 18px 16px;
   border-radius: 18px;
   background: var(--surface);
