@@ -99,25 +99,33 @@ export function openMenu(items, anchor) {
   menu.classList.remove("hidden");
   overlay.classList.remove("hidden");
 
-  /* On phones, center the menu in the visible screen so it cannot
-     extend beyond the bottom edge near the last chat item. */
+  /* Keep chat actions inside the open hamburger sidebar on phones. */
   const rect = anchor && anchor.getBoundingClientRect ? anchor.getBoundingClientRect() : null;
+  const sidebar = anchor?.closest?.("#sidebar");
   const vw = document.documentElement.clientWidth || window.innerWidth;
   const vh = document.documentElement.clientHeight || window.innerHeight;
-  menu.style.maxHeight = `${Math.max(120, vh - 32)}px`;
+  menu.style.margin = "0";
   menu.style.overflowY = "auto";
   menu.style.overflowX = "hidden";
-  const mw = menu.offsetWidth;
-  const mh = menu.offsetHeight;
 
-  if (vw <= 700) {
-    menu.style.left = "50%";
-    menu.style.top = "50%";
-    menu.style.marginLeft = `${-mw / 2}px`;
-    menu.style.marginTop = `${-Math.min(mh, vh - 32) / 2}px`;
+  if (vw <= 700 && sidebar) {
+    const panel = sidebar.getBoundingClientRect();
+    const availableHeight = Math.max(120, panel.height - 24);
+    menu.style.width = `${Math.max(180, panel.width - 24)}px`;
+    menu.style.maxWidth = `${Math.max(180, panel.width - 24)}px`;
+    menu.style.maxHeight = `${availableHeight}px`;
+    const mh = Math.min(menu.scrollHeight, availableHeight);
+    const mw = menu.offsetWidth;
+    const preferredTop = rect ? rect.top + rect.height / 2 - mh / 2 : panel.top + 12;
+    const top = Math.max(panel.top + 12, Math.min(preferredTop, panel.bottom - mh - 12));
+    menu.style.left = `${panel.left + (panel.width - mw) / 2}px`;
+    menu.style.top = `${top}px`;
   } else {
-    menu.style.marginLeft = "0";
-    menu.style.marginTop = "0";
+    menu.style.width = "";
+    menu.style.maxWidth = "";
+    menu.style.maxHeight = `${Math.max(120, vh - 32)}px`;
+    const mw = menu.offsetWidth;
+    const mh = menu.offsetHeight;
     let left = rect ? rect.right - mw : (vw - mw) / 2;
     let top = rect ? rect.bottom + 6 : (vh - mh) / 2;
     left = Math.max(8, Math.min(left, vw - mw - 8));
