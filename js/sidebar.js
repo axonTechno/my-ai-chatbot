@@ -292,7 +292,6 @@ export function refreshAccountChip() {
 export function initSidebar() {
   $("#menuBtn")?.addEventListener("click", toggleSidebar);
   $("#closeSidebar")?.addEventListener("click", closeSidebar);
-  $("#sidebarOverlay")?.addEventListener("click", closeSidebar);
 
   $("#newChatBtn")?.addEventListener("click", () => {
     const chat = createChat();
