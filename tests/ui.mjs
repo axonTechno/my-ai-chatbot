@@ -183,6 +183,50 @@ await checkAsync("action menu works without blocking underlying inputs", async (
   anchor.remove();
 });
 
+await checkAsync("chat menu Rename, Share, and Delete options execute", async () => {
+  const chat = state.createChat("Menu integration test");
+  chat.messages.push({ id: "menu-test-message", role: "user", content: "Share test", time: Date.now(), images: [], rating: null, error: null });
+  state.persistChats();
+  sidebar.renderHistory();
+  const anchor = document.createElement("button");
+  document.body.appendChild(anchor);
+
+  sidebar.openChatMenu(chat, anchor);
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  const rename = [...document.querySelectorAll("#actionMenu button")].find((b) => b.textContent.trim() === "Rename");
+  if (!rename) throw new Error("Rename option missing");
+  rename.click();
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  const renameInput = document.querySelector("#confirmText input");
+  if (!renameInput) throw new Error("Rename input did not open");
+  renameInput.value = "Menu renamed";
+  document.querySelector("#confirmOk").click();
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  if (state.getChat(chat.id)?.title !== "Menu renamed") throw new Error("Rename did not save");
+
+  sidebar.openChatMenu(state.getChat(chat.id), anchor);
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  const share = [...document.querySelectorAll("#actionMenu button")].find((b) => b.textContent.trim() === "Share");
+  if (!share) throw new Error("Share option missing");
+  share.click();
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  if (!document.querySelector(".share-sheet")) throw new Error("Share sheet did not open");
+  const shareMod = await mod("js/share.js");
+  shareMod.closeShareSheet();
+
+  sidebar.openChatMenu(state.getChat(chat.id), anchor);
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  const remove = [...document.querySelectorAll("#actionMenu button")].find((b) => b.textContent.trim() === "Delete");
+  if (!remove) throw new Error("Delete option missing");
+  remove.click();
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  if (document.querySelector("#confirmCard").classList.contains("hidden")) throw new Error("Delete confirmation did not open");
+  document.querySelector("#confirmOk").click();
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  if (state.getChat(chat.id)) throw new Error("Delete did not remove the conversation");
+  anchor.remove();
+});
+
 /* ---------- composer ---------- */
 const chatMod = await mod("js/chat.js");
 
