@@ -42,9 +42,12 @@ function paintSync() {
   if (btn) btn.disabled = !signedIn;
 }
 
-function paint() {
-  const avatar = store.profile.avatar === "female" ? "female" : "male";
-  avatarDraft = avatar;
+function paint({ preserveAvatarDraft = false } = {}) {
+  const savedAvatar = store.profile.avatar === "female" ? "female" : "male";
+  const avatar = preserveAvatarDraft && (avatarDraft === "female" || avatarDraft === "male")
+    ? avatarDraft
+    : savedAvatar;
+  if (!preserveAvatarDraft) avatarDraft = savedAvatar;
   const img = $("#accountAvatarImg");
   if (img) img.src = avatar === "female" ? "./assets/female-avatar.webp" : "./assets/male-avatar.webp";
   const nameEl = $("#accountName");
@@ -143,7 +146,7 @@ export function initAccount() {
   $$("[data-avatar]").forEach((btn) => {
     btn.addEventListener("click", () => {
       avatarDraft = btn.dataset.avatar === "female" ? "female" : "male";
-      paint();
+      paint({ preserveAvatarDraft: true });
     });
   });
 
