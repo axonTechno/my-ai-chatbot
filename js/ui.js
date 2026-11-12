@@ -99,24 +99,33 @@ export function openMenu(items, anchor) {
   menu.classList.remove("hidden");
   overlay.classList.remove("hidden");
 
-  /* position near the anchor, clamped to the viewport */
+  /* On phones, center the menu in the visible screen so it cannot
+     extend beyond the bottom edge near the last chat item. */
   const rect = anchor && anchor.getBoundingClientRect ? anchor.getBoundingClientRect() : null;
-  const viewport = window.visualViewport;
-  const vw = viewport?.width || window.innerWidth;
-  const vh = viewport?.height || window.innerHeight;
-  const vx = viewport?.offsetLeft || 0;
-  const vy = viewport?.offsetTop || 0;
-  menu.style.maxHeight = `${Math.max(120, vh - 16)}px`;
+  const vw = document.documentElement.clientWidth || window.innerWidth;
+  const vh = document.documentElement.clientHeight || window.innerHeight;
+  menu.style.maxHeight = `${Math.max(120, vh - 32)}px`;
   menu.style.overflowY = "auto";
+  menu.style.overflowX = "hidden";
   const mw = menu.offsetWidth;
   const mh = menu.offsetHeight;
-  let left = rect ? rect.right - mw : vx + (vw - mw) / 2;
-  let top = rect ? rect.bottom + 6 : vy + vh / 2 - mh / 2;
-  left = Math.max(vx + 8, Math.min(left, vx + vw - mw - 8));
-  if (top + mh > vy + vh - 8) top = (rect ? rect.top - mh - 6 : vy + vh - mh - 8);
-  top = Math.max(vy + 8, Math.min(top, vy + vh - Math.min(mh, vh - 16) - 8));
-  menu.style.left = `${left}px`;
-  menu.style.top = `${top}px`;
+
+  if (vw <= 700) {
+    menu.style.left = "50%";
+    menu.style.top = "50%";
+    menu.style.marginLeft = `${-mw / 2}px`;
+    menu.style.marginTop = `${-Math.min(mh, vh - 32) / 2}px`;
+  } else {
+    menu.style.marginLeft = "0";
+    menu.style.marginTop = "0";
+    let left = rect ? rect.right - mw : (vw - mw) / 2;
+    let top = rect ? rect.bottom + 6 : (vh - mh) / 2;
+    left = Math.max(8, Math.min(left, vw - mw - 8));
+    if (top + mh > vh - 8) top = rect ? rect.top - mh - 6 : vh - mh - 8;
+    top = Math.max(8, Math.min(top, vh - Math.min(mh, vh - 16) - 8));
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+  }
 
   const onDocClick = (e) => {
     if (!menu.contains(e.target)) closeMenu();
