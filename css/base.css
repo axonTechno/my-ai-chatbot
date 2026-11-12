@@ -565,8 +565,8 @@ body.dark .new-chat {
   max-width: 88vw;
   padding: 11px 17px;
   border-radius: 22px;
-  background: #2a2538;
-  color: #fff;
+  background: #f1f1f1;
+  color: #111111;
   font-size: 13.5px;
   box-shadow: var(--shadow-lg);
   animation: toastIn .2s ease both;
