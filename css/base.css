@@ -524,6 +524,17 @@ body.dark .new-chat {
   margin: 5px 6px;
 }
 
+@keyframes confirmDialogIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
 .confirm-card {
   position: fixed;
   z-index: 100001;
@@ -538,7 +549,7 @@ body.dark .new-chat {
   border-radius: 18px;
   background: var(--surface);
   box-shadow: var(--shadow-lg);
-  animation: menuIn .18s ease both;
+  animation: confirmDialogIn .18s ease both;
 }
 
 .confirm-card h3 {
