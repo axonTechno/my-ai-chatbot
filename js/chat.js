@@ -7,11 +7,11 @@
    ========================================================= */
 
 import { store, uid, getChat, createChat, touchChat, persistChats, scheduleSaveChats, flushSaveChats } from "./state.js";
-import { saveImage, getImageBlob, getImageURL } from "./image-store.js";
+import { saveImage, getImageBlob, getImageURL, deleteImage } from "./image-store.js";
 import { sendChat, generateImage, editImage, AIError, buildHistory } from "./ai.js";
 import { modelInfo } from "./config.js";
 import { renderMarkdown, setMarkdown } from "./markdown.js";
-import { $, toast, copyText, confirmDialog, openImageViewer, formatTime, haptic, downloadFile } from "./ui.js";
+import { $, toast, copyText, confirmDialog, openImageViewer, closeImageViewer, formatTime, haptic, downloadFile } from "./ui.js";
 import { queueOutbox, isSignedIn } from "./backend.js";
 import { shareMessageSheet, shareChatSheet } from "./share.js";
 
@@ -328,7 +328,8 @@ function buildMessage(chat, message) {
             image.addEventListener("click", () => openImageViewer(src, image.alt, {
               onDownload: () => downloadGeneratedImage(message),
               onShare: () => shareGeneratedImage(message),
-              onRegenerate: () => regenerateImage(chat, message)
+              onRegenerate: () => regenerateImage(chat, message),
+              onDelete: () => deleteGeneratedImage(chat, message)
             }));
           }
         } catch (error) {
@@ -340,8 +341,11 @@ function buildMessage(chat, message) {
       actions.appendChild(actionButton({iconId:"i-download",label:"Download image",onClick:()=>downloadGeneratedImage(message)}));
       actions.appendChild(actionButton({iconId:"i-share",label:"Share image",onClick:()=>shareGeneratedImage(message)}));
       actions.appendChild(actionButton({iconId:"i-refresh",label:"Regenerate image",onClick:()=>regenerateImage(chat,message)}));
+      actions.appendChild(actionButton({iconId:"i-trash",label:"Delete image",danger:true,onClick:()=>deleteGeneratedImage(chat,message)}));
       panel.appendChild(actions);
 
+    } else if (message.imageStatus === "deleted") {
+      panel.appendChild(el("p", "generated-image-error", "Image deleted"));
     } else if (message.imageStatus === "error") {
       panel.appendChild(el("p", "generated-image-error", message.imageError || "Image generation failed."));
       panel.appendChild(actionButton({iconId:"i-refresh",label:"Try again",onClick:()=>regenerateImage(chat,message)}));
@@ -940,6 +944,30 @@ async function shareGeneratedImage(message) {
     if (err?.name !== "AbortError") {
       toast(err.message || "Could not share image.", "error");
     }
+  }
+}
+
+async function deleteGeneratedImage(chat, message) {
+  const ok = await confirmDialog({
+    title: "Delete generated image?",
+    text: "This image will be removed from this conversation on this device. This cannot be undone.",
+    okLabel: "Delete"
+  });
+  if (!ok) return;
+
+  try {
+    if (message.generatedImageId) await deleteImage(message.generatedImageId);
+    message.generatedImageId = "";
+    message.generatedImage = "";
+    message.imageStatus = "deleted";
+    touchChat(chat);
+    flushSaveChats();
+    closeImageViewer();
+    renderMessages();
+    document.dispatchEvent(new CustomEvent("axon:chat-updated"));
+    toast("Image deleted");
+  } catch (error) {
+    toast(error?.message || "Could not delete image.", "error");
   }
 }
 
