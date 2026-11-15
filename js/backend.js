@@ -123,8 +123,12 @@ export async function refreshSession() {
 
   // The device's persisted refresh session is the login state. Do not contact
   // the auth service on every launch while the access token is still valid.
-  const expiresAt = Number(store.session.expiresAt) || 0;
-  const needsRefresh = expiresAt > 0 && expiresAt <= Date.now() + 60_000;
+  const rawExpiry = store.session.expiresAt;
+  const numericExpiry = Number(rawExpiry);
+  const expiresAt = Number.isFinite(numericExpiry) && rawExpiry !== null && rawExpiry !== ""
+    ? numericExpiry
+    : (Date.parse(rawExpiry) || 0);
+  const needsRefresh = !expiresAt || expiresAt <= Date.now() + 60_000;
   if (!needsRefresh) return true;
 
   if (!store.session.refreshToken) {
