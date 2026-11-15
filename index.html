@@ -3,6 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<script>
+/* Restrict pinch zoom only when AXON is running as an installed app.
+   Regular browser tabs retain their native zoom controls. */
+(function () {
+  var isInstalledApp =
+    (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+    window.navigator.standalone === true;
+
+  if (!isInstalledApp) return;
+
+  document.documentElement.classList.add("axon-installed-app");
+  var viewport = document.querySelector('meta[name="viewport"]');
+  if (viewport) {
+    viewport.setAttribute(
+      "content",
+      "width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    );
+  }
+})();
+</script>
 <meta name="theme-color" content="#ffffff" id="metaThemeColor">
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="AXON AI — your personal AI assistant. Chat, attach images, and talk with AXON.">
