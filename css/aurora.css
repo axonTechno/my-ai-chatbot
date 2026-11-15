@@ -621,3 +621,13 @@ body.has-messages::before {
   min-width: 40px;
   height: 40px;
 }
+
+
+/* Installed AXON app: preserve one-finger scrolling but prevent pinch zoom.
+   This class is only applied in standalone/PWA display mode; browser tabs
+   keep their normal pinch-to-zoom behaviour. */
+html.axon-installed-app,
+html.axon-installed-app body,
+html.axon-installed-app .app {
+  touch-action: pan-x pan-y;
+}
