@@ -131,12 +131,18 @@ async function boot() {
     });
   });
 
-  /* AXON account gate */
+  /* AXON account gate
+     A saved session belongs to this browser profile/device. Restore it quietly;
+     only show sign-in when the account service is configured and there is no
+     usable saved session (or the server explicitly revoked it). */
   setTimeout(async () => {
-    if (backendConfigured() && isSignedIn()) {
+    if (!backendConfigured()) return;
+
+    if (isSignedIn()) {
       const restored = await refreshSession();
       if (restored) return;
     }
+
     openAuthPage();
   }, 700);
 

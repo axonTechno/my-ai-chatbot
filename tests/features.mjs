@@ -157,6 +157,11 @@ check("history drops empty placeholders and error turns", () => {
 
 /* ---------- sync layer (no backend configured) ---------- */
 
+// Isolate tests that verify behavior without a configured backend.
+const config = await mod("js/config.js");
+config.BACKEND.baseUrl = "";
+config.BACKEND.authBase = "";
+
 const backend = await mod("js/backend.js");
 
 check("sync reports not_configured instead of faking success", () => {
