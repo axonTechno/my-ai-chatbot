@@ -119,14 +119,30 @@ export async function verifyEmailCode(email, code) {
 }
 
 export async function refreshSession() {
-  if (!isSignedIn() || !store.session.refreshToken) return false;
+  if (!isSignedIn()) return false;
+
+  // The device's persisted refresh session is the login state. Do not contact
+  // the auth service on every launch while the access token is still valid.
+  const expiresAt = Number(store.session.expiresAt) || 0;
+  const needsRefresh = expiresAt > 0 && expiresAt <= Date.now() + 60_000;
+  if (!needsRefresh) return true;
+
+  if (!store.session.refreshToken) {
+    // A legacy session without a refresh token can remain usable until its
+    // access token expires; only then must the user authenticate again.
+    return expiresAt === 0 || expiresAt > Date.now();
+  }
+
   try {
     const data = await request(`${authBase()}auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refresh_token: store.session.refreshToken })
     });
-    if (!data || !data.access_token) return false;
+    if (!data || !data.access_token) {
+      // A malformed/temporary response must not erase a remembered login.
+      return true;
+    }
     saveSession({
       ...store.session,
       accessToken: data.access_token,
@@ -135,7 +151,13 @@ export async function refreshSession() {
     });
     return true;
   } catch (e) {
-    return false;
+    // Only an explicit auth rejection means this device's session is revoked.
+    // Network, timeout and server errors should never force an unnecessary login.
+    if (e.status === 401 || e.status === 403) {
+      signOutLocal();
+      return false;
+    }
+    return true;
   }
 }
 
