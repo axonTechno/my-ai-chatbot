@@ -343,8 +343,14 @@ async function attempt({ body, model, signal, onDelta, onMeta }) {
     } catch (e) {}
   }
 
-  if (streamError && !acc) {
+  if (streamError) {
     throw new AIError(streamError, { code: "api", status: 200, retryable: true });
+  }
+  if (!parser.done) {
+    throw new AIError("The AI stream ended before the reply was complete. Please retry.", {
+      code: "incomplete",
+      retryable: true
+    });
   }
   if (!acc.trim()) {
     throw new AIError("The AI service returned an empty answer.", { code: "empty", retryable: true });
