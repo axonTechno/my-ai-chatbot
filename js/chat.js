@@ -698,7 +698,8 @@ async function runGeneration(chat, { assistantMessage, history, message, images 
       }
     } else {
       assistantMessage.thinking = false;
-      assistantMessage.content = state.liveText || "";
+      /* Never save/display a truncated stream as a completed assistant reply. */
+      assistantMessage.content = err && err.code === "incomplete" ? "" : (state.liveText || "");
       assistantMessage.error = errorFor(err);
       assistantMessage.failed = true;
       if (!assistantMessage.content) assistantMessage.content = "";
