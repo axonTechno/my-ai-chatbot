@@ -127,6 +127,31 @@ await checkAsync("non-streaming JSON answer is accepted", async () => {
   if (res.text !== "plain answer") throw new Error(res.text);
 });
 
+await checkAsync("streaming answer is accepted only after explicit completion", async () => {
+  window.fetch = global.fetch = async () =>
+    new Response('data: {"response":"complete streamed answer"}\\n\\ndata: [DONE]\\n\\n', {
+      status: 200,
+      headers: { "content-type": "text/event-stream" }
+    });
+  const res = await ai.sendChat({ message: "hi", history: [] });
+  if (res.text !== "complete streamed answer") throw new Error(res.text);
+});
+
+await checkAsync("truncated stream is rejected as incomplete", async () => {
+  window.fetch = global.fetch = async () =>
+    new Response('data: {"response":"partial answer"}\\n\\n', {
+      status: 200,
+      headers: { "content-type": "text/event-stream" }
+    });
+  let err = null;
+  try {
+    await ai.sendChat({ message: "hi", history: [] });
+  } catch (e) {
+    err = e;
+  }
+  if (!err || err.code !== "incomplete") throw new Error(err ? err.code : "no error");
+});
+
 await checkAsync("empty answer is reported, not silently accepted", async () => {
   window.fetch = global.fetch = async () =>
     new Response(JSON.stringify({ response: "" }), {
