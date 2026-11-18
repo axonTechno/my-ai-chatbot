@@ -129,7 +129,7 @@ await checkAsync("non-streaming JSON answer is accepted", async () => {
 
 await checkAsync("streaming answer is accepted only after explicit completion", async () => {
   window.fetch = global.fetch = async () =>
-    new Response('data: {"response":"complete streamed answer"}\\n\\ndata: [DONE]\\n\\n', {
+    new Response('data: {"response":"complete streamed answer"}\n\ndata: [DONE]\n\n', {
       status: 200,
       headers: { "content-type": "text/event-stream" }
     });
@@ -139,7 +139,7 @@ await checkAsync("streaming answer is accepted only after explicit completion", 
 
 await checkAsync("truncated stream is rejected as incomplete", async () => {
   window.fetch = global.fetch = async () =>
-    new Response('data: {"response":"partial answer"}\\n\\n', {
+    new Response('data: {"response":"partial answer"}\n\n', {
       status: 200,
       headers: { "content-type": "text/event-stream" }
     });
