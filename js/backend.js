@@ -221,7 +221,7 @@ export async function pushProfile(profile) {
   return request(`${base()}profile`, {
     method: "PUT",
     headers: authHeaders(),
-    body: JSON.stringify({ name: profile.name, avatar: profile.avatar })
+    body: JSON.stringify({ name: profile.name, avatar: profile.avatar, bio: profile.bio || "" })
   });
 }
 
