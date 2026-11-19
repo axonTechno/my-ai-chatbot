@@ -475,3 +475,109 @@ select:focus-visible,
   }
 }
 
+
+
+/* ---------- Settings directory ---------- */
+.settings-home,
+.settings-detail {
+  padding: 18px 16px calc(28px + var(--safe-bottom));
+}
+
+.settings-search {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 16px;
+  margin: 0 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.settings-search svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.settings-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.settings-search input::placeholder { color: var(--muted); }
+
+.settings-category-list {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--surface);
+}
+
+.settings-category {
+  width: 100%;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 18px;
+  color: var(--text);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  font-size: 16px;
+  font-weight: 400;
+  transition: background .16s ease;
+}
+
+.settings-category:last-child { border-bottom: 0; }
+.settings-category:active,
+.settings-category:hover { background: var(--hover); }
+.settings-category > svg:first-child {
+  width: 23px;
+  height: 23px;
+  color: var(--text);
+}
+.settings-category span {
+  flex: 1;
+  min-width: 0;
+  font-weight: 400;
+}
+.settings-category .settings-chevron {
+  width: 19px;
+  height: 19px;
+  color: var(--muted);
+}
+
+.settings-no-results,
+.settings-empty {
+  padding: 24px 12px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 13px;
+}
+
+.settings-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  margin: -4px 0 16px;
+}
+
+.settings-detail-header h2 {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+@media (max-width: 380px) {
+  .settings-category { min-height: 62px; padding: 0 14px; gap: 13px; }
+  .settings-category span { font-size: 15px; }
+}
