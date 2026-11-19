@@ -171,7 +171,7 @@ function openSettingsCategory(category) {
   const detail = $("#settingsDetail");
   const title = $("#settingsDetailTitle");
   const empty = $("#settingsEmpty");
-  const groups = $("##settingsDetailContent .setting-group");
+  const groups = $("#settingsDetailContent .setting-group");
   let found = false;
 
   groups.forEach((group) => {
@@ -197,12 +197,12 @@ function returnToSettingsHome() {
 function filterSettingsDirectory() {
   const input = $("#settingsSearch");
   const query = (input?.value || "").trim().toLowerCase();
-  const rows = $("##settingsCategoryList [data-settings-category]");
+  const rows = $("#settingsCategoryList [data-settings-category]");
   let visibleCount = 0;
 
   rows.forEach((row) => {
     const category = row.dataset.settingsCategory || "";
-    const groups = $("##settingsDetailContent .setting-group").filter((group) =>
+    const groups = $("#settingsDetailContent .setting-group").filter((group) =>
       (group.dataset.settingsCategory || "").split("|").includes(category)
     );
     const matchesCategory = category.toLowerCase().includes(query);
