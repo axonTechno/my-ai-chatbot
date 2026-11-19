@@ -142,3 +142,14 @@
 body * {
   font-weight: 400 !important;
 }
+
+
+/* Sidebar profile heading */
+.sidebar-section-label {
+  margin: 2px 9px 6px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 400;
+  letter-spacing: .02em;
+}
