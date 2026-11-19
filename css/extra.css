@@ -153,3 +153,88 @@ body * {
   font-weight: 400;
   letter-spacing: .02em;
 }
+
+
+/* Profile editor — distinct, quiet fields with simple typography. */
+.sidebar-account { cursor: pointer; }
+.profile-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.profile-editor-avatar {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 2px;
+}
+.profile-editor-avatar .account-avatar {
+  width: 76px;
+  height: 76px;
+}
+.profile-field-group {
+  gap: 10px;
+}
+.profile-field-group h3,
+.profile-field-group .field-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text);
+}
+.profile-field-group input,
+.profile-field-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  padding: 11px 12px;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+.profile-field-group textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.profile-field-group input:focus,
+.profile-field-group textarea:focus {
+  border-color: var(--border-strong);
+  box-shadow: none;
+}
+.profile-editor-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.account-access-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.account-access-content .setting-group h3 {
+  font-weight: 400;
+}
+.account-action-row {
+  width: 100%;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+}
+.account-action-row svg {
+  width: 18px;
+  height: 18px;
+}
+.account-action-row.danger { color: var(--danger, #c44); }
