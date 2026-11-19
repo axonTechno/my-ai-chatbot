@@ -24,3 +24,51 @@
 .settings-category:hover {
   border-color: color-mix(in srgb, var(--purple, #2585ed) 38%, var(--border));
 }
+
+
+/* Settings categories: keep original row size, separate rounded outlines,
+   left-aligned labels and chevrons pinned to the right edge. */
+.settings-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.settings-category {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 68px;
+  box-sizing: border-box;
+  padding: 0 18px;
+  gap: 16px;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.settings-category:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-category > svg:first-child {
+  flex: 0 0 23px;
+}
+
+.settings-category span {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+}
+
+.settings-category .settings-chevron {
+  flex: 0 0 19px;
+  margin-left: auto;
+}
