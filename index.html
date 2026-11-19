@@ -53,6 +53,9 @@
 <link rel="stylesheet" href="./css/voice.css">
 <link rel="stylesheet" href="./css/extra.css">
 <link rel="stylesheet" href="./css/aurora.css">
+<!-- Cloudflare Web Analytics -->
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "23abaa43143f421b817b109397bb84be"}'></script>
+<!-- End Cloudflare Web Analytics -->
 </head>
 
 <body>
@@ -517,7 +520,7 @@
 
     <div class="setting-group">
       <h3>Data &amp; privacy</h3>
-      <p>Your conversations are stored locally on this device. Nothing is sent anywhere except your AI request.</p>
+      <p>Your conversations are stored locally on this device. Messages are sent to the AXON AI service; basic website usage data is measured by Cloudflare Web Analytics.</p>
       <button class="btn ghost" id="exportAllBtn"><svg><use href="#i-download"/></svg><span>Export all chats</span></button>
       <button class="btn ghost" id="deleteAllBtn"><svg><use href="#i-trash"/></svg><span>Delete all chats</span></button>
     </div>
@@ -578,8 +581,7 @@
 
     <div class="setting-group">
       <h3>Privacy</h3>
-      <p>Messages are sent only to the AXON AI Worker to generate replies. No analytics, no tracking,
-        no third-party scripts. You can delete all chats at any time in Settings.</p>
+      <p>Messages are sent to the AXON AI Worker to generate replies. Cloudflare Web Analytics measures basic website visits and usage; it does not receive your chat messages. You can delete all chats at any time in Settings.</p>
     </div>
 
     <div class="setting-group">
