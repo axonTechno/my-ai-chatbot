@@ -149,6 +149,69 @@ async function runConnectionTest() {
   return result;
 }
 
+
+/* ================= SETTINGS DIRECTORY ================= */
+
+function openSettingsCategory(category) {
+  if (category === "About AXON") {
+    paintAbout();
+    openPage("#aboutPage");
+    return;
+  }
+  if (category === "Help & issues") {
+    renderReportHistory();
+    openPage("#helpPage");
+    return;
+  }
+
+  const home = $("#settingsHome");
+  const detail = $("#settingsDetail");
+  const title = $("#settingsDetailTitle");
+  const empty = $("#settingsEmpty");
+  const groups = $("#settingsDetailContent .setting-group");
+  let found = false;
+
+  groups.forEach((group) => {
+    const categories = (group.dataset.settingsCategory || "").split("|");
+    const visible = categories.includes(category);
+    group.classList.toggle("hidden", !visible);
+    if (visible) found = true;
+  });
+
+  if (title) title.textContent = category;
+  if (empty) empty.classList.toggle("hidden", found);
+  home?.classList.add("hidden");
+  detail?.classList.remove("hidden");
+  if (detail) detail.scrollTop = 0;
+}
+
+function returnToSettingsHome() {
+  $("#settingsDetail")?.classList.add("hidden");
+  $("#settingsHome")?.classList.remove("hidden");
+  $("#settingsSearch")?.focus();
+}
+
+function filterSettingsDirectory() {
+  const input = $("#settingsSearch");
+  const query = (input?.value || "").trim().toLowerCase();
+  const rows = $("#settingsCategoryList [data-settings-category]");
+  let visibleCount = 0;
+
+  rows.forEach((row) => {
+    const category = row.dataset.settingsCategory || "";
+    const groups = $("#settingsDetailContent .setting-group").filter((group) =>
+      (group.dataset.settingsCategory || "").split("|").includes(category)
+    );
+    const matchesCategory = category.toLowerCase().includes(query);
+    const matchesSetting = groups.some((group) => group.textContent.toLowerCase().includes(query));
+    const visible = !query || matchesCategory || matchesSetting;
+    row.classList.toggle("hidden", !visible);
+    if (visible) visibleCount += 1;
+  });
+
+  $("#settingsNoResults")?.classList.toggle("hidden", visibleCount > 0);
+}
+
 /* ================= HELP & ISSUES ================= */
 
 function renderReportHistory() {
@@ -268,6 +331,12 @@ function paintAbout() {
 
 export function initSettings() {
   paintSettings();
+
+  $("#settingsCategoryList [data-settings-category]").forEach((row) => {
+    row.addEventListener("click", () => openSettingsCategory(row.dataset.settingsCategory));
+  });
+  $("#settingsSearch")?.addEventListener("input", filterSettingsDirectory);
+  $("#settingsDetailBack")?.addEventListener("click", returnToSettingsHome);
 
   $("#settingsBtn")?.addEventListener("click", () => {
     paintSettings();
