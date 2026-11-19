@@ -238,3 +238,42 @@ body * {
   height: 18px;
 }
 .account-action-row.danger { color: var(--danger, #c44); }
+
+
+/* Settings screens: clean, regular-weight typography and compact spacing. */
+#settingsPage,
+#settingsPage * {
+  font-weight: 400 !important;
+  letter-spacing: normal;
+}
+
+#settingsPage .page-header h2,
+#settingsPage .settings-detail-header h2,
+#settingsPage .setting-group h3 {
+  font-size: 15px;
+  font-weight: 400 !important;
+}
+
+#settingsPage .setting-group {
+  gap: 10px;
+  padding: 14px;
+}
+
+#settingsPage .setting-group > p,
+#settingsPage .settings-empty,
+#settingsPage .settings-no-results {
+  display: none !important;
+}
+
+#settingsPage .field-label,
+#settingsPage label,
+#settingsPage select,
+#settingsPage button,
+#settingsPage input {
+  font-size: 14px;
+  font-weight: 400 !important;
+}
+
+#settingsPage .settings-category {
+  font-weight: 400 !important;
+}
