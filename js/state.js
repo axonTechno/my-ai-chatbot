@@ -32,7 +32,8 @@ export const DEFAULT_SETTINGS = {
 export const DEFAULT_PROFILE = {
   name: "",
   avatar: "male",
-  email: ""
+  email: "",
+  bio: ""
 };
 
 function readJSON(key, fallback) {
