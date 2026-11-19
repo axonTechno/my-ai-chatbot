@@ -64,6 +64,10 @@ function paint({ preserveAvatarDraft = false } = {}) {
 
   const nameInput = $("#profileNameInput");
   if (nameInput) nameInput.value = store.profile.name || "";
+  const bioInput = $("#profileBioInput");
+  if (bioInput) bioInput.value = store.profile.bio || "";
+  const currentEmail = $("#currentAccountEmail");
+  if (currentEmail) currentEmail.textContent = isSignedIn() ? session().email : "Not signed in";
 
   const note = $("#accountEmailNote");
   if (note) {
@@ -98,11 +102,17 @@ export function closeAccountPage() {
   $("#accountPage")?.classList.add("hidden");
 }
 
+export function openAccountAccessPage() {
+  paint();
+  $("#accountAccessPage")?.classList.remove("hidden");
+}
+
 async function saveProfile() {
   const nameInput = $("#profileNameInput");
   const name = (nameInput?.value || "").trim().slice(0, 60);
   store.profile.name = name;
   store.profile.avatar = avatarDraft;
+  store.profile.bio = ($("#profileBioInput")?.value || "").trim().slice(0, 240);
   persistProfile();
   refreshAccountChip();
   renderMessages();
@@ -137,6 +147,7 @@ async function doLogout() {
   }
   signOut();
   closeAccountPage();
+  $("#accountAccessPage")?.classList.add("hidden");
   renderHistory();
   openAuthPage();
   toast("Logged out");
@@ -160,25 +171,14 @@ export function initAccount() {
     paint();
     if (btn) btn.disabled = !isSignedIn();
   });
-  $("#accountSignInBtn")?.addEventListener("click", () => {
-    closeAccountPage();
+  $("#switchAccountBtn")?.addEventListener("click", () => {
+    $("#accountAccessPage")?.classList.add("hidden");
     openAuthPage();
   });
+  $("#accountLogoutBtn")?.addEventListener("click", doLogout);
 
-  // TEMPORARY DIAGNOSTIC (remove after debugging):
-  const accountDiag = (source) => (e) => {
-    console.log("[diag] tapped element:", source, e && e.target ? e.target : "");
-    try {
-      openAccountPage();
-      console.log("[diag] openAccountPage() called: true");
-      const page = $("#accountPage");
-      console.log("[diag] #accountPage lost hidden class:", page ? !page.classList.contains("hidden") : "page not found");
-    } catch (err) {
-      console.error("[diag] EXCEPTION in account open flow:", err);
-    }
-  };
-  $("#sidebarAccount")?.addEventListener("click", accountDiag("#sidebarAccount"));
-  $("#accountBtn")?.addEventListener("click", accountDiag("#accountBtn"));
+  $("#sidebarAccount")?.addEventListener("click", openAccountPage);
+  $("#accountBtn")?.addEventListener("click", openAccountAccessPage);
   $("#settingsAccountBtn")?.addEventListener("click", () => {
     document.dispatchEvent(new CustomEvent("axon:close-pages"));
     openAccountPage();
@@ -186,9 +186,9 @@ export function initAccount() {
 
   // Add event listener for the back button in the account page
   const backButton = $("#accountPage button[data-back]");
-  if (backButton) {
-    backButton.addEventListener("click", closeAccountPage);
-  }
+  if (backButton) backButton.addEventListener("click", closeAccountPage);
+  const accountBackButton = $("#accountAccessPage button[data-back]");
+  if (accountBackButton) accountBackButton.addEventListener("click", () => $("#accountAccessPage")?.classList.add("hidden"));
 
   document.addEventListener("axon:open-account", openAccountPage);
   document.addEventListener("axon:sync-changed", () => {
