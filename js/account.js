@@ -93,9 +93,19 @@ function paint({ preserveAvatarDraft = false } = {}) {
   paintSync();
 }
 
+function showAccountPage(pageId) {
+  document.querySelectorAll(".full-page").forEach((page) => page.classList.add("hidden"));
+  const page = document.getElementById(pageId);
+  if (!page) return;
+  page.classList.remove("hidden");
+  page.scrollTop = 0;
+  const content = page.querySelector(".page-content");
+  if (content) content.scrollTop = 0;
+}
+
 export function openAccountPage() {
   paint();
-  $("#accountPage")?.classList.remove("hidden");
+  showAccountPage("accountPage");
 }
 
 export function closeAccountPage() {
@@ -104,7 +114,7 @@ export function closeAccountPage() {
 
 export function openAccountAccessPage() {
   paint();
-  $("#accountAccessPage")?.classList.remove("hidden");
+  showAccountPage("accountAccessPage");
 }
 
 async function saveProfile() {
