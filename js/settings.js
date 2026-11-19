@@ -321,7 +321,7 @@ function paintAbout() {
 export function initSettings() {
   paintSettings();
 
-  $("#settingsCategoryList [data-settings-category]").forEach((row) => {
+  $$("#settingsCategoryList [data-settings-category]").forEach((row) => {
     row.addEventListener("click", () => openSettingsCategory(row.dataset.settingsCategory));
   });
   $("#settingsSearch")?.addEventListener("input", filterSettingsDirectory);
