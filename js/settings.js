@@ -113,6 +113,20 @@ function paintSettings() {
       : "No support endpoint is connected on this build, so submissions are saved on this device with a tracking ID. Nothing is sent to a support team yet.";
   }
 
+  const chatCount = Array.isArray(store.chats) ? store.chats.length : 0;
+  const messageCount = Array.isArray(store.chats)
+    ? store.chats.reduce((total, chat) => total + (Array.isArray(chat.messages) ? chat.messages.length : 0), 0)
+    : 0;
+  const usageSummary = $("#settingsUsageSummary");
+  if (usageSummary) usageSummary.textContent = `${chatCount} conversation(s) · ${messageCount} message(s) stored on this device.`;
+  const storageSummary = $("#settingsStorageSummary");
+  if (storageSummary) {
+    let bytes = 0;
+    try { bytes = new Blob([JSON.stringify(store.chats || [])]).size; } catch (e) {}
+    const size = bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+    storageSummary.textContent = `${chatCount} conversation(s) · approximately ${size} of local chat data. Chats remain on this device unless account sync is configured.`;
+  }
+
   const modelLabel = $("#connectionModel");
   if (modelLabel) modelLabel.textContent = currentModelLabel();
   const urlLabel = $("#connectionUrl");
@@ -326,6 +340,13 @@ export function initSettings() {
   });
   $("#settingsSearch")?.addEventListener("input", filterSettingsDirectory);
   $("#settingsDetailBack")?.addEventListener("click", returnToSettingsHome);
+  $("#settingsOpenVoiceBtn")?.addEventListener("click", () => $("#voiceBtn")?.click());
+  $("#settingsSafetyHelpBtn")?.addEventListener("click", () => {
+    renderReportHistory();
+    openPage("#helpPage");
+  });
+  $("#settingsTestServiceBtn")?.addEventListener("click", runConnectionTest);
+
 
   $("#settingsBtn")?.addEventListener("click", () => {
     closeSidebar();
