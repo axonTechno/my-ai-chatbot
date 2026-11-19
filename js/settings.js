@@ -9,7 +9,7 @@ import { APP_VERSION, MODELS, LANGUAGES, DEFAULT_WORKER_URL, modelInfo, BACKEND,
 import { $, $$, toast, confirmDialog, downloadFile } from "./ui.js";
 import { testConnection, workerUrl, currentModelLabel } from "./ai.js";
 import { exportAllChats } from "./chat.js";
-import { renderHistory, refreshAccountChip } from "./sidebar.js";
+import { renderHistory, refreshAccountChip, closeSidebar } from "./sidebar.js";
 import { submitSupport, supportConfigured, backendConfigured, isSignedIn } from "./backend.js";
 import { uid } from "./state.js";
 
@@ -339,7 +339,10 @@ export function initSettings() {
   $("#settingsDetailBack")?.addEventListener("click", returnToSettingsHome);
 
   $("#settingsBtn")?.addEventListener("click", () => {
+    closeSidebar();
     paintSettings();
+    $("#settingsHome")?.classList.remove("hidden");
+    $("#settingsDetail")?.classList.add("hidden");
     openPage("#settingsPage");
   });
   $("#aboutBtn")?.addEventListener("click", () => {
