@@ -42,10 +42,8 @@ export function applyTextSize() {
 
 /* ================= PAGES ================= */
 
-const PAGES = ["#settingsPage", "#aboutPage", "#helpPage", "#accountPage", "#loginPage", "#galleryPage"];
-
 export function closeAllPages() {
-  PAGES.forEach((sel) => $(sel)?.classList.add("hidden"));
+  document.querySelectorAll(".full-page").forEach((page) => page.classList.add("hidden"));
 }
 
 export function openPage(sel) {
