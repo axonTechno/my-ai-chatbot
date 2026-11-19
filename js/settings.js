@@ -335,8 +335,16 @@ function paintAbout() {
 export function initSettings() {
   paintSettings();
 
-  $$("#settingsCategoryList [data-settings-category]").forEach((row) => {
-    row.addEventListener("click", () => openSettingsCategory(row.dataset.settingsCategory));
+  $("#settingsCategoryList [data-settings-category]").forEach((row) => {
+    row.addEventListener("click", () => {
+      const category = row.dataset.settingsCategory;
+      if (category === "About AXON") {
+        paintAbout();
+        openPage("#aboutPage");
+        return;
+      }
+      openSettingsCategory(category);
+    });
   });
   $("#settingsSearch")?.addEventListener("input", filterSettingsDirectory);
   $("#settingsDetailBack")?.addEventListener("click", returnToSettingsHome);
