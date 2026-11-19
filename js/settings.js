@@ -335,7 +335,7 @@ function paintAbout() {
 export function initSettings() {
   paintSettings();
 
-  $("#settingsCategoryList [data-settings-category]").forEach((row) => {
+  $$("#settingsCategoryList [data-settings-category]").forEach((row) => {
     row.addEventListener("click", () => {
       const category = row.dataset.settingsCategory;
       if (category === "About AXON") {
