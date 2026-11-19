@@ -408,7 +408,6 @@
       <button class="settings-category" type="button" data-settings-category="General" aria-label="General"><svg><use href="#i-settings"/></svg><span>General</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
       <button class="settings-category" type="button" data-settings-category="AI & Models" aria-label="AI & Models"><svg><use href="#i-sparkles"/></svg><span>AI & Models</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
       <button class="settings-category" type="button" data-settings-category="Usage and limits" aria-label="Usage and limits"><svg><use href="#i-info"/></svg><span>Usage and limits</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
-      <button class="settings-category" type="button" data-settings-category="Notifications" aria-label="Notifications"><svg><use href="#i-bell"/></svg><span>Notifications</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
       <button class="settings-category" type="button" data-settings-category="Voice" aria-label="Voice"><svg><use href="#i-volume"/></svg><span>Voice</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
       <button class="settings-category" type="button" data-settings-category="Safety & wellbeing" aria-label="Safety & wellbeing"><svg><use href="#i-shield"/></svg><span>Safety & wellbeing</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
       <button class="settings-category" type="button" data-settings-category="Security and login" aria-label="Security and login"><svg><use href="#i-lock"/></svg><span>Security and login</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
@@ -432,7 +431,6 @@
 
     <div class="setting-group" data-settings-category="General">
       <h3>Language</h3>
-      <p>Language AXON should reply in.</p>
       <select id="languageSelect">
         <option value="English">English</option>
         <option value="Hindi">Hindi</option>
@@ -445,7 +443,6 @@
 
     <div class="setting-group" data-settings-category="General">
       <h3>Theme</h3>
-      <p>Choose how AXON looks.</p>
       <div class="segmented" id="themeSegmented" role="radiogroup" aria-label="Theme">
         <button data-theme-choice="light" role="radio"><svg><use href="#i-sun"/></svg><span>Light</span></button>
         <button data-theme-choice="dark" role="radio"><svg><use href="#i-moon"/></svg><span>Dark</span></button>
@@ -455,7 +452,6 @@
 
     <div class="setting-group" data-settings-category="General">
       <h3>Text size</h3>
-      <p>Size of AI replies and messages.</p>
       <div class="segmented" id="textSizeSegmented" role="radiogroup" aria-label="Text size">
         <button data-size-choice="sm" role="radio"><span>Small</span></button>
         <button data-size-choice="md" role="radio"><span>Default</span></button>
@@ -466,7 +462,6 @@
 
     <div class="setting-group" data-settings-category="AI & Models">
       <h3>AI response preferences</h3>
-      <p>How detailed AXON's answers should be.</p>
       <select id="responseStyleSelect">
         <option value="balanced">Balanced</option>
         <option value="concise">Concise</option>
@@ -476,7 +471,6 @@
 
     <div class="setting-group" data-settings-category="General">
       <h3>Enter to send</h3>
-      <p>When off, use the send button (Enter adds a new line).</p>
       <label class="switch-row">
         <span>Send with Enter</span>
         <input type="checkbox" id="enterToSendToggle" class="switch">
@@ -485,13 +479,11 @@
 
     <div class="setting-group" data-settings-category="AI & Models">
       <h3>AI model</h3>
-      <p>AXON tries another available free model automatically if the selected one is unavailable.</p>
       <select id="modelSelect"></select>
     </div>
 
     <div class="setting-group" data-settings-category="AI & Models">
       <h3>Streaming</h3>
-      <p>Show the answer word by word as it arrives.</p>
       <label class="switch-row">
         <span>Stream responses</span>
         <input type="checkbox" id="streamToggle" class="switch">
@@ -501,7 +493,6 @@
 
     <div class="setting-group" id="workerConnectionGroup" data-settings-category="AI & Models">
       <h3>Worker connection</h3>
-      <p>AXON is preconfigured to talk to its Cloudflare Worker. No URL entry is needed.</p>
       <div class="status-row">
         <span class="status-dot" id="workerStatusDot"></span>
         <span id="workerStatusText">Not checked yet</span>
@@ -529,27 +520,23 @@
 
     <div class="setting-group" data-settings-category="Data controls|History and data|Privacy center">
       <h3>Data &amp; privacy</h3>
-      <p>Your conversations are stored locally on this device. Messages are sent to the AXON AI service; basic website usage data is measured by Cloudflare Web Analytics.</p>
       <button class="btn ghost" id="exportAllBtn"><svg><use href="#i-download"/></svg><span>Export all chats</span></button>
       <button class="btn ghost" id="deleteAllBtn"><svg><use href="#i-trash"/></svg><span>Delete all chats</span></button>
     </div>
 
     <div class="setting-group" data-settings-category="About AXON">
       <h3>About AXON</h3>
-      <p>Version, model information and credits.</p>
       <button class="btn ghost" id="aboutFromSettings"><svg><use href="#i-info"/></svg><span>About AXON</span></button>
     </div>
 
     <div class="setting-group" data-settings-category="Help & issues">
       <h3>Help &amp; issues</h3>
-      <p>Report a problem or send feedback.</p>
       <p id="helpServiceNote" class="auth-note"></p>
       <button class="btn ghost" id="helpBtn"><svg><use href="#i-help"/></svg><span>Help &amp; issues</span></button>
     </div>
 
     <div class="setting-group" data-settings-category="General">
       <h3>Reset</h3>
-      <p>Restore default preferences. Chats are not deleted.</p>
       <button class="btn ghost" id="resetSettingsBtn">Reset settings</button>
     </div>
 
@@ -559,18 +546,12 @@
       <h3>Usage summary</h3>
       <p id="settingsUsageSummary">Your local conversation statistics.</p>
     </div>
-    <div class="setting-group" data-settings-category="Notifications">
-      <h3>Notifications</h3>
-      <p>Push notifications are not enabled in this web build. AXON will not request notification permission unless this feature is implemented.</p>
-    </div>
     <div class="setting-group" data-settings-category="Voice">
       <h3>Voice chat</h3>
-      <p>Use your device's speech recognition and speech synthesis where supported by your browser.</p>
       <button class="btn ghost" id="settingsOpenVoiceBtn"><svg><use href="#i-volume"/></svg><span>Open voice chat</span></button>
     </div>
     <div class="setting-group" data-settings-category="Safety & wellbeing">
       <h3>Safety & wellbeing</h3>
-      <p>Review AXON's privacy information or contact support if you encounter an issue.</p>
       <button class="btn ghost" id="settingsSafetyHelpBtn"><svg><use href="#i-help"/></svg><span>Help & issues</span></button>
     </div>
     <div class="setting-group" data-settings-category="Storage">
@@ -579,7 +560,6 @@
     </div>
     <div class="setting-group" data-settings-category="Connected services">
       <h3>AI service connection</h3>
-      <p>AXON uses its configured Cloudflare Worker for AI requests. Connection details and testing are available below.</p>
       <button class="btn ghost" id="settingsTestServiceBtn"><svg><use href="#i-refresh"/></svg><span>Test AI connection</span></button>
     </div>
     </div>
@@ -597,14 +577,11 @@
     <div class="about-hero">
       <img src="./assets/axon-logo.webp" alt="AXON logo" width="88" height="88">
       <h2>AXON AI</h2>
-      <p>Your personal AI assistant for ideas, answers and conversations.</p>
-    </div>
+      </div>
 
     <div class="setting-group">
       <h3>What AXON does</h3>
-      <p>AXON is a fast, private chat assistant. Ask questions, attach images, and switch to voice mode.
-        Conversations stay on your device unless you sign in to sync them.</p>
-    </div>
+      </div>
 
     <div class="setting-group">
       <h3>Product information</h3>
@@ -621,8 +598,7 @@
 
     <div class="setting-group">
       <h3>Privacy</h3>
-      <p>Messages are sent to the AXON AI Worker to generate replies. Cloudflare Web Analytics measures basic website visits and usage; it does not receive your chat messages. You can delete all chats at any time in Settings.</p>
-    </div>
+      </div>
 
     <div class="setting-group">
       <h3>Help &amp; issues</h3>
