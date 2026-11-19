@@ -346,67 +346,49 @@
   </div>
 </section>
 
+<!-- PROFILE -->
+<section class="full-page hidden" id="accountPage" aria-label="Your profile">
+  <header class="page-header">
+    <button class="icon-btn" data-back aria-label="Back"><svg><use href="#i-arrow-left"/></svg></button>
+    <h2>Your profile</h2>
+  </header>
+  <div class="page-content profile-editor">
+    <div class="profile-editor-avatar"><img id="accountAvatarImg" class="account-avatar" src="./assets/male-avatar.webp" alt="Your avatar" width="72" height="72"></div>
+    <div class="setting-group profile-field-group">
+      <h3>Choose avatar</h3>
+      <div class="profile-avatars">
+        <button class="avatar-option" data-avatar="male" aria-label="Male avatar"><img src="./assets/male-avatar.webp" alt="Male avatar" width="76" height="76"></button>
+        <button class="avatar-option" data-avatar="female" aria-label="Female avatar"><img src="./assets/female-avatar.webp" alt="Female avatar" width="76" height="76"></button>
+      </div>
+    </div>
+    <div class="setting-group profile-field-group">
+      <label class="field-label" for="profileNameInput">Your name</label>
+      <input type="text" id="profileNameInput" placeholder="Enter your name" autocomplete="name" maxlength="60">
+    </div>
+    <div class="setting-group profile-field-group">
+      <label class="field-label" for="profileBioInput">Tell something about you</label>
+      <textarea id="profileBioInput" placeholder="A little about you..." rows="4" maxlength="240"></textarea>
+    </div>
+    <div class="profile-editor-actions">
+      <button class="btn primary" id="saveProfileBtn">Save profile</button>
+      <button class="btn ghost" id="cancelProfileBtn">Cancel</button>
+    </div>
+  </div>
+</section>
+
 <!-- ACCOUNT -->
-<section class="full-page hidden" id="accountPage" aria-label="Account">
+<section class="full-page hidden" id="accountAccessPage" aria-label="Account">
   <header class="page-header">
     <button class="icon-btn" data-back aria-label="Back"><svg><use href="#i-arrow-left"/></svg></button>
     <h2>Account</h2>
   </header>
-  <div class="page-content">
-    <div class="account-head">
-      <img id="accountAvatarImg" class="account-avatar" src="./assets/male-avatar.webp" alt="Your avatar" width="72" height="72">
-      <div>
-        <div class="account-name" id="accountName">Guest</div>
-        <div class="account-email" id="accountEmail">Not signed in</div>
-      </div>
-    </div>
-
+  <div class="page-content account-access-content">
     <div class="setting-group">
-      <h3>Choose your avatar</h3>
-      <p>Pick the avatar shown next to your messages.</p>
-      <div class="profile-avatars">
-        <button class="avatar-option" data-avatar="male" aria-label="Male avatar">
-          <img src="./assets/male-avatar.webp" alt="Male avatar" width="76" height="76">
-        </button>
-        <button class="avatar-option" data-avatar="female" aria-label="Female avatar">
-          <img src="./assets/female-avatar.webp" alt="Female avatar" width="76" height="76">
-        </button>
-      </div>
+      <h3>Current email account</h3>
+      <p id="currentAccountEmail">Not signed in</p>
     </div>
-
-    <div class="setting-group">
-      <h3>Your name</h3>
-      <p>Used in greetings and sent along with your messages.</p>
-      <input type="text" id="profileNameInput" placeholder="Your name" autocomplete="name">
-      <div class="button-row">
-        <button class="btn primary" id="saveProfileBtn">Save details</button>
-        <button class="btn ghost" id="cancelProfileBtn">Cancel</button>
-      </div>
-    </div>
-
-    <div class="setting-group">
-      <h3>Cloud sync</h3>
-      <p id="syncNote">Chats on this device only.</p>
-      <div class="status-row">
-        <span class="sync-badge local" id="syncBadge"><svg><use href="#i-smartphone"/></svg><span>Local</span></span>
-        <span id="syncDetail" class="sync-detail">No account connected</span>
-      </div>
-      <button class="btn ghost" id="syncNowBtn"><svg><use href="#i-refresh"/></svg><span>Sync now</span></button>
-    </div>
-
-    <div class="setting-group">
-      <h3>Email address</h3>
-      <p id="accountEmailNote">Sign in to sync your chats across devices.</p>
-      <button class="btn ghost" id="accountSignInBtn">Sign in with email</button>
-    </div>
-
-    <div class="setting-group">
-      <h3>Session</h3>
-      <p id="sessionNote">You are using AXON locally on this device.</p>
-      <button class="btn danger" id="logoutBtn">
-        <svg><use href="#i-logout"/></svg><span>Log out</span>
-      </button>
-    </div>
+    <button class="account-action-row" id="switchAccountBtn"><span>Switch account</span><svg><use href="#i-chevron-right"/></svg></button>
+    <button class="account-action-row danger" id="accountLogoutBtn"><span>Log out</span><svg><use href="#i-logout"/></svg></button>
   </div>
 </section>
 
