@@ -153,17 +153,6 @@ async function runConnectionTest() {
 /* ================= SETTINGS DIRECTORY ================= */
 
 function openSettingsCategory(category) {
-  if (category === "About AXON") {
-    paintAbout();
-    openPage("#aboutPage");
-    return;
-  }
-  if (category === "Help & issues") {
-    renderReportHistory();
-    openPage("#helpPage");
-    return;
-  }
-
   const home = $("#settingsHome");
   const detail = $("#settingsDetail");
   const title = $("#settingsDetailTitle");
