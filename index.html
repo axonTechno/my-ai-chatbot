@@ -575,6 +575,34 @@
     </div>
 
   
+
+    <div class="setting-group" data-settings-category="Usage and limits">
+      <h3>Usage summary</h3>
+      <p id="settingsUsageSummary">Your local conversation statistics.</p>
+    </div>
+    <div class="setting-group" data-settings-category="Notifications">
+      <h3>Notifications</h3>
+      <p>Push notifications are not enabled in this web build. AXON will not request notification permission unless this feature is implemented.</p>
+    </div>
+    <div class="setting-group" data-settings-category="Voice">
+      <h3>Voice chat</h3>
+      <p>Use your device's speech recognition and speech synthesis where supported by your browser.</p>
+      <button class="btn ghost" id="settingsOpenVoiceBtn"><svg><use href="#i-volume"/></svg><span>Open voice chat</span></button>
+    </div>
+    <div class="setting-group" data-settings-category="Safety & wellbeing">
+      <h3>Safety & wellbeing</h3>
+      <p>Review AXON's privacy information or contact support if you encounter an issue.</p>
+      <button class="btn ghost" id="settingsSafetyHelpBtn"><svg><use href="#i-help"/></svg><span>Help & issues</span></button>
+    </div>
+    <div class="setting-group" data-settings-category="Storage">
+      <h3>Local storage</h3>
+      <p id="settingsStorageSummary">Conversation data is stored in this browser on this device.</p>
+    </div>
+    <div class="setting-group" data-settings-category="Connected services">
+      <h3>AI service connection</h3>
+      <p>AXON uses its configured Cloudflare Worker for AI requests. Connection details and testing are available below.</p>
+      <button class="btn ghost" id="settingsTestServiceBtn"><svg><use href="#i-refresh"/></svg><span>Test AI connection</span></button>
+    </div>
     </div>
     <p class="settings-empty hidden" id="settingsEmpty">No settings are available in this section yet.</p>
   </div>
