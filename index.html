@@ -418,10 +418,40 @@
   <header class="page-header">
     <button class="icon-btn" data-back aria-label="Back"><svg><use href="#i-arrow-left"/></svg></button>
     <h2>Settings</h2>
+    <span class="page-header-spacer"></span>
   </header>
-  <div class="page-content">
+  <div class="page-content settings-home" id="settingsHome">
+    <label class="settings-search">
+      <svg><use href="#i-search"/></svg>
+      <input type="search" id="settingsSearch" placeholder="Search settings" aria-label="Search settings" autocomplete="off">
+    </label>
+    <div class="settings-category-list" id="settingsCategoryList">
+      <button class="settings-category" type="button" data-settings-category="General" aria-label="General"><svg><use href="#i-settings"/></svg><span>General</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="AI & Models" aria-label="AI & Models"><svg><use href="#i-sparkles"/></svg><span>AI & Models</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="Usage and limits" aria-label="Usage and limits"><svg><use href="#i-info"/></svg><span>Usage and limits</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="Notifications" aria-label="Notifications"><svg><use href="#i-bell"/></svg><span>Notifications</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="Voice" aria-label="Voice"><svg><use href="#i-volume"/></svg><span>Voice</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="Safety & wellbeing" aria-label="Safety & wellbeing"><svg><use href="#i-shield"/></svg><span>Safety & wellbeing</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="Security and login" aria-label="Security and login"><svg><use href="#i-lock"/></svg><span>Security and login</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="Data controls" aria-label="Data controls"><svg><use href="#i-download"/></svg><span>Data controls</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="Privacy center" aria-label="Privacy center"><svg><use href="#i-shield"/></svg><span>Privacy center</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="History and data" aria-label="History and data"><svg><use href="#i-message"/></svg><span>History and data</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="Storage" aria-label="Storage"><svg><use href="#i-image"/></svg><span>Storage</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="Connected services" aria-label="Connected services"><svg><use href="#i-cloud"/></svg><span>Connected services</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="About AXON" aria-label="About AXON"><svg><use href="#i-info"/></svg><span>About AXON</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+      <button class="settings-category" type="button" data-settings-category="Help & issues" aria-label="Help & issues"><svg><use href="#i-help"/></svg><span>Help & issues</span><svg class="settings-chevron"><use href="#i-chevron-right"/></svg></button>
+    </div>
+    <p class="settings-no-results hidden" id="settingsNoResults">No settings found.</p>
+  </div>
+  <div class="page-content settings-detail hidden" id="settingsDetail">
+    <header class="settings-detail-header">
+      <button class="icon-btn" type="button" id="settingsDetailBack" aria-label="Back to settings"><svg><use href="#i-arrow-left"/></svg></button>
+      <h2 id="settingsDetailTitle">General</h2>
+    </header>
+    <div id="settingsDetailContent">
 
-    <div class="setting-group">
+
+    <div class="setting-group" data-settings-category="General">
       <h3>Language</h3>
       <p>Language AXON should reply in.</p>
       <select id="languageSelect">
@@ -434,7 +464,7 @@
       </select>
     </div>
 
-    <div class="setting-group">
+    <div class="setting-group" data-settings-category="General">
       <h3>Theme</h3>
       <p>Choose how AXON looks.</p>
       <div class="segmented" id="themeSegmented" role="radiogroup" aria-label="Theme">
@@ -444,7 +474,7 @@
       </div>
     </div>
 
-    <div class="setting-group">
+    <div class="setting-group" data-settings-category="General">
       <h3>Text size</h3>
       <p>Size of AI replies and messages.</p>
       <div class="segmented" id="textSizeSegmented" role="radiogroup" aria-label="Text size">
@@ -455,7 +485,7 @@
       </div>
     </div>
 
-    <div class="setting-group">
+    <div class="setting-group" data-settings-category="AI & Models">
       <h3>AI response preferences</h3>
       <p>How detailed AXON's answers should be.</p>
       <select id="responseStyleSelect">
@@ -465,7 +495,7 @@
       </select>
     </div>
 
-    <div class="setting-group">
+    <div class="setting-group" data-settings-category="General">
       <h3>Enter to send</h3>
       <p>When off, use the send button (Enter adds a new line).</p>
       <label class="switch-row">
@@ -474,13 +504,13 @@
       </label>
     </div>
 
-    <div class="setting-group">
+    <div class="setting-group" data-settings-category="AI & Models">
       <h3>AI model</h3>
       <p>AXON tries another available free model automatically if the selected one is unavailable.</p>
       <select id="modelSelect"></select>
     </div>
 
-    <div class="setting-group">
+    <div class="setting-group" data-settings-category="AI & Models">
       <h3>Streaming</h3>
       <p>Show the answer word by word as it arrives.</p>
       <label class="switch-row">
@@ -490,7 +520,7 @@
       
     </div>
 
-    <div class="setting-group" id="workerConnectionGroup">
+    <div class="setting-group" id="workerConnectionGroup" data-settings-category="AI & Models">
       <h3>Worker connection</h3>
       <p>AXON is preconfigured to talk to its Cloudflare Worker. No URL entry is needed.</p>
       <div class="status-row">
@@ -512,38 +542,41 @@
       </details>
     </div>
 
-    <div class="setting-group">
+    <div class="setting-group" data-settings-category="Security and login">
       <h3>Account</h3>
       <p id="settingsAccountNote">Not signed in — chats are stored on this device only.</p>
       <button class="btn ghost" id="settingsAccountBtn">Open account</button>
     </div>
 
-    <div class="setting-group">
+    <div class="setting-group" data-settings-category="Data controls|History and data|Privacy center">
       <h3>Data &amp; privacy</h3>
       <p>Your conversations are stored locally on this device. Messages are sent to the AXON AI service; basic website usage data is measured by Cloudflare Web Analytics.</p>
       <button class="btn ghost" id="exportAllBtn"><svg><use href="#i-download"/></svg><span>Export all chats</span></button>
       <button class="btn ghost" id="deleteAllBtn"><svg><use href="#i-trash"/></svg><span>Delete all chats</span></button>
     </div>
 
-    <div class="setting-group">
+    <div class="setting-group" data-settings-category="About AXON">
       <h3>About AXON</h3>
       <p>Version, model information and credits.</p>
       <button class="btn ghost" id="aboutFromSettings"><svg><use href="#i-info"/></svg><span>About AXON</span></button>
     </div>
 
-    <div class="setting-group">
+    <div class="setting-group" data-settings-category="Help & issues">
       <h3>Help &amp; issues</h3>
       <p>Report a problem or send feedback.</p>
       <p id="helpServiceNote" class="auth-note"></p>
       <button class="btn ghost" id="helpBtn"><svg><use href="#i-help"/></svg><span>Help &amp; issues</span></button>
     </div>
 
-    <div class="setting-group">
+    <div class="setting-group" data-settings-category="General">
       <h3>Reset</h3>
       <p>Restore default preferences. Chats are not deleted.</p>
       <button class="btn ghost" id="resetSettingsBtn">Reset settings</button>
     </div>
 
+  
+    </div>
+    <p class="settings-empty hidden" id="settingsEmpty">No settings are available in this section yet.</p>
   </div>
 </section>
 
