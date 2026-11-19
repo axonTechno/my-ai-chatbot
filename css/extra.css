@@ -121,3 +121,24 @@
   outline: 0;
   box-shadow: none;
 }
+
+
+/* Search chats: remove the nested input outline and keep the outer border neutral. */
+.sidebar-search input,
+.sidebar-search input:focus,
+.sidebar-search input:focus-visible {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.sidebar-search:focus-within {
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+}
+
+/* Use regular-weight typography throughout AXON, including headings and rich text. */
+body * {
+  font-weight: 400 !important;
+}
