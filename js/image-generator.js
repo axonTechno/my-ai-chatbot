@@ -4,7 +4,6 @@ import { openPage } from "./settings.js";
 import { closeSidebar } from "./sidebar.js";
 import { generateImage } from "./ai.js";
 import { saveImage } from "./image-store.js";
-import { openGeneratedGallery } from "./gallery.js";
 
 export function initImageGenerator() {
   const page = $("#imageGeneratorPage");
@@ -15,13 +14,32 @@ export function initImageGenerator() {
   const submitButton = form.querySelector('button[type="submit"]');
   const note = $("#imageGeneratorNote");
 
+  const resultPanel = $("#imageGeneratorResult");
+  const resultImage = $("#imageGeneratorResultImage");
+
+  function resetGeneratorScreen() {
+    if (resultPanel) {
+      resultPanel.classList.add("hidden");
+      resultPanel.classList.remove("is-loading");
+    }
+    if (resultImage) {
+      resultImage.removeAttribute("src");
+      resultImage.style.aspectRatio = "";
+    }
+    promptInput.value = "";
+    if (note) note.textContent = "Your generated image will be saved in Your Images.";
+    if (submitButton) submitButton.disabled = false;
+  }
+
   $("#generateImagesBtn")?.addEventListener("click", () => {
     closeSidebar();
+    resetGeneratorScreen();
     openPage("#imageGeneratorPage");
     promptInput.focus({ preventScroll: true });
   });
 
   $("#imageGeneratorBackBtn")?.addEventListener("click", () => {
+    resetGeneratorScreen();
     page.classList.add("hidden");
     document.dispatchEvent(new CustomEvent("axon:page-closed"));
   });
@@ -45,7 +63,12 @@ export function initImageGenerator() {
     if (submitButton?.disabled) return;
 
     if (submitButton) submitButton.disabled = true;
-    if (note) note.textContent = "Creating your image…";
+    if (resultPanel) {
+      resultPanel.classList.remove("hidden");
+      resultPanel.classList.add("is-loading");
+    }
+    if (resultImage) resultImage.removeAttribute("src");
+    if (note) note.textContent = "Generating your image…";
 
     try {
       const result = await generateImage({ prompt });
@@ -57,13 +80,24 @@ export function initImageGenerator() {
         name: prompt.slice(0, 80)
       });
 
+      if (resultImage) {
+        resultImage.onload = () => {
+          resultImage.style.aspectRatio = resultImage.naturalWidth + " / " + resultImage.naturalHeight;
+          resultPanel?.classList.remove("is-loading");
+        };
+        resultImage.src = result.image;
+      } else {
+        resultPanel?.classList.remove("is-loading");
+      }
+      if (note) note.textContent = "Saved in Your Images.";
       promptInput.value = "";
-      page.classList.add("hidden");
-      document.dispatchEvent(new CustomEvent("axon:page-closed"));
-      openGeneratedGallery();
       toast("Image saved in Your Images.");
     } catch (error) {
       console.error("[axon] Standalone image generation failed", error);
+      if (resultPanel) {
+        resultPanel.classList.add("hidden");
+        resultPanel.classList.remove("is-loading");
+      }
       toast(error?.message || "Image generation failed. Please try again.", "error");
       if (note) note.textContent = "Your generated image will be saved in Your Images.";
     } finally {
