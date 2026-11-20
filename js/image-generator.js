@@ -47,7 +47,10 @@ export function initImageGenerator() {
         };
         resultImage.src = result.image;
       }
-      if (note) note.textContent = "Saved in Your Images.";
+      if (note) {
+        note.textContent = "Saved in Your Images.";
+        note.classList.remove("hidden");
+      }
       toast("Image saved in Your Images.");
       return result.image;
     } catch (error) {
@@ -56,7 +59,10 @@ export function initImageGenerator() {
         resultPanel.classList.add("hidden");
         resultPanel.classList.remove("is-loading");
       }
-      if (note) note.textContent = "Your generated image will be saved in Your Images.";
+      if (note) {
+        note.textContent = "Your generated image will be saved in Your Images.";
+        note.classList.remove("hidden");
+      }
       toast(error?.message || "Image generation failed. Please try again.", "error");
       return null;
     } finally {
@@ -77,7 +83,10 @@ export function initImageGenerator() {
     currentPrompt = "";
     promptInput.value = "";
     promptSuggestions?.classList.remove("hidden");
-    if (note) note.textContent = "Your generated image will be saved in Your Images.";
+    if (note) {
+      note.textContent = "Your generated image will be saved in Your Images.";
+      note.classList.remove("hidden");
+    }
     if (submitButton) submitButton.disabled = false;
   }
 
