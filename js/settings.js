@@ -59,7 +59,6 @@ export function openPage(sel) {
 /* ================= SETTINGS UI ================= */
 
 const PREFERENCE_OPTIONS = {
-  languageSelect: LANGUAGES.map((value) => ({ value, label: value })),
   responseStyleSelect: [
     { value: "concise", label: "Concise", description: "Short and direct answers" },
     { value: "balanced", label: "Balanced", description: "Clear detail with useful context" },
@@ -172,7 +171,33 @@ function paintSettings() {
       lang.appendChild(opt);
     });
     lang.value = store.settings.language || "English";
-    paintPreferencePicker(lang);
+    lang.classList.add("preference-native-select");
+    let languageOptions = $("#languageOptions");
+    if (!languageOptions) {
+      languageOptions = document.createElement("div");
+      languageOptions.id = "languageOptions";
+      languageOptions.className = "language-options";
+      languageOptions.setAttribute("role", "radiogroup");
+      languageOptions.setAttribute("aria-label", "Choose reply language");
+      lang.insertAdjacentElement("afterend", languageOptions);
+    }
+    languageOptions.replaceChildren();
+    LANGUAGES.forEach((language) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "language-option";
+      button.dataset.language = language;
+      button.setAttribute("role", "radio");
+      button.setAttribute("aria-checked", String(language === lang.value));
+      const label = document.createElement("span");
+      label.className = "language-option-label";
+      label.textContent = language;
+      const indicator = document.createElement("span");
+      indicator.className = "language-option-indicator";
+      indicator.setAttribute("aria-hidden", "true");
+      button.append(label, indicator);
+      languageOptions.appendChild(button);
+    });
   }
 
   const style = $("#responseStyleSelect");
@@ -528,12 +553,20 @@ export function initSettings() {
     });
   });
 
-  /* language */
-  $("#languageSelect")?.addEventListener("change", (e) => {
-    store.settings.language = e.target.value;
-    paintPreferencePicker(e.target);
+  /* language radio cards */
+  $("#languageOptions")?.addEventListener("click", (event) => {
+    const option = event.target.closest("[data-language]");
+    const select = $("#languageSelect");
+    if (!option || !select) return;
+    select.value = option.dataset.language;
+    store.settings.language = select.value;
+    $("#languageOptions").querySelectorAll("[data-language]").forEach((button) => {
+      const selected = button.dataset.language === select.value;
+      button.classList.toggle("selected", selected);
+      button.setAttribute("aria-checked", String(selected));
+    });
     persistSettings();
-    toast(`Reply language: ${e.target.value}`);
+    toast("Reply language: " + select.value);
   });
 
   /* theme */
