@@ -54,6 +54,54 @@ async function readBlobAsDataURL(blob) {
   });
 }
 
+/* Sample a video into compact chronological frames for vision models. */
+async function sampleVideoFrames(file, maxFrames = 12) {
+  const objectUrl = URL.createObjectURL(file);
+  const player = document.createElement("video");
+  player.muted = true;
+  player.playsInline = true;
+  player.preload = "auto";
+  player.src = objectUrl;
+  try {
+    await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error("Video could not be loaded for analysis.")), 15000);
+      player.onloadedmetadata = () => { clearTimeout(timer); resolve(); };
+      player.onerror = () => { clearTimeout(timer); reject(new Error("This MP4 could not be decoded by the browser.")); };
+    });
+    const duration = Number(player.duration);
+    if (!Number.isFinite(duration) || duration <= 0) throw new Error("The video duration could not be read.");
+    const count = Math.min(maxFrames, Math.max(1, Math.ceil(duration / 2)));
+    const frames = [];
+    const width = player.videoWidth || 640;
+    const height = player.videoHeight || 360;
+    const scale = Math.min(1, 640 / Math.max(width, height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(width * scale));
+    canvas.height = Math.max(1, Math.round(height * scale));
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Video frame extraction is unavailable in this browser.");
+    for (let i = 0; i < count; i++) {
+      const time = count === 1 ? 0 : (duration * i) / (count - 1);
+      if (Math.abs(player.currentTime - time) > 0.05) {
+        await new Promise((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error("Video frame extraction timed out.")), 8000);
+          player.onseeked = () => { clearTimeout(timer); resolve(); };
+          player.onerror = () => { clearTimeout(timer); reject(new Error("Could not read a video frame.")); };
+          player.currentTime = Math.min(time, Math.max(0, duration - 0.05));
+        });
+      }
+      context.drawImage(player, 0, 0, canvas.width, canvas.height);
+      frames.push(canvas.toDataURL("image/jpeg", 0.62));
+    }
+    return frames;
+  } finally {
+    player.pause();
+    player.removeAttribute("src");
+    player.load();
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 async function resolveVideoData(video) {
   if (!video) return "";
   if (video.dataUrl) return video.dataUrl;
@@ -829,7 +877,7 @@ export async function sendMessage({ text, images = [], video = null, editingId =
   };
   chat.messages.push(userMessage);
 
-  let videoDataUrl = "";
+  let videoFrames = [];
   if (video) {
     try {
       console.info("[axon] video-send: local-save-start", { sizeBytes: video.file?.size || 0 });
@@ -847,9 +895,9 @@ export async function sendMessage({ text, images = [], video = null, editingId =
         thumbnail: video.thumbnail || ""
       };
       console.info("[axon] video-send: local-save-complete");
-      console.info("[axon] video-send: base64-read-start");
-      videoDataUrl = await readBlobAsDataURL(video.file);
-      console.info("[axon] video-send: base64-read-complete", { dataUrlChars: videoDataUrl.length });
+      console.info("[axon] video-send: frame-sampling-start");
+      videoFrames = await sampleVideoFrames(video.file);
+      console.info("[axon] video-send: frame-sampling-complete", { frameCount: videoFrames.length });
     } catch (error) {
       console.error("[axon] video-send: local-preparation-failed", error);
       chat.messages = chat.messages.filter((message) => message.id !== userMessage.id);
@@ -944,15 +992,15 @@ export async function sendMessage({ text, images = [], video = null, editingId =
     }
 
     console.info("[axon] video-send: generation-start", {
-      hasVideo: Boolean(videoDataUrl),
-      videoDataUrlChars: videoDataUrl.length
+      hasVideo: videoFrames.length > 0,
+      videoFrameCount: videoFrames.length
     });
     await runGeneration(chat, {
       assistantMessage,
       history,
       message: content || (video ? "Please analyze this video." : ""),
       images: requestImages,
-      video: videoDataUrl
+      videoFrames
     });
   }
 
@@ -991,7 +1039,7 @@ export async function regenerate(chat, messageId) {
     history,
     message: lastUser ? lastUser.content : "",
     images: lastUser && lastUser.images ? (await Promise.all(lastUser.images.map(resolveImageData))).filter(Boolean) : [],
-    video: lastUser?.video ? await resolveVideoData(lastUser.video) : ""
+    videoFrames: lastUser?.video ? await sampleVideoFrames(await getVideoBlob(lastUser.video.videoId)) : []
   });
 }
 
