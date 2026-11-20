@@ -13,6 +13,7 @@ export function initImageGenerator() {
 
   const submitButton = form.querySelector('button[type="submit"]');
   const note = $("#imageGeneratorNote");
+  const promptSuggestions = page.querySelector(".image-prompt-suggestions");
 
   const resultPanel = $("#imageGeneratorResult");
   const resultImage = $("#imageGeneratorResultImage");
@@ -20,6 +21,7 @@ export function initImageGenerator() {
   let currentPrompt = "";
 
   async function createImage(prompt) {
+    promptSuggestions?.classList.add("hidden");
     if (submitButton) submitButton.disabled = true;
     actionBar?.classList.add("hidden");
     if (resultPanel) {
@@ -74,6 +76,7 @@ export function initImageGenerator() {
     actionBar?.classList.add("hidden");
     currentPrompt = "";
     promptInput.value = "";
+    promptSuggestions?.classList.remove("hidden");
     if (note) note.textContent = "Your generated image will be saved in Your Images.";
     if (submitButton) submitButton.disabled = false;
   }
@@ -109,8 +112,9 @@ export function initImageGenerator() {
     }
     if (submitButton?.disabled) return;
     currentPrompt = prompt;
-    const image = await createImage(prompt);
-    if (image) promptInput.value = "";
+    promptInput.value = "";
+    promptInput.dispatchEvent(new Event("input", { bubbles: true }));
+    await createImage(prompt);
   });
 
   resultImage?.addEventListener("click", () => {
