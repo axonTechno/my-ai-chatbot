@@ -855,3 +855,31 @@ body.dark .about-hero h2 {
 }
 .image-generator-result.is-loading img,
 .image-generator-result img:not([src]) { display: none; }
+
+
+/* Generated image action controls, matching compact app icon actions. */
+.image-generator-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.image-generator-actions.hidden { display: none; }
+.image-generator-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 7px 13px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.image-generator-actions button:active { background: var(--surface-2); }
+.image-generator-actions svg { width: 17px; height: 17px; flex: 0 0 17px; }
+#imageGeneratorResultImage[role="button"] { cursor: zoom-in; }
