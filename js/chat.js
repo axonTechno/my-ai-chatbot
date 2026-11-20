@@ -820,7 +820,7 @@ export async function sendMessage({ text, images = [], video = null, editingId =
   const userMessage = {
     id: uid("m"),
     role: "user",
-    content,
+    content: content || (video ? "Please analyze this video." : ""),
     images: [],
     time: Date.now(),
     rating: null,
@@ -930,7 +930,7 @@ export async function sendMessage({ text, images = [], video = null, editingId =
     await runGeneration(chat, {
       assistantMessage,
       history,
-      message: content,
+      message: content || (video ? "Please analyze this video." : ""),
       images: requestImages,
       video: videoDataUrl
     });
