@@ -1427,21 +1427,72 @@ function renderPreviews() {
 async function prepareVideoFile(file) {
   if (!file || file.size <= 0) throw new Error("The selected video is empty.");
   if (file.size > 20 * 1024 * 1024) throw new Error("MP4 videos must be 20 MB or smaller.");
+
   const url = URL.createObjectURL(file);
   let thumbnail = "";
+  const player = document.createElement("video");
+  player.muted = true;
+  player.playsInline = true;
+  player.preload = "auto";
+
   try {
-    const player = document.createElement("video");
-    player.muted = true;
-    player.playsInline = true;
-    player.preload = "metadata";
-    player.src = url;
-    await new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error("Video preview timed out.")), 5000);
-      player.onloadeddata = () => { clearTimeout(timer); resolve(); };
-      player.onerror = () => { clearTimeout(timer); reject(new Error("Could not preview this MP4 video.")); };
+    // Attach listeners before src: Android can dispatch media events immediately.
+    const metadata = new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error("Video preview timed out.")), 12000);
+      player.addEventListener("loadedmetadata", () => {
+        clearTimeout(timer);
+        resolve();
+      }, { once: true });
+      player.addEventListener("error", () => {
+        clearTimeout(timer);
+        reject(new Error("Could not preview this MP4 video."));
+      }, { once: true });
     });
-    const width = player.videoWidth || 320;
-    const height = player.videoHeight || 180;
+    player.src = url;
+    player.load();
+    await metadata;
+
+    const duration = Number(player.duration);
+    if (!player.videoWidth || !player.videoHeight || !Number.isFinite(duration) || duration <= 0) {
+      throw new Error("Video dimensions are unavailable.");
+    }
+
+    const frameReady = new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error("Video frame preview timed out.")), 12000);
+      player.addEventListener("loadeddata", () => {
+        clearTimeout(timer);
+        resolve();
+      }, { once: true });
+      player.addEventListener("error", () => {
+        clearTimeout(timer);
+        reject(new Error("Could not decode the video preview frame."));
+      }, { once: true });
+    });
+    player.currentTime = Math.min(0.12, duration / 2);
+    await frameReady;
+
+    // Seeking ensures the canvas captures a decoded frame rather than the initial black surface.
+    if (player.currentTime > 0) {
+      await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => resolve(), 1500);
+        player.addEventListener("seeked", () => {
+          clearTimeout(timer);
+          resolve();
+        }, { once: true });
+      });
+    }
+    if (typeof player.requestVideoFrameCallback === "function") {
+      await new Promise(resolve => {
+        const timer = setTimeout(resolve, 1000);
+        player.requestVideoFrameCallback(() => {
+          clearTimeout(timer);
+          resolve();
+        });
+      });
+    }
+
+    const width = player.videoWidth;
+    const height = player.videoHeight;
     const scale = Math.min(1, 480 / Math.max(width, height));
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(width * scale));
@@ -1449,15 +1500,17 @@ async function prepareVideoFile(file) {
     const context = canvas.getContext("2d");
     if (context) {
       context.drawImage(player, 0, 0, canvas.width, canvas.height);
-      thumbnail = canvas.toDataURL("image/jpeg", 0.72);
+      thumbnail = canvas.toDataURL("image/jpeg", 0.76);
     }
-    player.removeAttribute("src");
-    player.load();
   } catch (error) {
     console.info("[axon] Video thumbnail unavailable; filename preview will be used.", error);
   } finally {
+    player.pause();
+    player.removeAttribute("src");
+    player.load();
     URL.revokeObjectURL(url);
   }
+
   const mp4File = file.type === "video/mp4"
     ? file
     : new File([file], file.name || "video.mp4", { type: "video/mp4", lastModified: file.lastModified });
