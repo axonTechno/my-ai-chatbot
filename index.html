@@ -749,6 +749,24 @@
   </div>
 </section>
 
+<script>
+/* Keep the navigation drawer responsive even if app startup is delayed. */
+document.addEventListener("click", function (event) {
+  var path = typeof event.composedPath === "function" ? event.composedPath() : [];
+  var button = path.find(function (node) { return node && node.id === "menuBtn"; });
+  if (!button && event.target instanceof Element) button = event.target.closest("#menuBtn");
+  if (!button) return;
+  event.preventDefault();
+  var sidebar = document.getElementById("sidebar");
+  var overlay = document.getElementById("sidebarOverlay");
+  if (!sidebar || !overlay) return;
+  var open = !sidebar.classList.contains("open");
+  sidebar.classList.toggle("open", open);
+  overlay.classList.toggle("hidden", !open);
+  button.setAttribute("aria-expanded", String(open));
+  document.body.style.overflow = open ? "hidden" : "";
+}, true);
+</script>
 <script type="module" src="./js/main.js"></script>
 </body>
 </html>
