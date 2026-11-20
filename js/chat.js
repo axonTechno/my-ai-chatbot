@@ -650,8 +650,29 @@ export function renderMessages() {
 
   welcome.classList.add("hidden");
   list.classList.remove("hidden");
+
+  // Keep completed assistant action toolbars attached to their message across
+  // any chat refresh while another answer is streaming. Reusing the existing
+  // nodes also prevents transient UI updates from dropping feedback controls.
+  const retainedActions = new Map();
+  list.querySelectorAll(".msg.assistant[data-id]").forEach((item) => {
+    const actions = item.querySelector(":scope > .msg-actions");
+    if (actions) retainedActions.set(item.dataset.id, actions);
+  });
+
   const frag = document.createDocumentFragment();
-  chat.messages.forEach((m) => frag.appendChild(buildMessage(chat, m)));
+  chat.messages.forEach((m) => {
+    const item = buildMessage(chat, m);
+    if (m.role === "assistant" && !m.thinking) {
+      const previousActions = retainedActions.get(m.id);
+      if (previousActions) {
+        const newActions = item.querySelector(":scope > .msg-actions");
+        if (newActions) newActions.replaceWith(previousActions);
+        else item.appendChild(previousActions);
+      }
+    }
+    frag.appendChild(item);
+  });
   list.replaceChildren(frag);
   bindUserActionMenu(list);
 
