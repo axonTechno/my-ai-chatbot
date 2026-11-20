@@ -308,7 +308,18 @@
     </div>
     <div class="image-generator-result hidden" id="imageGeneratorResult" aria-live="polite">
       <div class="image-generator-placeholder">Generating...</div>
-      <img id="imageGeneratorResultImage" alt="Generated image">
+      <img id="imageGeneratorResultImage" alt="Generated image" role="button" tabindex="0" aria-label="Open generated image">
+    </div>
+    <div class="image-generator-actions hidden" id="imageGeneratorActions" aria-label="Generated image actions">
+      <button type="button" id="imageGeneratorSave" aria-label="Save image" title="Save">
+        <svg><use href="#i-download"/></svg><span>Save</span>
+      </button>
+      <button type="button" id="imageGeneratorShare" aria-label="Share image" title="Share">
+        <svg><use href="#i-share"/></svg><span>Share</span>
+      </button>
+      <button type="button" id="imageGeneratorRetry" aria-label="Generate another image" title="Retry">
+        <svg><use href="#i-refresh"/></svg><span>Retry</span>
+      </button>
     </div>
     <div class="image-prompt-suggestions" aria-label="Image prompt ideas">
       <button type="button" class="image-prompt-chip" data-image-prompt="A realistic view of planet Earth from space">Realistic Earth</button>
