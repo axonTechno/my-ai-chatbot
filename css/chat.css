@@ -186,7 +186,9 @@ body.dark .welcome h1 {
   50% { opacity: .15; }
 }
 
-/* AXON blue thinking dots. Message wrappers use .msg.ai in the current UI. */
+/* AXON thinking dots: visible while waiting for the first token,
+   then the text stream starts immediately. Keep original dot dimensions. */
+.msg.assistant .thinking,
 .msg.ai .thinking {
   display: inline-flex !important;
   align-items: center;
@@ -194,6 +196,7 @@ body.dark .welcome h1 {
   padding: 5px 0;
 }
 
+.msg.assistant .thinking i,
 .msg.ai .thinking i {
   display: block !important;
   width: 7px !important;
@@ -202,25 +205,25 @@ body.dark .welcome h1 {
   border-radius: 50% !important;
   background: #B9DDFF !important;
   opacity: 1 !important;
-  transform: scale(1);
   animation: axonThinkingBlue 0.6s infinite linear !important;
 }
 
+.msg.assistant .thinking i:nth-of-type(1),
 .msg.ai .thinking i:nth-of-type(1) { animation-delay: 0s !important; }
+.msg.assistant .thinking i:nth-of-type(2),
 .msg.ai .thinking i:nth-of-type(2) { animation-delay: 0.2s !important; }
+.msg.assistant .thinking i:nth-of-type(3),
 .msg.ai .thinking i:nth-of-type(3) { animation-delay: 0.4s !important; }
 
 @keyframes axonThinkingBlue {
   0%, 24% {
     background: #075FCB !important;
     opacity: 1 !important;
-    transform: scale(1.25);
-    box-shadow: 0 0 8px rgba(7, 95, 203, .42);
+    box-shadow: 0 0 6px rgba(7, 95, 203, .35);
   }
   25%, 100% {
     background: #B9DDFF !important;
     opacity: 1 !important;
-    transform: scale(1);
     box-shadow: none;
   }
 }
