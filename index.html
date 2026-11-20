@@ -25,7 +25,7 @@
 </script>
 <meta name="theme-color" content="#ffffff" id="metaThemeColor">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="AXON AI — your personal AI assistant. Chat, attach images, and talk with AXON.">
+<meta name="description" content="AXON AI — your personal AI assistant. Chat, attach images and MP4 videos, and talk with AXON.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="AXON">
@@ -223,7 +223,7 @@
       </div>
 
       <div class="composer" id="composer">
-        <button class="icon-btn" id="attachBtn" aria-label="Attach images">
+        <button class="icon-btn" id="attachBtn" aria-label="Attach images or one MP4 video" title="Attach images or one MP4 video">
           <svg><use href="#i-image"/></svg>
         </button>
 
@@ -244,7 +244,7 @@
       </div>
 
 
-      <input type="file" id="fileInput" class="hidden" accept="image/*" multiple>
+      <input type="file" id="fileInput" class="hidden" accept="image/*,video/mp4,.mp4" multiple>
     </div>
   </main>
 </div>
