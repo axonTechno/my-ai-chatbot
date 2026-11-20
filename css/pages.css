@@ -883,3 +883,25 @@ body.dark .about-hero h2 {
 .image-generator-actions button:active { background: var(--surface-2); }
 .image-generator-actions svg { width: 17px; height: 17px; flex: 0 0 17px; }
 #imageGeneratorResultImage[role="button"] { cursor: zoom-in; }
+
+
+/* Match the animated three-dot thinking indicator used in chat. */
+.image-generator-placeholder .image-generator-thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 9px;
+}
+.image-generator-placeholder .image-generator-thinking i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background-color: #B9DDFF;
+  opacity: 1;
+  animation: axonThinkingBlue .9s infinite linear;
+}
+.image-generator-placeholder .image-generator-thinking i:nth-child(1) { animation-delay: 0s; }
+.image-generator-placeholder .image-generator-thinking i:nth-child(2) { animation-delay: .3s; }
+.image-generator-placeholder .image-generator-thinking i:nth-child(3) { animation-delay: .6s; }
