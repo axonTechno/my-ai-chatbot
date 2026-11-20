@@ -1029,3 +1029,38 @@ body.dark .msg-error .btn.ghost {
   background: var(--surface-2, #303039) !important;
   border-color: var(--border, rgba(255,255,255,.14)) !important;
 }
+
+
+/* Mobile navigation: keep the drawer and its open state above the app shell. */
+@media (max-width: 899px) {
+  #sidebar.sidebar {
+    position: absolute !important;
+    inset: 0 auto 0 0 !important;
+    width: min(88vw, 320px) !important;
+    max-width: calc(100vw - 52px) !important;
+    height: 100% !important;
+    z-index: 40 !important;
+    transform: translate3d(-105%, 0, 0) !important;
+    visibility: hidden;
+    transition: transform .28s cubic-bezier(.2, .8, .2, 1), visibility .28s !important;
+    will-change: transform;
+  }
+
+  #sidebar.sidebar.open {
+    transform: translate3d(0, 0, 0) !important;
+    visibility: visible;
+  }
+
+  #sidebarOverlay.sidebar-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 35 !important;
+  }
+
+  #menuBtn {
+    position: relative;
+    z-index: 6;
+    display: inline-flex !important;
+    pointer-events: auto !important;
+  }
+}
