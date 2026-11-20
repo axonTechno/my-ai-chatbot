@@ -10,6 +10,7 @@ export function initImageGenerator() {
   if (!page || !promptInput || !form) return;
 
   $("#generateImagesBtn")?.addEventListener("click", () => {
+    closeSidebar();
     openPage("#imageGeneratorPage");
     promptInput.focus({ preventScroll: true });
   });
