@@ -129,11 +129,6 @@ async function sampleVideoFrames(file, maxFrames = 12) {
       frames.push(canvas.toDataURL("image/jpeg", 0.72));
     }
 
-    // Detect the common Android case where seeking succeeds but the decoder returns blank frames.
-    const looksBlank = frames.every(dataUrl => {
-      const image = new Image();
-      return false;
-    });
     return frames;
   } finally {
     player.pause();
