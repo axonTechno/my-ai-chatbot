@@ -308,6 +308,8 @@ function paintSettings() {
       : "No support endpoint is connected on this build, so submissions are saved on this device with a tracking ID. Nothing is sent to a support team yet.";
   }
 
+  renderHistoryData();
+
   const chatCount = Array.isArray(store.chats) ? store.chats.length : 0;
   const messageCount = Array.isArray(store.chats)
     ? store.chats.reduce((total, chat) => total + (Array.isArray(chat.messages) ? chat.messages.length : 0), 0)
@@ -329,6 +331,49 @@ function paintSettings() {
 
   applyTheme();
   applyTextSize();
+}
+
+function renderHistoryData() {
+  const list = $("#historyDataList");
+  const summary = $("#historyDataSummary");
+  if (!list) return;
+
+  const chats = [...(Array.isArray(store.chats) ? store.chats : [])]
+    .sort((a, b) => Number(b.updatedAt || 0) - Number(a.updatedAt || 0));
+  const totalMessages = chats.reduce((sum, chat) =>
+    sum + (Array.isArray(chat.messages) ? chat.messages.length : 0), 0
+  );
+  if (summary) {
+    summary.textContent = `${chats.length} conversation(s) · ${totalMessages} message(s) saved on this device.`;
+  }
+
+  list.replaceChildren();
+  if (!chats.length) {
+    const empty = document.createElement("p");
+    empty.className = "history-data-empty";
+    empty.textContent = "No conversations yet. Your chats will appear here when you start a conversation.";
+    list.appendChild(empty);
+    return;
+  }
+
+  chats.forEach((chat, index) => {
+    const row = document.createElement("div");
+    row.className = "history-data-row";
+    const number = document.createElement("span");
+    number.className = "history-data-number";
+    number.textContent = String(index + 1);
+    const details = document.createElement("div");
+    details.className = "history-data-details";
+    const title = document.createElement("strong");
+    title.textContent = chat.title || "New chat";
+    const meta = document.createElement("span");
+    const date = chat.updatedAt ? new Date(chat.updatedAt).toLocaleString() : "Date unavailable";
+    const messageCount = Array.isArray(chat.messages) ? chat.messages.length : 0;
+    meta.textContent = `${date} · ${messageCount} message(s)${chat.pinned ? " · Pinned" : ""}`;
+    details.append(title, meta);
+    row.append(number, details);
+    list.appendChild(row);
+  });
 }
 
 function setStatus(ok, text) {
@@ -693,6 +738,7 @@ export function initSettings() {
     const { persistChats } = await import("./state.js");
     persistChats();
     renderHistory();
+    renderHistoryData();
     document.dispatchEvent(new CustomEvent("axon:all-chats-deleted"));
     toast("All conversations deleted");
   });
