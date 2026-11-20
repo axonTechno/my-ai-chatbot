@@ -56,43 +56,84 @@ async function readBlobAsDataURL(blob) {
 
 /* Sample a video into compact chronological frames for vision models. */
 async function sampleVideoFrames(file, maxFrames = 12) {
+  if (!(file instanceof Blob)) throw new Error("Saved video file is unavailable.");
   const objectUrl = URL.createObjectURL(file);
   const player = document.createElement("video");
   player.muted = true;
   player.playsInline = true;
   player.preload = "auto";
-  player.src = objectUrl;
+
   try {
-    await new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error("Video could not be loaded for analysis.")), 15000);
-      player.onloadedmetadata = () => { clearTimeout(timer); resolve(); };
-      player.onerror = () => { clearTimeout(timer); reject(new Error("This MP4 could not be decoded by the browser.")); };
+    // Register listeners before assigning src: on Android, metadata can arrive very quickly.
+    const loaded = new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error("Video could not be decoded for analysis.")), 20000);
+      player.addEventListener("loadeddata", () => {
+        clearTimeout(timer);
+        resolve();
+      }, { once: true });
+      player.addEventListener("error", () => {
+        clearTimeout(timer);
+        reject(new Error("This MP4 could not be decoded by the browser. Try another MP4 export."));
+      }, { once: true });
     });
+    player.src = objectUrl;
+    player.load();
+    await loaded;
+
     const duration = Number(player.duration);
-    if (!Number.isFinite(duration) || duration <= 0) throw new Error("The video duration could not be read.");
+    const width = player.videoWidth;
+    const height = player.videoHeight;
+    if (!Number.isFinite(duration) || duration <= 0 || !width || !height) {
+      throw new Error("The browser could not read this video's frames.");
+    }
+
     const count = Math.min(maxFrames, Math.max(1, Math.ceil(duration / 2)));
-    const frames = [];
-    const width = player.videoWidth || 640;
-    const height = player.videoHeight || 360;
     const scale = Math.min(1, 640 / Math.max(width, height));
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(width * scale));
     canvas.height = Math.max(1, Math.round(height * scale));
     const context = canvas.getContext("2d");
     if (!context) throw new Error("Video frame extraction is unavailable in this browser.");
+
+    const frames = [];
     for (let i = 0; i < count; i++) {
-      const time = count === 1 ? 0 : (duration * i) / (count - 1);
-      if (Math.abs(player.currentTime - time) > 0.05) {
-        await new Promise((resolve, reject) => {
-          const timer = setTimeout(() => reject(new Error("Video frame extraction timed out.")), 8000);
-          player.onseeked = () => { clearTimeout(timer); resolve(); };
-          player.onerror = () => { clearTimeout(timer); reject(new Error("Could not read a video frame.")); };
-          player.currentTime = Math.min(time, Math.max(0, duration - 0.05));
+      // Seek every frame, including the first, so a decoded frame is available before drawing.
+      const time = Math.min(Math.max(0.05, duration * i / count), Math.max(0, duration - 0.05));
+      await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error("Video frame extraction timed out.")), 10000);
+        player.addEventListener("seeked", () => {
+          clearTimeout(timer);
+          resolve();
+        }, { once: true });
+        player.addEventListener("error", () => {
+          clearTimeout(timer);
+          reject(new Error("Could not decode a video frame."));
+        }, { once: true });
+        player.currentTime = time;
+      });
+
+      // Wait until the browser has actually presented the decoded frame.
+      if (typeof player.requestVideoFrameCallback === "function") {
+        await new Promise(resolve => {
+          const timer = setTimeout(resolve, 700);
+          player.requestVideoFrameCallback(() => {
+            clearTimeout(timer);
+            resolve();
+          });
         });
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 120));
       }
+
       context.drawImage(player, 0, 0, canvas.width, canvas.height);
-      frames.push(canvas.toDataURL("image/jpeg", 0.62));
+      frames.push(canvas.toDataURL("image/jpeg", 0.72));
     }
+
+    // Detect the common Android case where seeking succeeds but the decoder returns blank frames.
+    const looksBlank = frames.every(dataUrl => {
+      const image = new Image();
+      return false;
+    });
     return frames;
   } finally {
     player.pause();
