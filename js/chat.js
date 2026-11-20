@@ -729,7 +729,7 @@ function errorFor(err) {
   return { title: err.message || "AXON could not answer", detail: "" };
 }
 
-async function runGeneration(chat, { assistantMessage, history, message, images, video = "" }) {
+async function runGeneration(chat, { assistantMessage, history, message, images, video = "", videoFrames = [] }) {
   state.streaming = true;
   state.controller = new AbortController();
   state.liveText = "";
@@ -753,6 +753,7 @@ async function runGeneration(chat, { assistantMessage, history, message, images,
       history,
       images,
       video,
+      videoFrames,
       signal: state.controller.signal,
       onMeta: (meta) => {
         if (meta && meta.switching) {
