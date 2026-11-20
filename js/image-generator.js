@@ -1,6 +1,7 @@
 /* AXON AI — dedicated image generation screen */
 import { $, toast } from "./ui.js";
-import { openPage } from "./settings.js";
+import { openPage, closeAllPages } from "./settings.js";
+import { closeSidebar } from "./sidebar.js";
 
 export function initImageGenerator() {
   const page = $("#imageGeneratorPage");
@@ -42,7 +43,9 @@ export function initImageGenerator() {
       return;
     }
 
-    page.classList.add("hidden");
+    closeAllPages();
+    closeSidebar();
+    document.dispatchEvent(new CustomEvent("axon:page-closed"));
     chatInput.value = `Generate an image: ${prompt}`;
     chatInput.dispatchEvent(new Event("input", { bubbles: true }));
     sendButton.click();
