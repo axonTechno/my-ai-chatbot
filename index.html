@@ -138,6 +138,10 @@
       </div>
     </div>
 
+    <button class="nav-item" id="generateImagesBtn">
+      <svg><use href="#i-sparkles"/></svg>
+      <span>Generate images</span>
+    </button>
     <button class="nav-item" id="yourImagesBtn">
       <svg><use href="#i-image"/></svg>
       <span>Your Images</span>
@@ -288,6 +292,36 @@
 </div>
 
 <!-- ================= PAGES ================= -->
+
+<!-- IMAGE GENERATION -->
+<section class="full-page hidden" id="imageGeneratorPage" aria-label="Generate images">
+  <header class="page-header">
+    <button class="icon-btn" id="imageGeneratorBackBtn" aria-label="Back">
+      <svg style="transform:rotate(180deg)"><use href="#i-chevron-right"/></svg>
+    </button>
+    <h2>Generate images</h2>
+  </header>
+  <div class="image-generator-content">
+    <div class="image-generator-welcome">
+      <img src="./assets/axon-logo.webp" alt="AXON logo" class="image-generator-logo" width="92" height="92">
+      <h1>Generate instant</h1>
+      <p>Describe the image you want to create</p>
+    </div>
+    <div class="image-prompt-suggestions" aria-label="Image prompt ideas">
+      <button type="button" class="image-prompt-chip" data-image-prompt="A realistic view of planet Earth from space">Realistic Earth</button>
+      <button type="button" class="image-prompt-chip" data-image-prompt="A beautiful modern city at golden hour, cinematic photography">A beautiful city</button>
+      <button type="button" class="image-prompt-chip" data-image-prompt="A futuristic space station orbiting Saturn, highly detailed">Space station</button>
+      <button type="button" class="image-prompt-chip" data-image-prompt="A magical forest with glowing flowers and soft morning mist">Magical forest</button>
+    </div>
+    <form class="image-generator-composer" id="imageGeneratorForm">
+      <textarea id="imageGeneratorPrompt" rows="2" maxlength="2000" placeholder="Describe your image..." aria-label="Image prompt"></textarea>
+      <button type="submit" class="send-btn" aria-label="Generate image">
+        <svg><use href="#i-arrow-up"/></svg>
+      </button>
+    </form>
+    <p class="image-generator-note">Your generated image will appear in the chat and Your Images.</p>
+  </div>
+</section>
 
 <!-- YOUR IMAGES -->
 <section class="full-page hidden" id="galleryPage" aria-label="Your Images">
