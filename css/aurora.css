@@ -936,3 +936,36 @@ html.axon-installed-app .app {
   border-radius: 50%;
   background: var(--ax-accent);
 }
+
+
+/* Always-visible AI response preference radio cards. */
+.response-style-options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  width: 100%;
+  margin-top: 10px;
+}
+.response-style-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 58px;
+  padding: 10px 13px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  text-align: left;
+  transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.response-style-option.selected {
+  border-color: var(--ax-accent);
+  background: color-mix(in srgb, var(--ax-accent) 10%, var(--surface));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ax-accent) 18%, transparent);
+}
+.response-style-copy { display: grid; gap: 3px; min-width: 0; }
+.response-style-label { font: 550 14px/1.35 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+.response-style-description { color: var(--muted); font: 400 11.5px/1.4 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
