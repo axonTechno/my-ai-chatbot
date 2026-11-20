@@ -318,7 +318,7 @@ function buildActions(message, chat) {
           iconId: "i-thumbs-up",
           label: "Like answer",
           active: message.rating === "like",
-          onClick: () => rateMessage(chat, message, "like")
+          onClick: (btn) => rateMessage(chat, message, "like", btn)
         })
       );
       actions.appendChild(
@@ -326,7 +326,7 @@ function buildActions(message, chat) {
           iconId: "i-thumbs-down",
           label: "Dislike answer",
           active: message.rating === "dislike",
-          onClick: () => rateMessage(chat, message, "dislike")
+          onClick: (btn) => rateMessage(chat, message, "dislike", btn)
         })
       );
       if (isLastAi && !state.streaming) {
@@ -508,9 +508,9 @@ function buildMessage(chat, message) {
     wrap.appendChild(statusWrap);
   }
   
-  // Assistant controls are rendered only after the complete answer is finalized.
-  // The completed render pass adds them below the response, never beside the live stream.
-  if (message.role !== "assistant" || (!message.thinking && !state.streaming)) {
+  // Keep controls for every completed assistant reply visible during later generations.
+  // Only the currently streaming assistant reply waits until completion for its controls.
+  if (message.role !== "assistant" || !message.thinking) {
     wrap.appendChild(buildActions(message, chat));
   }
   return wrap;
@@ -1252,11 +1252,20 @@ async function regenerateImage(chat, message) {
 
 /* ================= MESSAGE ACTIONS ================= */
 
-export function rateMessage(chat, message, rating) {
+export function rateMessage(chat, message, rating, button = null) {
   message.rating = message.rating === rating ? null : rating;
   touchChat(chat);
   persistChats();
-  renderMessages();
+
+  // Update only the clicked control. Re-rendering the full message list here
+  // detaches the live streaming node and interrupts its in-place text updates.
+  const actionRow = button?.closest(".msg-actions");
+  if (actionRow) {
+    actionRow.querySelectorAll('button[aria-label="Like answer"], button[aria-label="Dislike answer"]')
+      .forEach((control) => control.classList.remove("active"));
+    if (message.rating) button.classList.add("active");
+  }
+
   if (message.rating) {
     haptic(10);
     toast(message.rating === "like" ? "Thanks for the feedback" : "Feedback noted");
