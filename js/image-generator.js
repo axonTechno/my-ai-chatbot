@@ -29,7 +29,7 @@ export function initImageGenerator() {
       resultPanel.classList.add("is-loading");
     }
     if (resultImage) resultImage.removeAttribute("src");
-    if (note) note.textContent = "Generating your image…";
+    note?.classList.add("hidden");
 
     try {
       const result = await generateImage({ prompt });
