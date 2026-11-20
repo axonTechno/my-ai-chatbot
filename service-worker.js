@@ -6,7 +6,7 @@
    • Never caches AI requests
    ========================================================= */
 
-const VERSION = "axon-v2.1.3";
+const VERSION = "axon-v2.1.4";
 const CACHE_NAME = `axon-${VERSION}`;
 
 const APP_SHELL = [
@@ -20,6 +20,7 @@ const APP_SHELL = [
   "./css/extra.css",
   "./css/aurora.css",
   "./js/main.js",
+  "./js/image-generator.js",
   "./js/config.js",
   "./js/state.js",
   "./js/ui.js",
