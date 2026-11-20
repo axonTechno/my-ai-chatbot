@@ -59,12 +59,7 @@ export function openPage(sel) {
 /* ================= SETTINGS UI ================= */
 
 const PREFERENCE_OPTIONS = {
-  responseStyleSelect: [
-    { value: "concise", label: "Concise", description: "Short and direct answers" },
-    { value: "balanced", label: "Balanced", description: "Clear detail with useful context" },
-    { value: "detailed", label: "Detailed", description: "In-depth explanations and examples" }
-  ]
-};
+ };
 
 function paintPreferencePicker(select) {
   if (!select) return;
@@ -204,7 +199,45 @@ function paintSettings() {
   const style = $("#responseStyleSelect");
   if (style) {
     style.value = store.settings.responseStyle || "balanced";
-    paintPreferencePicker(style);
+    style.classList.add("preference-native-select");
+    let styleOptions = $("#responseStyleOptions");
+    if (!styleOptions) {
+      styleOptions = document.createElement("div");
+      styleOptions.id = "responseStyleOptions";
+      styleOptions.className = "response-style-options";
+      styleOptions.setAttribute("role", "radiogroup");
+      styleOptions.setAttribute("aria-label", "Choose AI response preference");
+      style.insertAdjacentElement("afterend", styleOptions);
+    }
+    styleOptions.replaceChildren();
+    const choices = [
+      { value: "concise", label: "Concise", description: "Short and direct answers" },
+      { value: "balanced", label: "Balanced", description: "Clear detail with useful context" },
+      { value: "detailed", label: "Detailed", description: "In-depth explanations and examples" }
+    ];
+    choices.forEach((choice) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "response-style-option";
+      button.classList.toggle("selected", choice.value === style.value);
+      button.dataset.responseStyle = choice.value;
+      button.setAttribute("role", "radio");
+      button.setAttribute("aria-checked", String(choice.value === style.value));
+      const copy = document.createElement("span");
+      copy.className = "response-style-copy";
+      const label = document.createElement("span");
+      label.className = "response-style-label";
+      label.textContent = choice.label;
+      const description = document.createElement("span");
+      description.className = "response-style-description";
+      description.textContent = choice.description;
+      copy.append(label, description);
+      const indicator = document.createElement("span");
+      indicator.className = "language-option-indicator";
+      indicator.setAttribute("aria-hidden", "true");
+      button.append(copy, indicator);
+      styleOptions.appendChild(button);
+    });
   }
 
   const model = $("#modelSelect");
@@ -588,10 +621,18 @@ export function initSettings() {
     });
   });
 
-  /* response style */
-  $("#responseStyleSelect")?.addEventListener("change", (e) => {
-    store.settings.responseStyle = e.target.value;
-    paintPreferencePicker(e.target);
+  /* response style radio cards */
+  $("#responseStyleOptions")?.addEventListener("click", (event) => {
+    const option = event.target.closest("[data-response-style]");
+    const select = $("#responseStyleSelect");
+    if (!option || !select) return;
+    select.value = option.dataset.responseStyle;
+    store.settings.responseStyle = select.value;
+    $("#responseStyleOptions").querySelectorAll("[data-response-style]").forEach((button) => {
+      const selected = button.dataset.responseStyle === select.value;
+      button.classList.toggle("selected", selected);
+      button.setAttribute("aria-checked", String(selected));
+    });
     persistSettings();
   });
 
