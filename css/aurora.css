@@ -631,3 +631,20 @@ html.axon-installed-app body,
 html.axon-installed-app .app {
   touch-action: pan-x pan-y;
 }
+
+/* Sidebar navigation: keep Settings anchored at the bottom. */
+.sidebar-bottom {
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+#yourImagesBtn,
+#settingsBtn {
+  font-weight: 600;
+}
+
+.sidebar-bottom .nav-item {
+  margin: 0;
+}
+
