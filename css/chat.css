@@ -186,7 +186,7 @@ body.dark .welcome h1 {
   50% { opacity: .15; }
 }
 
-/* Three-dot thinking indicator: one dark dot travels left to right, then loops. */
+/* Fast sequential thinking dots: first → middle → last → repeat. */
 .thinking {
   display: inline-flex;
   align-items: center;
@@ -200,24 +200,30 @@ body.dark .welcome h1 {
   flex: 0 0 7px;
   border-radius: 50%;
   background: var(--muted);
-  opacity: .3;
-  transform: scale(.88);
-  animation: dotChase .72s infinite linear;
+  opacity: .28;
+  transform: scale(.86);
+  animation: dotChase .6s infinite ease-in-out;
 }
 
-.thinking i:nth-of-type(2) { animation-delay: .18s; }
-.thinking i:nth-of-type(3) { animation-delay: .36s; }
+.thinking i:nth-of-type(2) { animation-delay: .2s; }
+.thinking i:nth-of-type(3) { animation-delay: .4s; }
 
 @keyframes dotChase {
-  0%, 27% {
+  0%, 30% {
     background: var(--text);
     opacity: 1;
-    transform: scale(1.12);
+    transform: scale(1.14);
   }
-  28%, 100% {
+  31%, 100% {
     background: var(--muted);
-    opacity: .3;
-    transform: scale(.88);
+    opacity: .28;
+    transform: scale(.86);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thinking i {
+    animation-duration: 1.8s;
   }
 }
 
