@@ -8,6 +8,7 @@
 
 import { store, uid, getChat, createChat, touchChat, persistChats, scheduleSaveChats, flushSaveChats } from "./state.js";
 import { saveImage, getImageBlob, getImageURL, deleteImage } from "./image-store.js";
+import { saveVideo, getVideoBlob } from "./video-store.js";
 import { sendChat, generateImage, editImage, AIError, buildHistory } from "./ai.js";
 import { modelInfo } from "./config.js";
 import { renderMarkdown, setMarkdown } from "./markdown.js";
@@ -21,6 +22,7 @@ const state = {
   controller: null,
   editingId: null,
   pendingImages: [],
+  pendingVideo: null,
   liveNode: null,
   liveText: "",
   rafPending: false,
@@ -41,6 +43,23 @@ async function resolveImageData(image) {
     reader.onerror = () => reject(new Error("Could not read saved image."));
     reader.readAsDataURL(blob);
   });
+}
+
+async function readBlobAsDataURL(blob) {
+  return await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("Could not read the video file."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function resolveVideoData(video) {
+  if (!video) return "";
+  if (video.dataUrl) return video.dataUrl;
+  const blob = await getVideoBlob(video.videoId);
+  if (!blob) throw new Error("Saved video could not be loaded from this device.");
+  return await readBlobAsDataURL(blob);
 }
 
 async function resolveMessageImages(messages) {
@@ -149,6 +168,25 @@ function buildImages(message) {
 
   return wrap.children.length ? wrap : null;
 }
+function buildVideoAttachment(video) {
+  if (!video) return null;
+  const wrap = el("div", "msg-video");
+  if (video.thumbnail) {
+    const thumb = el("img", "msg-video-thumb");
+    thumb.src = video.thumbnail;
+    thumb.alt = "Video thumbnail";
+    wrap.appendChild(thumb);
+  } else {
+    wrap.appendChild(el("div", "msg-video-placeholder", "MP4"));
+  }
+  const details = el("div", "msg-video-details");
+  details.appendChild(el("strong", null, video.name || "video.mp4"));
+  const size = Number(video.size) ? ` · ${(Number(video.size) / (1024 * 1024)).toFixed(1)} MB` : "";
+  details.appendChild(el("span", null, `MP4 video${size}`));
+  wrap.appendChild(details);
+  return wrap;
+}
+
 function actionButton({ iconId, label, onClick, active = false, danger = false, text = "" }) {
   const btn = el("button");
   btn.type = "button";
@@ -283,6 +321,8 @@ function buildMessage(chat, message) {
   if (message.role === "user") {
     const images = buildImages(message);
     if (images) body.appendChild(images);
+    const video = buildVideoAttachment(message.video);
+    if (video) body.appendChild(video);
     if (message.content) {
       const text = el("div", "user-text", message.content);
       body.appendChild(text);
@@ -368,9 +408,11 @@ function buildMessage(chat, message) {
       const label =
         message.pending === "offline"
           ? "Waiting for connection…"
-          : message.pending === "image"
-            ? "Sending image…"
-            : "Sending...";
+          : message.pending === "video"
+            ? "Sending video…"
+            : message.pending === "image"
+              ? "Sending image…"
+              : "Sending...";
       status.appendChild(el("span", null, label));
       statusWrap.appendChild(status);
     } else if (message.failed) {
@@ -611,9 +653,10 @@ export function ensureChat() {
   return newChat();
 }
 
-function titleFromText(text, images) {
+function titleFromText(text, images, video = null) {
   const clean = (text || "").replace(/\s+/g, " ").trim();
   if (clean) return clean.length > 42 ? `${clean.slice(0, 42)}…` : clean;
+  if (video) return video.name ? `Video: ${video.name}` : "Video chat";
   if (images && images.length) return images.length > 1 ? `${images.length} images` : "Image chat";
   return "New chat";
 }
@@ -638,7 +681,7 @@ function errorFor(err) {
   return { title: err.message || "AXON could not answer", detail: "" };
 }
 
-async function runGeneration(chat, { assistantMessage, history, message, images }) {
+async function runGeneration(chat, { assistantMessage, history, message, images, video = "" }) {
   state.streaming = true;
   state.controller = new AbortController();
   state.liveText = "";
@@ -661,6 +704,7 @@ async function runGeneration(chat, { assistantMessage, history, message, images 
       message,
       history,
       images,
+      video,
       signal: state.controller.signal,
       onMeta: (meta) => {
         if (meta && meta.switching) {
@@ -746,16 +790,20 @@ export function stopGeneration() {
  * If `editingId` is set, the message is replaced and everything after it is
  * regenerated (old branch removed) instead of adding a duplicate.
  */
-export async function sendMessage({ text, images = [], editingId = null }) {
+export async function sendMessage({ text, images = [], video = null, editingId = null }) {
   if (state.streaming) {
     toast("AXON is still answering — stop it first", "error");
     return;
   }
   const content = (text || "").trim();
-  if (!content && !images.length) return;
+  if (!content && !images.length && !video) return;
 
   /* offline: keep the message on screen and resume automatically */
   if (navigator.onLine === false) {
+    if (video) {
+      toast("Connect to the internet before sending a video.", "error");
+      return;
+    }
     queueOfflineSend({ text: content, images, editingId });
     return;
   }
@@ -777,9 +825,33 @@ export async function sendMessage({ text, images = [], editingId = null }) {
     time: Date.now(),
     rating: null,
     error: null,
-    pending: images.length ? "image" : true
+    pending: video ? "video" : images.length ? "image" : true
   };
   chat.messages.push(userMessage);
+
+  let videoDataUrl = "";
+  if (video) {
+    try {
+      const videoId = await saveVideo(video.file, {
+        chatId: chat.id,
+        messageId: userMessage.id,
+        name: video.name,
+        createdAt: userMessage.time
+      });
+      userMessage.video = {
+        videoId,
+        name: video.name || "video.mp4",
+        type: "video/mp4",
+        size: video.size || video.file.size,
+        thumbnail: video.thumbnail || ""
+      };
+      videoDataUrl = await readBlobAsDataURL(video.file);
+    } catch (error) {
+      chat.messages = chat.messages.filter((message) => message.id !== userMessage.id);
+      toast(error?.message || "Could not save this video on your device.", "error");
+      return;
+    }
+  }
 
   for (const image of images) {
     try {
@@ -805,9 +877,9 @@ export async function sendMessage({ text, images = [], editingId = null }) {
   );
 
   const editImageRequest = Boolean(
-    !images.length && previousGeneratedImage && isImageEditRequest(content)
+    !images.length && !video && previousGeneratedImage && isImageEditRequest(content)
   );
-  const makeImage = !editImageRequest && isImageGenerationRequest(content, images);
+  const makeImage = !video && !editImageRequest && isImageGenerationRequest(content, images);
 
   const assistantMessage = {
     id: uid("m"),
@@ -829,11 +901,11 @@ export async function sendMessage({ text, images = [], editingId = null }) {
   chat.messages.push(assistantMessage);
 
   if (chat.autoTitle && chat.messages.filter((message) => message.role === "user").length === 1) {
-    chat.title = titleFromText(content, images);
+    chat.title = titleFromText(content, images, video);
   }
   touchChat(chat);
   persistChats();
-  state.lastSent = { text: content, images, chatId: chat.id };
+  state.lastSent = { text: content, images, video: userMessage.video || null, chatId: chat.id };
 
   /* user message is on screen immediately with a "Sending..." status */
   renderMessages();
@@ -859,7 +931,8 @@ export async function sendMessage({ text, images = [], editingId = null }) {
       assistantMessage,
       history,
       message: content,
-      images: requestImages
+      images: requestImages,
+      video: videoDataUrl
     });
   }
 
@@ -897,7 +970,8 @@ export async function regenerate(chat, messageId) {
     assistantMessage,
     history,
     message: lastUser ? lastUser.content : "",
-    images: lastUser && lastUser.images ? (await Promise.all(lastUser.images.map(resolveImageData))).filter(Boolean) : []
+    images: lastUser && lastUser.images ? (await Promise.all(lastUser.images.map(resolveImageData))).filter(Boolean) : [],
+    video: lastUser?.video ? await resolveVideoData(lastUser.video) : ""
   });
 }
 
@@ -1180,6 +1254,7 @@ export function addPendingImages(images) {
 
 export function clearPendingImages() {
   state.pendingImages = [];
+  state.pendingVideo = null;
   renderPreviews();
 }
 
@@ -1192,11 +1267,37 @@ function renderPreviews() {
   const box = $("#imagePreview");
   if (!wrap || !box) return;
   wrap.replaceChildren();
-  if (!state.pendingImages.length) {
+  if (!state.pendingImages.length && !state.pendingVideo) {
     box.classList.add("hidden");
     return;
   }
   box.classList.remove("hidden");
+  if (state.pendingVideo) {
+    const video = state.pendingVideo;
+    const item = el("div", "preview-video-item");
+    if (video.thumbnail) {
+      const thumb = el("img", "preview-video-thumb");
+      thumb.src = video.thumbnail;
+      thumb.alt = "Video thumbnail";
+      item.appendChild(thumb);
+    } else {
+      item.appendChild(el("div", "video-preview-placeholder", "MP4"));
+    }
+    const details = el("div", "preview-video-details");
+    details.appendChild(el("strong", null, video.name));
+    details.appendChild(el("span", null, `${(video.size / (1024 * 1024)).toFixed(1)} MB · MP4`));
+    item.appendChild(details);
+    const removeVideo = el("button", "remove");
+    removeVideo.type = "button";
+    removeVideo.setAttribute("aria-label", "Remove video");
+    removeVideo.appendChild(icon("i-x"));
+    removeVideo.addEventListener("click", () => {
+      state.pendingVideo = null;
+      renderPreviews();
+    });
+    item.appendChild(removeVideo);
+    wrap.appendChild(item);
+  }
   state.pendingImages.forEach((img, index) => {
     const item = el("div", "preview-item");
     const thumb = el("img");
@@ -1218,6 +1319,43 @@ function renderPreviews() {
   });
 }
 
+async function prepareVideoFile(file) {
+  if (!file || file.size <= 0) throw new Error("The selected video is empty.");
+  if (file.size > 20 * 1024 * 1024) throw new Error("MP4 videos must be 20 MB or smaller.");
+  const url = URL.createObjectURL(file);
+  let thumbnail = "";
+  try {
+    const player = document.createElement("video");
+    player.muted = true;
+    player.playsInline = true;
+    player.preload = "metadata";
+    player.src = url;
+    await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error("Video preview timed out.")), 5000);
+      player.onloadeddata = () => { clearTimeout(timer); resolve(); };
+      player.onerror = () => { clearTimeout(timer); reject(new Error("Could not preview this MP4 video.")); };
+    });
+    const width = player.videoWidth || 320;
+    const height = player.videoHeight || 180;
+    const scale = Math.min(1, 480 / Math.max(width, height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(width * scale));
+    canvas.height = Math.max(1, Math.round(height * scale));
+    const context = canvas.getContext("2d");
+    if (context) {
+      context.drawImage(player, 0, 0, canvas.width, canvas.height);
+      thumbnail = canvas.toDataURL("image/jpeg", 0.72);
+    }
+    player.removeAttribute("src");
+    player.load();
+  } catch (error) {
+    console.info("[axon] Video thumbnail unavailable; filename preview will be used.", error);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+  return { file, name: file.name || "video.mp4", size: file.size, thumbnail };
+}
+
 export function initChatComposer() {
   const input = $("#messageInput");
   const sendBtn = $("#sendBtn");
@@ -1229,7 +1367,8 @@ export function initChatComposer() {
     if (state.streaming) return;
     const text = input ? input.value : "";
     const images = [...state.pendingImages];
-    if (!text.trim() && !images.length) return;
+    const video = state.pendingVideo;
+    if (!text.trim() && !images.length && !video) return;
     const editingId = state.editingId;
     if (input) {
       input.value = "";
@@ -1241,7 +1380,7 @@ export function initChatComposer() {
       $("#editBanner")?.classList.add("hidden");
       document.dispatchEvent(new CustomEvent("axon:edit-mode", { detail: { on: false } }));
     }
-    await sendMessage({ text, images, editingId });
+    await sendMessage({ text, images, video, editingId });
   };
 
   sendBtn?.addEventListener("click", submit);
@@ -1261,12 +1400,32 @@ export function initChatComposer() {
   attachBtn?.addEventListener("click", () => fileInput?.click());
 
   fileInput?.addEventListener("change", async (e) => {
-    const files = e.target.files;
-    if (!files || !files.length) return;
-    const { prepareFiles } = await import("./images.js");
-    const { images, errors } = await prepareFiles(files);
-    if (images.length) addPendingImages(images);
-    if (errors.length) toast(errors[0], "error");
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const videoFiles = files.filter((file) => file.type.startsWith("video/") || /\\.mp4$/i.test(file.name));
+    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+    const unsupported = files.filter((file) => !videoFiles.includes(file) && !imageFiles.includes(file));
+    if (unsupported.length) toast("Only images and MP4 videos are supported.", "error");
+    if (videoFiles.length > 1) toast("Only one video can be attached per message. The first video was selected.", "error");
+    const selectedVideo = videoFiles[0];
+    if (selectedVideo) {
+      if (selectedVideo.type && selectedVideo.type !== "video/mp4") {
+        toast("Please choose an MP4 video.", "error");
+      } else {
+        try {
+          state.pendingVideo = await prepareVideoFile(selectedVideo);
+          renderPreviews();
+        } catch (error) {
+          toast(error.message || "Could not prepare this video.", "error");
+        }
+      }
+    }
+    if (imageFiles.length) {
+      const { prepareFiles } = await import("./images.js");
+      const { images, errors } = await prepareFiles(imageFiles);
+      if (images.length) addPendingImages(images);
+      if (errors.length) toast(errors[0], "error");
+    }
     e.target.value = "";
   });
 
