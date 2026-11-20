@@ -58,6 +58,109 @@ export function openPage(sel) {
 
 /* ================= SETTINGS UI ================= */
 
+const PREFERENCE_OPTIONS = {
+  languageSelect: LANGUAGES.map((value) => ({ value, label: value })),
+  responseStyleSelect: [
+    { value: "concise", label: "Concise", description: "Short and direct answers" },
+    { value: "balanced", label: "Balanced", description: "Clear detail with useful context" },
+    { value: "detailed", label: "Detailed", description: "In-depth explanations and examples" }
+  ]
+};
+
+function paintPreferencePicker(select) {
+  if (!select) return;
+  const id = select.id;
+  const options = PREFERENCE_OPTIONS[id];
+  if (!options) return;
+
+  let picker = select.parentElement.querySelector(`.preference-picker[data-for="${id}"]`);
+  if (!picker) {
+    picker = document.createElement("div");
+    picker.className = "preference-picker";
+    picker.dataset.for = id;
+    const trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.className = "preference-trigger";
+    trigger.setAttribute("aria-haspopup", "listbox");
+    trigger.setAttribute("aria-expanded", "false");
+    const chevron = document.createElement("span");
+    chevron.className = "preference-chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.textContent = "⌄";
+    trigger.appendChild(chevron);
+    const menu = document.createElement("div");
+    menu.className = "preference-menu";
+    menu.setAttribute("role", "listbox");
+    menu.hidden = true;
+    picker.append(trigger, menu);
+    select.insertAdjacentElement("afterend", picker);
+    select.classList.add("preference-native-select");
+
+    trigger.addEventListener("click", () => {
+      const open = !picker.classList.contains("open");
+      document.querySelectorAll(".preference-picker.open").forEach((item) => {
+        item.classList.remove("open");
+        item.querySelector(".preference-menu").hidden = true;
+        item.querySelector(".preference-trigger").setAttribute("aria-expanded", "false");
+      });
+      picker.classList.toggle("open", open);
+      menu.hidden = !open;
+      trigger.setAttribute("aria-expanded", String(open));
+    });
+
+    menu.addEventListener("click", (event) => {
+      const option = event.target.closest("[data-value]");
+      if (!option) return;
+      select.value = option.dataset.value;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      picker.classList.remove("open");
+      menu.hidden = true;
+      trigger.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  const selected = options.find((option) => option.value === select.value) || options[0];
+  const trigger = picker.querySelector(".preference-trigger");
+  const menu = picker.querySelector(".preference-menu");
+  trigger.replaceChildren();
+  const label = document.createElement("span");
+  label.className = "preference-trigger-label";
+  label.textContent = selected.label;
+  const chevron = document.createElement("span");
+  chevron.className = "preference-chevron";
+  chevron.setAttribute("aria-hidden", "true");
+  chevron.textContent = "⌄";
+  trigger.append(label, chevron);
+
+  menu.replaceChildren();
+  options.forEach((option) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "preference-option";
+    button.dataset.value = option.value;
+    button.setAttribute("role", "option");
+    button.setAttribute("aria-selected", String(option.value === select.value));
+    const copy = document.createElement("span");
+    copy.className = "preference-option-copy";
+    const name = document.createElement("span");
+    name.className = "preference-option-label";
+    name.textContent = option.label;
+    copy.appendChild(name);
+    if (option.description) {
+      const description = document.createElement("span");
+      description.className = "preference-option-description";
+      description.textContent = option.description;
+      copy.appendChild(description);
+    }
+    const check = document.createElement("span");
+    check.className = "preference-option-check";
+    check.textContent = option.value === select.value ? "✓" : "";
+    button.append(copy, check);
+    menu.appendChild(button);
+  });
+}
+
+
 function paintSettings() {
   const lang = $("#languageSelect");
   if (lang) {
@@ -69,10 +172,14 @@ function paintSettings() {
       lang.appendChild(opt);
     });
     lang.value = store.settings.language || "English";
+    paintPreferencePicker(lang);
   }
 
   const style = $("#responseStyleSelect");
-  if (style) style.value = store.settings.responseStyle || "balanced";
+  if (style) {
+    style.value = store.settings.responseStyle || "balanced";
+    paintPreferencePicker(style);
+  }
 
   const model = $("#modelSelect");
   const modelOptions = $("#modelOptions");
@@ -424,6 +531,7 @@ export function initSettings() {
   /* language */
   $("#languageSelect")?.addEventListener("change", (e) => {
     store.settings.language = e.target.value;
+    paintPreferencePicker(e.target);
     persistSettings();
     toast(`Reply language: ${e.target.value}`);
   });
@@ -449,6 +557,7 @@ export function initSettings() {
   /* response style */
   $("#responseStyleSelect")?.addEventListener("change", (e) => {
     store.settings.responseStyle = e.target.value;
+    paintPreferencePicker(e.target);
     persistSettings();
   });
 
