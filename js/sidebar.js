@@ -36,6 +36,18 @@ export function toggleSidebar() {
   else openSidebar();
 }
 
+/* Install the hamburger handler as soon as this module loads.
+   Do not wait for async app boot / IndexedDB migration to finish. */
+document.addEventListener("click", (event) => {
+  const path = typeof event.composedPath === "function" ? event.composedPath() : [];
+  const button = path.find((node) => node && node.id === "menuBtn")
+    || (event.target instanceof Element ? event.target.closest("#menuBtn") : null);
+  if (!button) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  toggleSidebar();
+}, true);
+
 function highlight(title, term) {
   if (!term) return document.createTextNode(title);
   const frag = document.createDocumentFragment();
@@ -298,14 +310,6 @@ export function refreshAccountChip() {
 }
 
 export function initSidebar() {
-  // Capture the hamburger click before other page handlers can intercept it.
-  document.addEventListener("click", (event) => {
-    const button = event.target.closest("#menuBtn");
-    if (!button) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    toggleSidebar();
-  }, true);
   $("#sidebarOverlay")?.addEventListener("click", closeSidebar);
 
   $("#newChatBtn")?.addEventListener("click", () => {
