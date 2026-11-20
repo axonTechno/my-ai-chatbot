@@ -7,6 +7,7 @@
 import { loadAll, store, persistChats, flushSaveChats, createChat, sortedChats } from "./state.js";
 import { migrateLegacyImages } from "./image-store.js";
 import { initGallery } from "./gallery.js";
+import { initImageGenerator } from "./image-generator.js";
 import { $, $$, toast, copyText, closeMenu, closeImageViewer } from "./ui.js";
 import {
   initChatComposer,
@@ -59,6 +60,7 @@ async function boot() {
 
   initSidebar();
   initGallery();
+  initImageGenerator();
   initSettings();
   initAccount();
   initAuth();
