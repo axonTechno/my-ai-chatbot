@@ -36,17 +36,6 @@ export function toggleSidebar() {
   else openSidebar();
 }
 
-/* Install the hamburger handler as soon as this module loads.
-   Do not wait for async app boot / IndexedDB migration to finish. */
-document.addEventListener("click", (event) => {
-  const path = typeof event.composedPath === "function" ? event.composedPath() : [];
-  const button = path.find((node) => node && node.id === "menuBtn")
-    || (event.target instanceof Element ? event.target.closest("#menuBtn") : null);
-  if (!button) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  toggleSidebar();
-}, true);
 
 function highlight(title, term) {
   if (!term) return document.createTextNode(title);
