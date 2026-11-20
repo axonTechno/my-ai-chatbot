@@ -382,7 +382,11 @@ function buildMessage(chat, message) {
     wrap.appendChild(statusWrap);
   }
   
-  wrap.appendChild(buildActions(message, chat));
+  // Assistant controls are rendered only after the complete answer is finalized.
+  // The completed render pass adds them below the response, never beside the live stream.
+  if (message.role !== "assistant" || (!message.thinking && !state.streaming)) {
+    wrap.appendChild(buildActions(message, chat));
+  }
   return wrap;
 }
 
