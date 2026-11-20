@@ -823,3 +823,35 @@ body.dark .about-hero h2 {
   .image-generator-content { padding-top: 28px; gap: 18px; }
   .image-generator-logo { width: 76px; height: 76px; }
 }
+
+
+/* Inline image generation result and neutral loading placeholder. */
+.image-generator-result {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-2);
+}
+.image-generator-result.hidden { display: none; }
+.image-generator-result .image-generator-placeholder {
+  display: none;
+  min-height: 220px;
+  aspect-ratio: 1 / 1;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  background: var(--surface-2);
+  font-size: 13px;
+}
+.image-generator-result.is-loading .image-generator-placeholder { display: flex; }
+.image-generator-result img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.image-generator-result.is-loading img,
+.image-generator-result img:not([src]) { display: none; }
