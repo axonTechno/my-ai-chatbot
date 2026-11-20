@@ -538,6 +538,11 @@ export function initSettings() {
         openPage("#aboutPage");
         return;
       }
+      if (category === "Help & issues") {
+        renderReportHistory();
+        openPage("#helpPage");
+        return;
+      }
       openSettingsCategory(category);
     });
   });
