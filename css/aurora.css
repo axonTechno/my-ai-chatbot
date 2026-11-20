@@ -889,3 +889,50 @@ html.axon-installed-app .app {
 .msg.assistant .msg-actions button span {
   font: 500 12px/1 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
 }
+
+
+/* Always-visible language radio choices: no dropdown or overlap. */
+.language-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  width: 100%;
+  margin-top: 10px;
+}
+.language-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  min-height: 46px;
+  padding: 0 13px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: 500 13.5px/1.35 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  text-align: left;
+  transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.language-option.selected {
+  border-color: var(--ax-accent);
+  background: color-mix(in srgb, var(--ax-accent) 10%, var(--surface));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ax-accent) 18%, transparent);
+}
+.language-option-indicator {
+  flex: 0 0 17px;
+  width: 17px;
+  height: 17px;
+  border: 1.5px solid var(--muted);
+  border-radius: 50%;
+  position: relative;
+}
+.language-option[aria-checked="true"] .language-option-indicator { border-color: var(--ax-accent); }
+.language-option[aria-checked="true"] .language-option-indicator::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--ax-accent);
+}
