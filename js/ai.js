@@ -210,13 +210,22 @@ async function attempt({ body, model, signal, onDelta, onMeta }) {
 
   let response;
   try {
+    console.info("[axon] chat-request: serialization-start", {
+      hasVideo: Boolean(body.video_url),
+      videoDataUrlChars: typeof body.video_url === "string" ? body.video_url.length : 0
+    });
+    const requestBody = JSON.stringify(body);
+    console.info("[axon] chat-request: fetch-start", {
+      hasVideo: Boolean(body.video_url),
+      requestBytesApprox: requestBody.length
+    });
     response = await fetch(workerUrl(AI_ROUTES.chat), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "text/event-stream, application/json"
       },
-      body: JSON.stringify(body),
+      body: requestBody,
       signal: controller.signal,
       mode: "cors",
       credentials: "omit",
@@ -224,6 +233,10 @@ async function attempt({ body, model, signal, onDelta, onMeta }) {
     });
   } catch (err) {
     clearTimeout(timer);
+    console.error("[axon] chat-request: fetch-failed", {
+      name: err?.name || "Error",
+      message: err?.message || String(err)
+    });
     if (signal && signal.aborted) throw new AIError("Stopped", { code: "aborted" });
     if (err && (err.name === "TimeoutError" || err.name === "AbortError")) {
       throw new AIError("The request timed out.", { code: "timeout", retryable: true });
@@ -234,6 +247,10 @@ async function attempt({ body, model, signal, onDelta, onMeta }) {
     );
   }
 
+  console.info("[axon] chat-request: response-received", {
+    status: response.status,
+    contentType: response.headers.get("content-type") || ""
+  });
   if (!response.ok) {
     clearTimeout(timer);
     let detail = "";
