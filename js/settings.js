@@ -544,10 +544,6 @@ export function initSettings() {
   $("#settingsSearch")?.addEventListener("input", filterSettingsDirectory);
   $("#settingsDetailBack")?.addEventListener("click", returnToSettingsHome);
   $("#settingsOpenVoiceBtn")?.addEventListener("click", () => $("#voiceBtn")?.click());
-  $("#settingsSafetyHelpBtn")?.addEventListener("click", () => {
-    renderReportHistory();
-    openPage("#helpPage");
-  });
   $("#settingsTestServiceBtn")?.addEventListener("click", runConnectionTest);
 
 
