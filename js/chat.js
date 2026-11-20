@@ -561,6 +561,9 @@ function scheduleLiveRender() {
     const rendered = renderMarkdown(state.liveText);
     rendered.appendChild(caret);
     body.replaceChildren(rendered);
+
+    // Keep the thinking indicator below the live answer until the stream ends.
+    body.appendChild(thinkingNode());
     maybeAutoScroll();
   });
 }
@@ -667,10 +670,8 @@ async function runGeneration(chat, { assistantMessage, history, message, images 
         }
       },
       onDelta: (chunk) => {
-        if (assistantMessage.thinking) {
-          assistantMessage.thinking = false;
-          setThinking(chat, assistantMessage, false);
-        }
+        // The thinking dots remain visible below the text throughout streaming.
+        // They are removed only by the final completed render.
         state.liveText += chunk;
         assistantMessage.content = state.liveText;
         scheduleLiveRender();
