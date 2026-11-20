@@ -75,15 +75,46 @@ function paintSettings() {
   if (style) style.value = store.settings.responseStyle || "balanced";
 
   const model = $("#modelSelect");
-  if (model) {
+  const modelOptions = $("#modelOptions");
+  if (model && modelOptions) {
     model.replaceChildren();
+    modelOptions.replaceChildren();
     MODELS.forEach((m) => {
       const opt = document.createElement("option");
       opt.value = m.id;
-      opt.textContent = `${m.label} — ${m.description}`;
+      opt.textContent = m.label;
       model.appendChild(opt);
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "model-option";
+      button.dataset.modelId = m.id;
+      button.setAttribute("role", "radio");
+      button.setAttribute("aria-checked", "false");
+
+      const copy = document.createElement("span");
+      copy.className = "model-option-copy";
+      const label = document.createElement("span");
+      label.className = "model-option-label";
+      label.textContent = m.label;
+      const description = document.createElement("span");
+      description.className = "model-option-description";
+      description.textContent = m.description;
+      copy.append(label, description);
+
+      const check = document.createElement("span");
+      check.className = "model-option-check";
+      check.setAttribute("aria-hidden", "true");
+      check.textContent = "✓";
+      button.append(copy, check);
+      modelOptions.appendChild(button);
     });
     model.value = store.settings.model || "auto";
+    modelOptions.querySelectorAll("[data-model-id]").forEach((button) => {
+      const selected = button.dataset.modelId === model.value;
+      button.classList.toggle("selected", selected);
+      button.setAttribute("aria-checked", String(selected));
+    });
   }
 
   const enter = $("#enterToSendToggle");
@@ -419,6 +450,15 @@ export function initSettings() {
   $("#responseStyleSelect")?.addEventListener("change", (e) => {
     store.settings.responseStyle = e.target.value;
     persistSettings();
+  });
+
+  /* Custom model cards */
+  $("#modelOptions")?.addEventListener("click", (event) => {
+    const option = event.target.closest("[data-model-id]");
+    const model = $("#modelSelect");
+    if (!option || !model) return;
+    model.value = option.dataset.modelId;
+    model.dispatchEvent(new Event("change", { bubbles: true }));
   });
 
   /* model */
