@@ -557,9 +557,7 @@ function scheduleLiveRender() {
     if (!state.liveNode) return;
     const body = state.liveNode.querySelector(".msg-body");
     if (!body) return;
-    const caret = el("span", "caret");
     const rendered = renderMarkdown(state.liveText);
-    rendered.appendChild(caret);
     body.replaceChildren(rendered);
 
     // Keep the thinking indicator below the live answer until the stream ends.
