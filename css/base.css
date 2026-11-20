@@ -676,3 +676,38 @@ body.dark .new-chat {
 .confirm-card.sidebar-inline p { font-size: 12.5px; overflow-wrap: anywhere; }
 .confirm-card.sidebar-inline .confirm-actions { gap: 7px; margin-top: 12px; }
 .confirm-card.sidebar-inline .confirm-actions .btn { min-height: 36px; padding: 7px 11px; }
+
+
+/* AXON typography: clean, lightweight system sans-serif across the entire app. */
+body,
+body button,
+body input,
+body textarea,
+body select,
+body .msg-body,
+body .msg-head,
+body .msg-video,
+body .msg-video *,
+body .preview-video-item,
+body .preview-video-item *,
+body .sidebar,
+body .topbar,
+body .page,
+body .modal,
+body .sheet {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+}
+body .msg-body {
+  font-weight: 400;
+  letter-spacing: -0.012em;
+}
+body .msg-body strong,
+body .msg-body b {
+  font-weight: 600;
+}
+body pre,
+body code,
+body pre *,
+body code * {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+}
