@@ -1,5 +1,5 @@
 /* AXON AI — dedicated, chat-independent image generation screen */
-import { $, toast } from "./ui.js";
+import { $, toast, openImageViewer } from "./ui.js";
 import { openPage } from "./settings.js";
 import { closeSidebar } from "./sidebar.js";
 import { generateImage } from "./ai.js";
@@ -16,6 +16,51 @@ export function initImageGenerator() {
 
   const resultPanel = $("#imageGeneratorResult");
   const resultImage = $("#imageGeneratorResultImage");
+  const actionBar = $("#imageGeneratorActions");
+  let currentPrompt = "";
+
+  async function createImage(prompt) {
+    if (submitButton) submitButton.disabled = true;
+    actionBar?.classList.add("hidden");
+    if (resultPanel) {
+      resultPanel.classList.remove("hidden");
+      resultPanel.classList.add("is-loading");
+    }
+    if (resultImage) resultImage.removeAttribute("src");
+    if (note) note.textContent = "Generating your image…";
+
+    try {
+      const result = await generateImage({ prompt });
+      if (!result?.image) throw new Error("The image service returned no image.");
+      await saveImage(result.image, {
+        category: "generated",
+        prompt,
+        name: prompt.slice(0, 80)
+      });
+      if (resultImage) {
+        resultImage.onload = () => {
+          resultImage.style.aspectRatio = resultImage.naturalWidth + " / " + resultImage.naturalHeight;
+          resultPanel?.classList.remove("is-loading");
+          actionBar?.classList.remove("hidden");
+        };
+        resultImage.src = result.image;
+      }
+      if (note) note.textContent = "Saved in Your Images.";
+      toast("Image saved in Your Images.");
+      return result.image;
+    } catch (error) {
+      console.error("[axon] Standalone image generation failed", error);
+      if (resultPanel) {
+        resultPanel.classList.add("hidden");
+        resultPanel.classList.remove("is-loading");
+      }
+      if (note) note.textContent = "Your generated image will be saved in Your Images.";
+      toast(error?.message || "Image generation failed. Please try again.", "error");
+      return null;
+    } finally {
+      if (submitButton) submitButton.disabled = false;
+    }
+  }
 
   function resetGeneratorScreen() {
     if (resultPanel) {
@@ -26,6 +71,8 @@ export function initImageGenerator() {
       resultImage.removeAttribute("src");
       resultImage.style.aspectRatio = "";
     }
+    actionBar?.classList.add("hidden");
+    currentPrompt = "";
     promptInput.value = "";
     if (note) note.textContent = "Your generated image will be saved in Your Images.";
     if (submitButton) submitButton.disabled = false;
@@ -61,47 +108,44 @@ export function initImageGenerator() {
       return;
     }
     if (submitButton?.disabled) return;
+    currentPrompt = prompt;
+    const image = await createImage(prompt);
+    if (image) promptInput.value = "";
+  });
 
-    if (submitButton) submitButton.disabled = true;
-    if (resultPanel) {
-      resultPanel.classList.remove("hidden");
-      resultPanel.classList.add("is-loading");
-    }
-    if (resultImage) resultImage.removeAttribute("src");
-    if (note) note.textContent = "Generating your image…";
+  resultImage?.addEventListener("click", () => {
+    if (resultImage.src) openImageViewer(resultImage.src, currentPrompt || "Generated image");
+  });
 
+  $("#imageGeneratorSave")?.addEventListener("click", () => {
+    if (!resultImage?.src) return;
+    const link = document.createElement("a");
+    link.href = resultImage.src;
+    link.download = (currentPrompt || "axon-image").slice(0, 70).replace(/[^a-z0-9-_]+/gi, "-") + ".png";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  });
+
+  $("#imageGeneratorShare")?.addEventListener("click", async () => {
+    if (!resultImage?.src) return;
     try {
-      const result = await generateImage({ prompt });
-      if (!result?.image) throw new Error("The image service returned no image.");
-
-      await saveImage(result.image, {
-        category: "generated",
-        prompt,
-        name: prompt.slice(0, 80)
-      });
-
-      if (resultImage) {
-        resultImage.onload = () => {
-          resultImage.style.aspectRatio = resultImage.naturalWidth + " / " + resultImage.naturalHeight;
-          resultPanel?.classList.remove("is-loading");
-        };
-        resultImage.src = result.image;
+      const response = await fetch(resultImage.src);
+      const blob = await response.blob();
+      const file = new File([blob], "axon-generated-image.png", { type: blob.type || "image/png" });
+      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+        await navigator.share({ files: [file], title: "AXON generated image" });
       } else {
-        resultPanel?.classList.remove("is-loading");
+        toast("Sharing is not supported on this device.", "error");
       }
-      if (note) note.textContent = "Saved in Your Images.";
-      promptInput.value = "";
-      toast("Image saved in Your Images.");
     } catch (error) {
-      console.error("[axon] Standalone image generation failed", error);
-      if (resultPanel) {
-        resultPanel.classList.add("hidden");
-        resultPanel.classList.remove("is-loading");
-      }
-      toast(error?.message || "Image generation failed. Please try again.", "error");
-      if (note) note.textContent = "Your generated image will be saved in Your Images.";
-    } finally {
-      if (submitButton) submitButton.disabled = false;
+      if (error?.name !== "AbortError") toast("Could not share this image.", "error");
     }
   });
+
+  $("#imageGeneratorRetry")?.addEventListener("click", async () => {
+    if (!currentPrompt || submitButton?.disabled) return;
+    await createImage(currentPrompt);
+  });
+}
 }
