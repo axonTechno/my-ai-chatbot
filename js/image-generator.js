@@ -148,4 +148,3 @@ export function initImageGenerator() {
     await createImage(currentPrompt);
   });
 }
-}
