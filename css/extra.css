@@ -355,12 +355,12 @@ body.dark .brand {
 .share-actions button:active { transform: scale(.985); }
 .share-actions button svg { width: 20px; height: 20px; flex: 0 0 20px; }
 
-/* Main sidebar destinations — clear, heading-like labels. */
+/* Main sidebar destinations — simple regular labels, slightly larger. */
 #generateImagesBtn.nav-item span,
 #yourImagesBtn.nav-item span,
 #settingsBtn.nav-item span {
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 650 !important;
+  font-size: 15px;
+  font-weight: 400 !important;
   letter-spacing: normal;
 }
