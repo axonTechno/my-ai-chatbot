@@ -186,8 +186,8 @@ body.dark .welcome h1 {
   height: 7px !important;
   flex: 0 0 7px !important;
   border-radius: 50% !important;
-  background-color: #B9DDFF !important;
-  opacity: 1 !important;
+  background-color: #B9DDFF;
+  opacity: 1;
   animation: axonThinkingBlue .9s infinite linear !important;
 }
 
