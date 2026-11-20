@@ -1423,8 +1423,12 @@ export function initChatComposer() {
     if (videoFiles.length > 1) toast("Only one video can be attached per message. The first video was selected.", "error");
     const selectedVideo = videoFiles[0];
     if (selectedVideo) {
-      if (selectedVideo.type && selectedVideo.type !== "video/mp4" && !selectedVideo.name.toLowerCase().endsWith(".mp4")) {
-        toast("Please choose an MP4 video.", "error");
+      const fileName = String(selectedVideo.name || "").toLowerCase();
+      const mimeType = String(selectedVideo.type || "").toLowerCase();
+      const hasMp4Extension = fileName.endsWith(".mp4");
+      const hasSupportedMime = !mimeType || mimeType === "video/mp4" || mimeType === "application/octet-stream";
+      if (!hasMp4Extension || !hasSupportedMime) {
+        toast("Please choose a valid MP4 video.", "error");
       } else {
         try {
           state.pendingVideo = await prepareVideoFile(selectedVideo);
