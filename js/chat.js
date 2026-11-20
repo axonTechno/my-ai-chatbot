@@ -1353,7 +1353,10 @@ async function prepareVideoFile(file) {
   } finally {
     URL.revokeObjectURL(url);
   }
-  return { file, name: file.name || "video.mp4", size: file.size, thumbnail };
+  const mp4File = file.type === "video/mp4"
+    ? file
+    : new File([file], file.name || "video.mp4", { type: "video/mp4", lastModified: file.lastModified });
+  return { file: mp4File, name: file.name || "video.mp4", size: file.size, thumbnail };
 }
 
 export function initChatComposer() {
@@ -1402,14 +1405,14 @@ export function initChatComposer() {
   fileInput?.addEventListener("change", async (e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
-    const videoFiles = files.filter((file) => file.type.startsWith("video/") || /\\.mp4$/i.test(file.name));
+    const videoFiles = files.filter((file) => file.type.startsWith("video/") || file.name.toLowerCase().endsWith(".mp4"));
     const imageFiles = files.filter((file) => file.type.startsWith("image/"));
     const unsupported = files.filter((file) => !videoFiles.includes(file) && !imageFiles.includes(file));
     if (unsupported.length) toast("Only images and MP4 videos are supported.", "error");
     if (videoFiles.length > 1) toast("Only one video can be attached per message. The first video was selected.", "error");
     const selectedVideo = videoFiles[0];
     if (selectedVideo) {
-      if (selectedVideo.type && selectedVideo.type !== "video/mp4") {
+      if (selectedVideo.type && selectedVideo.type !== "video/mp4" && !selectedVideo.name.toLowerCase().endsWith(".mp4")) {
         toast("Please choose an MP4 video.", "error");
       } else {
         try {
@@ -1464,6 +1467,7 @@ export function chatToMarkdown(chat) {
     if (m.images && m.images.length) {
       lines.push(`_${m.images.length} image attachment(s)_`);
     }
+    if (m.video?.name) lines.push(`_Video attachment: ${m.video.name}_`);
     lines.push("", m.content || "", "");
   });
   return lines.join("\n");
