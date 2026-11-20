@@ -832,6 +832,7 @@ export async function sendMessage({ text, images = [], video = null, editingId =
   let videoDataUrl = "";
   if (video) {
     try {
+      console.info("[axon] video-send: local-save-start", { sizeBytes: video.file?.size || 0 });
       const videoId = await saveVideo(video.file, {
         chatId: chat.id,
         messageId: userMessage.id,
@@ -845,8 +846,12 @@ export async function sendMessage({ text, images = [], video = null, editingId =
         size: video.size || video.file.size,
         thumbnail: video.thumbnail || ""
       };
+      console.info("[axon] video-send: local-save-complete");
+      console.info("[axon] video-send: base64-read-start");
       videoDataUrl = await readBlobAsDataURL(video.file);
+      console.info("[axon] video-send: base64-read-complete", { dataUrlChars: videoDataUrl.length });
     } catch (error) {
+      console.error("[axon] video-send: local-preparation-failed", error);
       chat.messages = chat.messages.filter((message) => message.id !== userMessage.id);
       state.pendingVideo = video;
       renderPreviews();
@@ -875,7 +880,9 @@ export async function sendMessage({ text, images = [], video = null, editingId =
     }
   }
 
+  console.info("[axon] video-send: history-resolve-start");
   const history = await resolveMessageImages(chat.messages);
+  console.info("[axon] video-send: history-resolve-complete", { messages: history.length });
   const previousGeneratedImage = [...chat.messages].reverse().find((m) =>
     m.role === "assistant" &&
     m.imageGeneration &&
@@ -924,7 +931,9 @@ export async function sendMessage({ text, images = [], video = null, editingId =
   } else if (makeImage) {
     await runImageGeneration(chat, assistantMessage, content);
   } else {
+    console.info("[axon] video-send: request-image-resolve-start");
     const requestImages = (await Promise.all(images.map(resolveImageData))).filter(Boolean);
+    console.info("[axon] video-send: request-image-resolve-complete", { count: requestImages.length });
 
     if (
       previousGeneratedImage &&
@@ -934,6 +943,10 @@ export async function sendMessage({ text, images = [], video = null, editingId =
       requestImages.push(await resolveImageData({ dataUrl: previousGeneratedImage.generatedImage, imageId: previousGeneratedImage.generatedImageId }));
     }
 
+    console.info("[axon] video-send: generation-start", {
+      hasVideo: Boolean(videoDataUrl),
+      videoDataUrlChars: videoDataUrl.length
+    });
     await runGeneration(chat, {
       assistantMessage,
       history,
