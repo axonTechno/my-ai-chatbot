@@ -9,39 +9,28 @@
 export const APP_VERSION = "2.1.0";
 export const APP_NAME = "AXON AI";
 
-/* Cloudflare Worker that proxies the AI provider (existing integration). */
+/* Cloudflare Worker that proxies the AI provider. */
 export const DEFAULT_WORKER_URL = "https://axon-api-staging.axontechno.workers.dev/";
 
-/* Model catalogue. `id` is sent to the Worker as `model`.
-   `fallback: true` models are tried automatically when the primary fails. */
+/* Model catalogue. IDs are sent to the Worker as `model`.
+   The current Worker resolves both options to NVIDIA Nemotron 3.5 Super VL. */
 export const MODELS = [
   {
     id: "auto",
     label: "AXON Auto",
-    description: "Picks the best available free model",
+    description: "Automatically uses the best configured AXON model",
     fallback: false,
     free: true
   },
   {
-    id: "meta-llama/llama-3.3-70b-instruct:free",
-    label: "Llama 3.3 70B",
-    description: "OpenRouter free tier",
-    fallback: true,
-    free: true
-  },
-  {
-    id: "google/gemma-2-9b-it:free",
-    label: "Gemma 2 9B",
-    description: "OpenRouter free tier",
-    fallback: true,
-    free: true
-  },
-  {
-    id: "mistralai/mistral-7b-instruct:free",
-    label: "Mistral 7B",
-    description: "OpenRouter free tier",
-    fallback: true,
-    free: true
+    id: "nvidia/nemotron-3.5-super-vl-120b-a12b",
+    label: "NVIDIA Nemotron 3.5 Super VL 120B A12B",
+    description: "Reasoning · Coding · Image & Video Understanding",
+    fallback: false,
+    free: true,
+    vision: true,
+    video: true,
+    reasoning: true
   }
 ];
 
@@ -51,8 +40,7 @@ export function modelInfo(id) {
   return MODELS.find((m) => m.id === id) || MODELS[0];
 }
 
-/* Routes on the AI Worker. Only `chat` is known to exist today; the rest are
-   probed at runtime and reported as "not connected" until deployed. */
+/* Routes on the AI Worker. */
 export const AI_ROUTES = {
   chat: "",
   health: "health",
