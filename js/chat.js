@@ -848,6 +848,13 @@ export async function sendMessage({ text, images = [], video = null, editingId =
       videoDataUrl = await readBlobAsDataURL(video.file);
     } catch (error) {
       chat.messages = chat.messages.filter((message) => message.id !== userMessage.id);
+      state.pendingVideo = video;
+      renderPreviews();
+      const messageInput = $("#messageInput");
+      if (messageInput && content) {
+        messageInput.value = content;
+        autoGrow(messageInput);
+      }
       toast(error?.message || "Could not save this video on your device.", "error");
       return;
     }
@@ -1372,6 +1379,10 @@ export function initChatComposer() {
     const images = [...state.pendingImages];
     const video = state.pendingVideo;
     if (!text.trim() && !images.length && !video) return;
+    if (video && navigator.onLine === false) {
+      toast("Connect to the internet before sending a video.", "error");
+      return;
+    }
     const editingId = state.editingId;
     if (input) {
       input.value = "";
