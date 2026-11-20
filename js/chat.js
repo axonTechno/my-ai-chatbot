@@ -862,7 +862,7 @@ async function runGeneration(chat, { assistantMessage, history, message, images,
     flushSaveChats();
     renderMessages();
     document.dispatchEvent(new CustomEvent("axon:chat-updated"));
-    if (!aborted) toast(errorFor(err).title, "error");
+    // The rendered error card already communicates the failure; avoid a duplicate toast.
     return false;
   } finally {
     state.controller = null;
