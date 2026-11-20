@@ -1457,30 +1457,30 @@ async function prepareVideoFile(file) {
       throw new Error("Video dimensions are unavailable.");
     }
 
-    const frameReady = new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error("Video frame preview timed out.")), 12000);
-      player.addEventListener("loadeddata", () => {
-        clearTimeout(timer);
-        resolve();
-      }, { once: true });
-      player.addEventListener("error", () => {
-        clearTimeout(timer);
-        reject(new Error("Could not decode the video preview frame."));
-      }, { once: true });
-    });
-    player.currentTime = Math.min(0.12, duration / 2);
-    await frameReady;
-
-    // Seeking ensures the canvas captures a decoded frame rather than the initial black surface.
-    if (player.currentTime > 0) {
+    if (player.readyState < 2) {
       await new Promise((resolve, reject) => {
-        const timer = setTimeout(() => resolve(), 1500);
-        player.addEventListener("seeked", () => {
+        const timer = setTimeout(() => reject(new Error("Video frame preview timed out.")), 12000);
+        player.addEventListener("loadeddata", () => {
           clearTimeout(timer);
           resolve();
         }, { once: true });
+        player.addEventListener("error", () => {
+          clearTimeout(timer);
+          reject(new Error("Could not decode the video preview frame."));
+        }, { once: true });
       });
     }
+
+    // Register seeked before changing currentTime to avoid missing fast Android decoder events.
+    const seeked = new Promise(resolve => {
+      const timer = setTimeout(resolve, 2500);
+      player.addEventListener("seeked", () => {
+        clearTimeout(timer);
+        resolve();
+      }, { once: true });
+    });
+    player.currentTime = Math.min(0.12, duration / 2);
+    await seeked;
     if (typeof player.requestVideoFrameCallback === "function") {
       await new Promise(resolve => {
         const timer = setTimeout(resolve, 1000);
