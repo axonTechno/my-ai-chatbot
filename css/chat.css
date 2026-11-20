@@ -169,23 +169,6 @@ body.dark .welcome h1 {
   font-style: italic;
 }
 
-/* streaming caret */
-.caret {
-  display: inline-block;
-  width: 7px;
-  height: 1.02em;
-  margin-left: 2px;
-  vertical-align: -2px;
-  border-radius: 2px;
-  background: linear-gradient(180deg, var(--purple), var(--pink));
-  animation: caretPulse 1s steps(2, start) infinite;
-}
-
-@keyframes caretPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .15; }
-}
-
 /* AXON thinking dots: visible while waiting for the first token,
    then the text stream starts immediately. Keep original dot dimensions. */
 .msg.assistant .thinking,
@@ -203,27 +186,25 @@ body.dark .welcome h1 {
   height: 7px !important;
   flex: 0 0 7px !important;
   border-radius: 50% !important;
-  background: #B9DDFF !important;
+  background-color: #B9DDFF !important;
   opacity: 1 !important;
-  animation: axonThinkingBlue 0.6s infinite linear !important;
+  animation: axonThinkingBlue .9s infinite linear !important;
 }
 
 .msg.assistant .thinking i:nth-of-type(1),
 .msg.ai .thinking i:nth-of-type(1) { animation-delay: 0s !important; }
 .msg.assistant .thinking i:nth-of-type(2),
-.msg.ai .thinking i:nth-of-type(2) { animation-delay: 0.2s !important; }
+.msg.ai .thinking i:nth-of-type(2) { animation-delay: .3s !important; }
 .msg.assistant .thinking i:nth-of-type(3),
-.msg.ai .thinking i:nth-of-type(3) { animation-delay: 0.4s !important; }
+.msg.ai .thinking i:nth-of-type(3) { animation-delay: .6s !important; }
 
 @keyframes axonThinkingBlue {
-  0%, 24% {
-    background: #075FCB !important;
-    opacity: 1 !important;
-    box-shadow: 0 0 6px rgba(7, 95, 203, .35);
+  0%, 30% {
+    background-color: #075FCB;
+    box-shadow: 0 0 6px rgba(7, 95, 203, .4);
   }
-  25%, 100% {
-    background: #B9DDFF !important;
-    opacity: 1 !important;
+  31%, 100% {
+    background-color: #B9DDFF;
     box-shadow: none;
   }
 }
