@@ -180,6 +180,29 @@ check("history drops empty placeholders and error turns", () => {
   if (h.some((m) => !m.content)) throw new Error("empty entry kept");
 });
 
+check("video-only messages remain in conversation history", () => {
+  const history = ai.buildHistory([
+    { role: "user", content: "Please analyze this video.", video: { name: "clip.mp4" } },
+    { role: "assistant", content: "The clip shows a moving car." }
+  ]);
+  if (history.length !== 2) throw new Error("video turn missing from history");
+  if (history[0].content !== "Please analyze this video.") throw new Error("video prompt missing");
+});
+
+check("video is sent through the Worker video_url field", () => {
+  const video = "data:video/mp4;base64,AAAA";
+  const body = ai.buildRequestBody({
+    message: "Summarize this clip",
+    history: [{ role: "user", content: "Earlier context" }],
+    images: [],
+    video,
+    model: "auto"
+  });
+  if (body.video_url !== video) throw new Error("video_url missing or changed");
+  if ("video" in body) throw new Error("unexpected video field");
+  if (body.message !== "Summarize this clip") throw new Error("message missing");
+});
+
 /* ---------- sync layer (no backend configured) ---------- */
 
 // Isolate tests that verify behavior without a configured backend.
