@@ -529,6 +529,16 @@
 
   
 
+    <div class="setting-group" data-settings-category="History and data">
+      <h3>Chat history</h3>
+      <p id="historyDataSummary">Your saved conversations on this device.</p>
+      <div class="history-data-actions">
+        <button class="btn ghost" id="exportAllBtn"><svg><use href="#i-download"/></svg><span>Export all chats</span></button>
+        <button class="btn danger" id="deleteAllBtn"><svg><use href="#i-trash"/></svg><span>Delete all chats</span></button>
+      </div>
+      <div class="history-data-list" id="historyDataList" aria-live="polite"></div>
+    </div>
+
     <div class="setting-group" data-settings-category="Usage and limits">
       <h3>Usage summary</h3>
       <p id="settingsUsageSummary">Your local conversation statistics.</p>
