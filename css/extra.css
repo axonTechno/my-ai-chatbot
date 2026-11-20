@@ -359,7 +359,8 @@ body.dark .brand {
 #generateImagesBtn.nav-item span,
 #yourImagesBtn.nav-item span,
 #settingsBtn.nav-item span {
+  font-family: inherit;
   font-size: 14px;
   font-weight: 650 !important;
-  letter-spacing: -0.01em;
+  letter-spacing: normal;
 }
