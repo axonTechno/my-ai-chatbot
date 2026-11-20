@@ -190,8 +190,7 @@ export function initAccount() {
   $("#sidebarAccount")?.addEventListener("click", openAccountPage);
   $("#accountBtn")?.addEventListener("click", openAccountAccessPage);
   $("#settingsAccountBtn")?.addEventListener("click", () => {
-    document.dispatchEvent(new CustomEvent("axon:close-pages"));
-    openAccountPage();
+    openAccountAccessPage();
   });
 
   // Add event listener for the back button in the account page
