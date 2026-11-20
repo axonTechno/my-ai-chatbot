@@ -183,7 +183,7 @@ export function buildHistory(messages) {
     });
 }
 
-export function buildRequestBody({ message, history, images, video, model }) {
+export function buildRequestBody({ message, history, images, video, videoFrames, model }) {
   const body = {
     message: message || "",
     messages: [{ role: "system", content: buildSystemPrompt() }, ...history],
@@ -192,7 +192,8 @@ export function buildRequestBody({ message, history, images, video, model }) {
     system: buildSystemPrompt()
   };
   if (images && images.length) body.images = images;
-  if (video) body.video_url = video;
+  if (videoFrames && videoFrames.length) body.video_frames = videoFrames;
+  else if (video) body.video_url = video;
   if (model && model !== "auto") body.model = model;
   return body;
 }
@@ -419,7 +420,7 @@ function candidateModels(primary) {
  * Send a chat request.
  * @returns {Promise<{text:string, model:string, attempts:Array}>}
  */
-export async function sendChat({ message, history, images, video, signal, onDelta, onMeta, allowFallback = true }) {
+export async function sendChat({ message, history, images, video, videoFrames, signal, onDelta, onMeta, allowFallback = true }) {
   const primary = store.settings.model || "auto";
   const models = allowFallback ? candidateModels(primary) : [primary];
   const attempts = [];
@@ -432,7 +433,7 @@ export async function sendChat({ message, history, images, video, signal, onDelt
 
     for (let attemptNo = 0; attemptNo <= REQUEST.maxRetries; attemptNo++) {
       if (signal && signal.aborted) throw new AIError("Stopped", { code: "aborted" });
-      const body = buildRequestBody({ message, history, images, video, model });
+      const body = buildRequestBody({ message, history, images, video, videoFrames, model });
       attempts.push({ model, attempt: attemptNo + 1 });
       try {
         const result = await attempt({
