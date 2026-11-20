@@ -768,3 +768,124 @@ html.axon-installed-app .app {
   padding: 0 !important;
   border: 0 !important;
 }
+
+
+/* Clean, consistent custom dropdowns for language and response style. */
+.preference-native-select {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.preference-picker {
+  position: relative;
+  width: 100%;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+.preference-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 15px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: 500 14px/1.4 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  text-align: left;
+}
+.preference-chevron {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font: 400 22px/1 Arial, sans-serif;
+  transition: transform .18s ease;
+}
+.preference-picker.open .preference-chevron { transform: rotate(180deg); }
+.preference-menu {
+  position: absolute;
+  z-index: 80;
+  inset: calc(100% + 7px) 0 auto;
+  display: grid;
+  gap: 5px;
+  max-height: min(55vh, 360px);
+  overflow-y: auto;
+  padding: 7px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: var(--surface, #fff);
+  box-shadow: 0 14px 38px rgba(20, 20, 35, .16);
+}
+.preference-menu[hidden] { display: none !important; }
+.preference-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 11px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font: 400 14px/1.4 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  text-align: left;
+}
+.preference-option[aria-selected="true"] {
+  background: color-mix(in srgb, var(--ax-accent) 10%, var(--surface));
+}
+.preference-option-copy { display: grid; gap: 3px; min-width: 0; }
+.preference-option-label { font-size: 14px; font-weight: 550; }
+.preference-option-description { color: var(--muted); font-size: 11.5px; }
+.preference-option-check { flex: 0 0 18px; color: var(--ax-accent); font-size: 16px; font-weight: 700; text-align: center; }
+
+/* Assistant feedback/action toolbar sits below the finalized answer. */
+.msg.assistant .msg-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  margin: 10px 0 22px;
+  padding: 0;
+  min-height: 34px;
+}
+.msg.assistant .msg-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  padding: 7px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  opacity: .82;
+  transition: background .16s ease, color .16s ease, opacity .16s ease;
+}
+.msg.assistant .msg-actions button:hover,
+.msg.assistant .msg-actions button.active {
+  color: var(--ax-accent);
+  background: color-mix(in srgb, var(--ax-accent) 10%, transparent);
+  opacity: 1;
+}
+.msg.assistant .msg-actions button svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+}
+.msg.assistant .msg-actions button span {
+  font: 500 12px/1 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
