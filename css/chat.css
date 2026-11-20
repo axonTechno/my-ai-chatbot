@@ -190,15 +190,15 @@ body.dark .welcome h1 {
 .msg.ai .thinking {
   display: inline-flex !important;
   align-items: center;
-  gap: 7px;
-  padding: 6px 0;
+  gap: 6px;
+  padding: 5px 0;
 }
 
 .msg.ai .thinking i {
   display: block !important;
-  width: 8px !important;
-  height: 8px !important;
-  flex: 0 0 8px !important;
+  width: 7px !important;
+  height: 7px !important;
+  flex: 0 0 7px !important;
   border-radius: 50% !important;
   background: #B9DDFF !important;
   opacity: 1 !important;
