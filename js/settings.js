@@ -186,6 +186,7 @@ function paintSettings() {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "language-option";
+      button.classList.toggle("selected", language === lang.value);
       button.dataset.language = language;
       button.setAttribute("role", "radio");
       button.setAttribute("aria-checked", String(language === lang.value));
