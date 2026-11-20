@@ -186,44 +186,45 @@ body.dark .welcome h1 {
   50% { opacity: .15; }
 }
 
-/* Fast sequential thinking dots: first → middle → last → repeat. */
-.thinking {
+/* AXON blue thinking dots: light-blue idle dots, one dark-blue active dot. */
+.msg.assistant .thinking {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 0;
+  gap: 7px;
+  padding: 6px 0;
 }
 
-.thinking i {
-  width: 7px;
-  height: 7px;
-  flex: 0 0 7px;
+.msg.assistant .thinking i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
   border-radius: 50%;
-  background: var(--muted);
-  opacity: .28;
-  transform: scale(.86);
-  animation: dotChase .6s infinite ease-in-out;
+  background-color: #B9DDFF !important;
+  opacity: 1 !important;
+  transform: scale(1);
+  animation: axonThinkingBlue 0.6s infinite ease-in-out !important;
 }
 
-.thinking i:nth-of-type(2) { animation-delay: .2s; }
-.thinking i:nth-of-type(3) { animation-delay: .4s; }
+.msg.assistant .thinking i:nth-of-type(2) { animation-delay: 0.2s !important; }
+.msg.assistant .thinking i:nth-of-type(3) { animation-delay: 0.4s !important; }
 
-@keyframes dotChase {
-  0%, 30% {
-    background: var(--text);
-    opacity: 1;
-    transform: scale(1.14);
+@keyframes axonThinkingBlue {
+  0%, 24% {
+    background-color: #1769D2 !important;
+    transform: scale(1.22);
+    box-shadow: 0 0 7px rgba(23, 105, 210, .28);
   }
-  31%, 100% {
-    background: var(--muted);
-    opacity: .28;
-    transform: scale(.86);
+  25%, 100% {
+    background-color: #B9DDFF !important;
+    transform: scale(1);
+    box-shadow: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .thinking i {
-    animation-duration: 1.8s;
+  .msg.assistant .thinking i {
+    animation-duration: 1.8s !important;
   }
 }
 
