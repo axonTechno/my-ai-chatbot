@@ -442,6 +442,105 @@ body.dark .welcome h1 {
 
 .msg.user .msg-images { justify-content: flex-end; }
 
+.msg-video {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(100%, 320px);
+  margin: 4px 0 8px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--hover);
+  overflow: hidden;
+}
+
+.msg.user .msg-video { margin-left: auto; }
+
+.msg-video-thumb,
+.msg-video-placeholder {
+  flex: 0 0 104px;
+  width: 104px;
+  height: 66px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--surface, var(--bg));
+}
+
+.msg-video-placeholder,
+.video-preview-placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.msg-video-details,
+.preview-video-details {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.msg-video-details strong,
+.preview-video-details strong {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.msg-video-details span,
+.preview-video-details span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.preview-video-item {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 9px;
+  width: min(270px, 82vw);
+  min-height: 68px;
+  padding: 5px 34px 5px 5px;
+  border: 1px solid var(--border-strong);
+  border-radius: 11px;
+  background: var(--hover);
+  overflow: hidden;
+}
+
+.preview-video-thumb,
+.video-preview-placeholder {
+  flex: 0 0 76px;
+  width: 76px;
+  height: 56px;
+  border-radius: 7px;
+  object-fit: cover;
+  background: var(--bg);
+}
+
+.preview-video-item .remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(18, 14, 28, .78);
+  color: #fff;
+}
+
+.preview-video-item .remove svg { width: 12px; height: 12px; stroke-width: 2.4; }
+
 /* composer previews */
 .image-preview {
   padding: 0 0 8px;
