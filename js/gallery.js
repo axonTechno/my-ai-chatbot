@@ -158,6 +158,17 @@ export function openGallery() {
   renderGallery();
 }
 
+export function openGeneratedGallery() {
+  activeCategory = "generated";
+  document.querySelectorAll("[data-gallery-filter]").forEach((tab) => {
+    const selected = tab.dataset.galleryFilter === "generated";
+    tab.classList.toggle("active", selected);
+    tab.setAttribute("aria-selected", String(selected));
+  });
+  openPage("#galleryPage");
+  renderGallery();
+}
+
 export function initGallery() {
   document.querySelectorAll("[data-gallery-filter]").forEach((tab) => {
     tab.addEventListener("click", () => {
