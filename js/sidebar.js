@@ -298,7 +298,14 @@ export function refreshAccountChip() {
 }
 
 export function initSidebar() {
-  $("#menuBtn")?.addEventListener("click", toggleSidebar);
+  // Capture the hamburger click before other page handlers can intercept it.
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("#menuBtn");
+    if (!button) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    toggleSidebar();
+  }, true);
   $("#sidebarOverlay")?.addEventListener("click", closeSidebar);
 
   $("#newChatBtn")?.addEventListener("click", () => {
