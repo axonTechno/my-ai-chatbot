@@ -648,3 +648,115 @@ html.axon-installed-app .app {
   margin: 0;
 }
 
+
+
+/* Full-width assistant reading column, with consistent mobile gutters. */
+.chat-inner {
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+  padding-inline: clamp(18px, 3.5vw, 32px);
+}
+.msg.assistant {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+.msg.assistant .msg-body {
+  width: 100%;
+  max-width: none;
+  padding-inline: 0;
+}
+.msg.assistant .msg-body > * {
+  max-width: 100%;
+}
+
+/* Keep the jump-to-latest control away from the reading edge. */
+#scrollBottomBtn,
+.scroll-bottom {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+#scrollBottomBtn:active,
+.scroll-bottom:active {
+  transform: translateX(-50%) scale(.96);
+}
+
+/* Native Android select popup is replaced by clean, accessible model cards. */
+.model-select-native {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.model-options {
+  display: grid;
+  gap: 9px;
+  width: 100%;
+}
+.model-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  min-height: 68px;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+  color: var(--text);
+  text-align: left;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+  transition: border-color .16s ease, background .16s ease, box-shadow .16s ease;
+}
+.model-option.selected {
+  border-color: var(--ax-accent);
+  background: color-mix(in srgb, var(--ax-accent) 8%, var(--surface));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ax-accent) 13%, transparent);
+}
+.model-option-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.model-option-label {
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 600 !important;
+  overflow-wrap: anywhere;
+}
+.model-option-description {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 400 !important;
+}
+.model-option-check {
+  display: grid;
+  place-items: center;
+  flex: 0 0 21px;
+  width: 21px;
+  height: 21px;
+  border: 1.6px solid var(--border-strong);
+  border-radius: 50%;
+  color: transparent;
+  font-family: Arial, sans-serif !important;
+  font-size: 12px;
+  font-weight: 700 !important;
+}
+.model-option.selected .model-option-check {
+  color: #fff;
+  border-color: var(--ax-accent);
+  background: var(--ax-accent);
+}
+.model-option:focus-visible {
+  outline: 2px solid var(--ax-accent);
+  outline-offset: 2px;
+}
