@@ -760,3 +760,11 @@ html.axon-installed-app .app {
   outline: 2px solid var(--ax-accent);
   outline-offset: 2px;
 }
+
+#settingsPage .model-select-native {
+  width: 1px !important;
+  min-height: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
