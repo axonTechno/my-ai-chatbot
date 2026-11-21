@@ -1,5 +1,5 @@
 /* AXON AI — dedicated, chat-independent image generation screen */
-import { $, toast, openImageViewer } from "./ui.js";
+import { $, toast, openImageViewer, openMenu, closeMenu, copyText, haptic } from "./ui.js";
 import { openPage } from "./settings.js";
 import { closeSidebar } from "./sidebar.js";
 import { generateImage } from "./ai.js";
@@ -32,7 +32,11 @@ export function initImageGenerator() {
   const resultPanel = $("#imageGeneratorResult");
   const resultImage = $("#imageGeneratorResultImage");
   const actionBar = $("#imageGeneratorActions");
+  const promptMessage = $("#imageGeneratorUserPrompt");
   let currentPrompt = "";
+  let promptPressTimer = null;
+  let promptPressStart = null;
+  let promptMenuOpened = false;
   const artwork = page.querySelector(".image-generator-welcome");
   const heading = page.querySelector(".generate-instant-nav-title");
 
@@ -60,6 +64,8 @@ export function initImageGenerator() {
     if (resultPanel) {
       resultPanel.classList.remove("hidden");
       resultPanel.classList.add("is-loading");
+      // The image service currently returns a 1024 × 1024 square image.
+      fitResultToImage(1024, 1024);
     }
     if (resultImage) resultImage.removeAttribute("src");
     note?.classList.add("hidden");
@@ -129,6 +135,10 @@ export function initImageGenerator() {
     }
     actionBar?.classList.add("hidden");
     currentPrompt = "";
+    if (promptMessage) {
+      promptMessage.textContent = "";
+      promptMessage.classList.add("hidden");
+    }
     promptInput.value = "";
     promptSuggestions?.classList.remove("hidden");
     if (note) {
@@ -173,9 +183,89 @@ export function initImageGenerator() {
     }
     if (submitButton?.disabled) return;
     currentPrompt = prompt;
+    if (promptMessage) {
+      promptMessage.textContent = prompt;
+      promptMessage.classList.remove("hidden");
+    }
     promptInput.value = "";
     promptInput.dispatchEvent(new Event("input", { bubbles: true }));
     await createImage(prompt);
+  });
+
+  function openPromptOptions() {
+    if (!promptMessage || promptMessage.classList.contains("hidden")) return;
+    openMenu([
+      {
+        label: "Copy",
+        icon: "i-copy",
+        onClick: async () => {
+          const ok = await copyText(currentPrompt);
+          toast(ok ? "Copied to clipboard" : "Could not copy", ok ? "" : "error");
+        }
+      },
+      {
+        label: "Edit",
+        icon: "i-edit",
+        onClick: () => {
+          const previousPrompt = currentPrompt;
+          resetGeneratorScreen();
+          promptInput.value = previousPrompt;
+          promptInput.focus({ preventScroll: true });
+          promptInput.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      },
+      {
+        label: "Share",
+        icon: "i-share",
+        onClick: async () => {
+          try {
+            if (navigator.share) await navigator.share({ text: currentPrompt, title: "AXON image prompt" });
+            else {
+              const ok = await copyText(currentPrompt);
+              toast(ok ? "Prompt copied to clipboard" : "Could not share prompt", ok ? "" : "error");
+            }
+          } catch (error) {
+            if (error?.name !== "AbortError") toast("Could not share prompt", "error");
+          }
+        }
+      }
+    ], promptMessage);
+  }
+
+  promptMessage?.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    clearTimeout(promptPressTimer);
+    promptPressStart = { x: event.clientX, y: event.clientY };
+    promptMenuOpened = false;
+    promptPressTimer = setTimeout(() => {
+      promptMenuOpened = true;
+      haptic(14);
+      openPromptOptions();
+    }, 500);
+  });
+  promptMessage?.addEventListener("pointermove", (event) => {
+    if (!promptPressStart) return;
+    if (Math.abs(event.clientX - promptPressStart.x) > 10 || Math.abs(event.clientY - promptPressStart.y) > 10) {
+      clearTimeout(promptPressTimer);
+      promptPressStart = null;
+    }
+  });
+  ["pointerup", "pointercancel", "pointerleave"].forEach((name) => {
+    promptMessage?.addEventListener(name, () => {
+      clearTimeout(promptPressTimer);
+      promptPressStart = null;
+    });
+  });
+  promptMessage?.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+    openPromptOptions();
+  });
+  promptMessage?.addEventListener("click", (event) => {
+    if (promptMenuOpened) {
+      event.preventDefault();
+      event.stopPropagation();
+      promptMenuOpened = false;
+    }
   });
 
   resultImage?.addEventListener("click", () => {
