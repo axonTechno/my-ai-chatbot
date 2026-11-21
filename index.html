@@ -35,6 +35,8 @@
 <link rel="icon" type="image/png" href="./assets/axon-icon-192.png">
 <!-- Fetch the Generate Instant artwork before the user opens that screen. -->
 <link rel="preload" as="image" href="./generate-instant-bg.png" fetchpriority="high">
+<!-- Preload the AXON logo so the welcome screen can display it immediately. -->
+<link rel="preload" as="image" href="./axon-logo.webp" fetchpriority="high">
 <script>
 /* Apply the saved theme before first paint to avoid a white flash. */
 (function () {
