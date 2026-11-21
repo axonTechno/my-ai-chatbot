@@ -1174,3 +1174,125 @@ body.dark #imageGeneratorPage .image-generator-actions button {
     font-size: clamp(32px, 9vw, 40px);
   }
 }
+
+
+/* Generate Instant — centered Generate glyph and clean navigation. */
+#imageGeneratorPage .image-generator-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 0;
+  padding: calc(14px + var(--safe-top, 0px)) 22px calc(22px + var(--safe-bottom, 0px));
+}
+#imageGeneratorPage .generate-instant-topbar {
+  position: relative;
+  z-index: 4;
+  width: 100%;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#imageGeneratorPage .generate-instant-topbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 7px 2px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 550;
+  text-shadow: 0 1px 10px rgba(0,0,0,.35);
+  cursor: pointer;
+}
+#imageGeneratorPage .generate-instant-topbar svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#imageGeneratorPage .generate-nav-back {
+  width: 42px;
+}
+#imageGeneratorPage .generate-nav-gallery svg {
+  width: 18px;
+  height: 18px;
+}
+#imageGeneratorPage .image-generator-welcome {
+  flex: 1;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+#imageGeneratorPage .generate-instant-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(64px, 18vw, 104px);
+  line-height: 1;
+  font-weight: 650;
+  letter-spacing: -2px;
+  text-shadow: 0 3px 28px rgba(0,0,0,.28);
+}
+#imageGeneratorPage .generate-instant-title > svg {
+  display: block;
+  width: clamp(104px, 32vw, 164px);
+  height: clamp(104px, 32vw, 164px);
+  margin: 0;
+  filter: drop-shadow(0 2px 18px rgba(0,0,0,.24));
+}
+#imageGeneratorPage .image-generator-composer {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 720px;
+  min-height: 62px;
+  margin: 0 auto;
+  padding: 9px 12px 9px 17px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(255,255,255,.72) !important;
+  border-radius: 18px !important;
+  background: rgba(255,255,255,.025) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+#imageGeneratorPage .image-generator-composer textarea {
+  min-height: 42px;
+  padding: 9px 0;
+  color: #fff;
+  background: transparent !important;
+}
+#imageGeneratorPage .image-generator-composer textarea::placeholder {
+  color: rgba(255,255,255,.78);
+}
+#imageGeneratorPage .image-generator-composer .send-btn {
+  color: #fff !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+@media (max-width: 420px) {
+  #imageGeneratorPage .image-generator-content {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  #imageGeneratorPage .generate-instant-title > svg {
+    width: 118px;
+    height: 118px;
+  }
+}
