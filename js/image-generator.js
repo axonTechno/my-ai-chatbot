@@ -59,6 +59,7 @@ export function initImageGenerator() {
 
   function archiveCurrentTurn() {
     if (!thread || !currentPrompt || !resultImage?.src || !page.classList.contains("has-result")) return;
+    const archivedPrompt = currentPrompt;
     const turn = document.createElement("div");
     turn.className = "image-generator-archived-turn";
     const promptCopy = document.createElement("div");
@@ -68,7 +69,49 @@ export function initImageGenerator() {
     imageCopy.className = "image-generator-archived-image";
     imageCopy.src = resultImage.src;
     imageCopy.alt = currentPrompt || "Previously generated image";
+
+    // Keep the same SVG action icons under every archived generation.
+    const archivedActions = actionBar?.cloneNode(true);
+    if (archivedActions) {
+      archivedActions.removeAttribute("id");
+      archivedActions.classList.remove("hidden");
+      archivedActions.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
+      const [saveButton, shareButton, retryButton] = archivedActions.querySelectorAll("button");
+
+      saveButton?.addEventListener("click", () => {
+        const link = document.createElement("a");
+        link.href = imageCopy.src;
+        link.download = (archivedPrompt || "axon-image").slice(0, 70).replace(/[^a-z0-9-_]+/gi, "-") + ".png";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      });
+
+      shareButton?.addEventListener("click", async () => {
+        try {
+          const response = await fetch(imageCopy.src);
+          const blob = await response.blob();
+          const file = new File([blob], "axon-generated-image.png", { type: blob.type || "image/png" });
+          if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+            await navigator.share({ files: [file], title: "AXON generated image" });
+          } else {
+            toast("Sharing is not supported on this device.", "error");
+          }
+        } catch (error) {
+          if (error?.name !== "AbortError") toast("Could not share this image.", "error");
+        }
+      });
+
+      retryButton?.addEventListener("click", () => {
+        promptInput.value = archivedPrompt;
+        promptInput.dispatchEvent(new Event("input", { bubbles: true }));
+        promptInput.focus({ preventScroll: true });
+        form.requestSubmit();
+      });
+    }
+
     turn.append(promptCopy, imageCopy);
+    if (archivedActions) turn.append(archivedActions);
     thread.insertBefore(turn, promptMessage);
   }
 
