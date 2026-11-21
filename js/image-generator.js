@@ -97,6 +97,10 @@ export function initImageGenerator() {
     promptInput.focus({ preventScroll: true });
   });
 
+  $("#openYourImagesFromGenerator")?.addEventListener("click", () => {
+    openPage("#galleryPage");
+  });
+
   $("#imageGeneratorBackBtn")?.addEventListener("click", () => {
     resetGeneratorScreen();
     page.classList.add("hidden");
