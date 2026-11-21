@@ -1303,10 +1303,10 @@ body.dark #imageGeneratorPage .image-generator-actions button {
   margin-left: 10px;
   margin-right: auto;
   color: #fff;
-  font-size: 17px;
+  font-size: 20px;
   line-height: 1.05;
-  font-weight: 800;
-  letter-spacing: -.35px;
+  font-weight: 850;
+  letter-spacing: -.45px;
   text-align: left;
   text-shadow: 0 2px 14px rgba(0,0,0,.38);
 }
