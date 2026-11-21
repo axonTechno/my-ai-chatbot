@@ -33,6 +33,7 @@ export function initImageGenerator() {
   const resultImage = $("#imageGeneratorResultImage");
   const actionBar = $("#imageGeneratorActions");
   const promptMessage = $("#imageGeneratorUserPrompt");
+  const thread = $("#imageGeneratorThread");
   let currentPrompt = "";
   let promptPressTimer = null;
   let promptPressStart = null;
@@ -54,6 +55,21 @@ export function initImageGenerator() {
     resultPanel.style.height = Math.round(height * scale) + "px";
     resultPanel.style.aspectRatio = width + " / " + height;
     if (actionBar) actionBar.style.top = "calc(50% + " + (Math.round(height * scale / 2) + 14) + "px)";
+  }
+
+  function archiveCurrentTurn() {
+    if (!thread || !currentPrompt || !resultImage?.src || !page.classList.contains("has-result")) return;
+    const turn = document.createElement("div");
+    turn.className = "image-generator-archived-turn";
+    const promptCopy = document.createElement("div");
+    promptCopy.className = "image-generator-archived-prompt";
+    promptCopy.textContent = currentPrompt;
+    const imageCopy = document.createElement("img");
+    imageCopy.className = "image-generator-archived-image";
+    imageCopy.src = resultImage.src;
+    imageCopy.alt = currentPrompt || "Previously generated image";
+    turn.append(promptCopy, imageCopy);
+    thread.insertBefore(turn, promptMessage);
   }
 
   async function createImage(prompt) {
@@ -92,6 +108,9 @@ export function initImageGenerator() {
           page.classList.remove("is-generating");
           page.classList.add("has-result");
           actionBar?.classList.remove("hidden");
+          requestAnimationFrame(() => {
+            if (thread) thread.scrollTop = thread.scrollHeight;
+          });
         };
         resultImage.src = result.image;
       }
@@ -182,6 +201,7 @@ export function initImageGenerator() {
       return;
     }
     if (submitButton?.disabled) return;
+    archiveCurrentTurn();
     currentPrompt = prompt;
     if (promptMessage) {
       promptMessage.textContent = prompt;
@@ -190,6 +210,9 @@ export function initImageGenerator() {
     promptInput.value = "";
     promptInput.dispatchEvent(new Event("input", { bubbles: true }));
     await createImage(prompt);
+    requestAnimationFrame(() => {
+      if (thread) thread.scrollTop = thread.scrollHeight;
+    });
   });
 
   function openPromptOptions() {
