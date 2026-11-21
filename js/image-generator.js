@@ -18,6 +18,7 @@ export function initImageGenerator() {
     if (!viewport) return;
     page.style.height = `${viewport.height}px`;
     page.style.top = `${viewport.offsetTop}px`;
+    page.style.bottom = "auto";
   };
   syncImageGeneratorViewport();
   window.visualViewport?.addEventListener("resize", syncImageGeneratorViewport);
