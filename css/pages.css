@@ -1039,3 +1039,138 @@ body.dark #imageGeneratorPage .image-generator-actions button {
   border-color: rgba(210, 222, 255, .16);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
 }
+
+
+/* Generate Instant — full-screen uploaded artwork with a minimal overlay.
+   Background asset is the user's uploaded generate-instant-bg.png. */
+#imageGeneratorPage {
+  isolation: isolate;
+  overflow: hidden;
+  background-color: #03070e;
+  background-image: url("../generate-instant-bg.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+#imageGeneratorPage::before,
+#imageGeneratorPage::after {
+  content: none !important;
+  display: none !important;
+}
+#imageGeneratorPage > .page-header {
+  display: none !important;
+}
+#imageGeneratorPage .image-generator-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  flex: 1;
+  margin: 0;
+  padding: calc(12vh + var(--safe-top, 0px)) clamp(24px, 7vw, 56px) calc(24px + var(--safe-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 22px;
+  overflow-y: auto;
+  background: transparent !important;
+}
+#imageGeneratorPage .image-generator-welcome {
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0;
+  text-align: left;
+  margin: 0;
+}
+#imageGeneratorPage .image-generator-logo {
+  display: none !important;
+}
+#imageGeneratorPage .generate-instant-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin: 0;
+  color: #f7faff;
+  font-size: clamp(34px, 8vw, 48px);
+  line-height: 1.04;
+  letter-spacing: -1.1px;
+  font-weight: 650;
+  text-shadow: 0 2px 22px rgba(0, 0, 0, .28);
+}
+#imageGeneratorPage .generate-instant-title > svg {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  margin-top: 5px;
+}
+#imageGeneratorPage .generate-instant-title > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+#imageGeneratorPage .image-prompt-suggestions,
+#imageGeneratorPage .image-generator-actions,
+#imageGeneratorPage .image-generator-note {
+  display: none !important;
+}
+#imageGeneratorPage .image-generator-composer {
+  width: 100%;
+  max-width: 680px;
+  margin: auto auto 0;
+  padding: 8px 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+#imageGeneratorPage .image-generator-composer textarea {
+  min-height: 48px;
+  padding: 10px 0;
+  color: #f5f8ff;
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0;
+  box-shadow: none !important;
+  resize: none;
+}
+#imageGeneratorPage .image-generator-composer textarea::placeholder {
+  color: rgba(239, 245, 255, .72);
+  opacity: 1;
+}
+#imageGeneratorPage .image-generator-composer .send-btn {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border: 0 !important;
+  border-radius: 50%;
+  background: transparent !important;
+  color: #f7faff !important;
+  box-shadow: none !important;
+}
+#imageGeneratorPage .image-generator-composer .send-btn svg {
+  stroke: currentColor;
+}
+#imageGeneratorPage .image-generator-result {
+  max-width: 680px;
+  margin: 0 auto;
+  background: rgba(0, 0, 0, .12);
+  border-color: rgba(235, 244, 255, .18);
+}
+@media (max-width: 420px) {
+  #imageGeneratorPage .image-generator-content {
+    padding-top: calc(11vh + var(--safe-top, 0px));
+    padding-left: 22px;
+    padding-right: 22px;
+    padding-bottom: calc(20px + var(--safe-bottom, 0px));
+  }
+  #imageGeneratorPage .generate-instant-title {
+    font-size: clamp(32px, 9vw, 40px);
+  }
+}
