@@ -1460,3 +1460,90 @@ body.dark #imageGeneratorPage .image-generator-actions button {
   width: 100%;
   align-self: stretch;
 }
+
+
+/* Generation state: replace the welcome artwork/title with a size-matched
+   frosted status/image field. Keep the composer and navigation available. */
+#imageGeneratorPage.is-generating .image-generator-welcome,
+#imageGeneratorPage.is-generating .generate-instant-nav-title,
+#imageGeneratorPage.has-result .image-generator-welcome,
+#imageGeneratorPage.has-result .generate-instant-nav-title {
+  display: none !important;
+}
+#imageGeneratorPage.is-generating .image-generator-result,
+#imageGeneratorPage.has-result .image-generator-result {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 86vw;
+  max-height: 52vh;
+  overflow: hidden;
+  border: 1px solid rgba(9, 13, 23, .72);
+  border-radius: 17px;
+  background: rgba(7, 11, 21, .24);
+  box-shadow: 0 10px 32px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter: blur(25px) saturate(125%);
+  -webkit-backdrop-filter: blur(25px) saturate(125%);
+}
+#imageGeneratorPage.is-generating .image-generator-result .image-generator-placeholder {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: auto;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 12px;
+  color: #fff;
+  background: rgba(7, 11, 21, .18);
+  font-size: 15px;
+  font-weight: 600;
+}
+#imageGeneratorPage.is-generating .image-generator-result img,
+#imageGeneratorPage.has-result .image-generator-result img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 52vh;
+  object-fit: contain;
+  border-radius: 16px;
+}
+#imageGeneratorPage.has-result .image-generator-result {
+  background: rgba(5, 8, 16, .16);
+}
+#imageGeneratorPage .image-generator-actions:not(.hidden) {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  gap: 18px;
+}
+#imageGeneratorPage .image-generator-actions button {
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.34);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(8, 12, 22, .38);
+  box-shadow: 0 5px 18px rgba(0,0,0,.14);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+#imageGeneratorPage .image-generator-actions button span {
+  display: none !important;
+}
+#imageGeneratorPage .image-generator-actions button svg {
+  width: 19px;
+  height: 19px;
+}
