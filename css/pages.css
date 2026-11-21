@@ -1595,3 +1595,151 @@ body.dark #imageGeneratorPage .image-generator-actions button {
   aspect-ratio: 1 / 1;
   overflow: hidden;
 }
+
+
+/* Chat-like image generation thread: scrollable history above a persistent composer. */
+#imageGeneratorPage .image-generator-content {
+  height: 100%;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+}
+#imageGeneratorPage .generate-instant-topbar { flex: 0 0 auto; }
+#imageGeneratorPage .image-generator-thread {
+  display: none;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 18px 2px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+#imageGeneratorPage .image-generator-thread::-webkit-scrollbar { display: none; }
+#imageGeneratorPage.is-generating .image-generator-thread,
+#imageGeneratorPage.has-result .image-generator-thread {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+#imageGeneratorPage .image-generator-user-prompt {
+  position: relative !important;
+  inset: auto !important;
+  z-index: 1;
+  align-self: flex-end;
+  width: fit-content;
+  max-width: min(86%, 480px);
+  margin: 0 0 2px auto;
+}
+#imageGeneratorPage .image-generator-result,
+#imageGeneratorPage.is-generating .image-generator-result,
+#imageGeneratorPage.has-result .image-generator-result {
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+  flex: 0 0 auto;
+  width: min(86vw, 480px);
+  max-width: 100%;
+  max-height: none;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+#imageGeneratorPage .image-generator-result.is-loading {
+  aspect-ratio: 1 / 1;
+  width: min(86vw, 480px);
+  height: auto !important;
+  border: 1px solid rgba(255,255,255,.78);
+  border-radius: 2px;
+  background: transparent;
+}
+#imageGeneratorPage .image-generator-result.is-loading .image-generator-placeholder,
+#imageGeneratorPage.is-generating .image-generator-result .image-generator-placeholder {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  padding: 12px;
+  border: 0;
+  border-radius: 0;
+  color: rgba(255,255,255,.96);
+  background: transparent !important;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+#imageGeneratorPage .image-generator-placeholder .image-generator-thinking { display: none !important; }
+#imageGeneratorPage .image-generator-placeholder > span:last-child { display: inline !important; }
+#imageGeneratorPage .image-generator-result:not(.is-loading),
+#imageGeneratorPage.has-result .image-generator-result {
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 14px;
+  background: rgba(5,9,18,.12);
+}
+#imageGeneratorPage .image-generator-result img,
+#imageGeneratorPage.has-result .image-generator-result img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
+  border-radius: 13px;
+}
+#imageGeneratorPage .image-generator-actions:not(.hidden) {
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+  align-self: center;
+  flex: 0 0 auto;
+  margin: 0 auto 12px;
+}
+#imageGeneratorPage .image-generator-composer {
+  position: relative;
+  z-index: 8;
+  flex: 0 0 auto !important;
+  margin: auto 0 0 !important;
+  width: 100%;
+}
+#imageGeneratorPage .image-generator-note { display: none !important; }
+#imageGeneratorPage .image-generator-archived-turn {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  margin: 0 0 10px;
+}
+#imageGeneratorPage .image-generator-archived-prompt {
+  align-self: flex-end;
+  max-width: min(86%, 480px);
+  padding: 10px 14px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 17px 5px 17px 17px;
+  color: #fff;
+  background: rgba(95,112,168,.28);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+#imageGeneratorPage .image-generator-archived-image {
+  display: block;
+  width: min(86vw, 480px);
+  max-width: 100%;
+  height: auto;
+  align-self: center;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 14px;
+}
