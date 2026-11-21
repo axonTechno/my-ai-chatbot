@@ -11,6 +11,19 @@ export function initImageGenerator() {
   const form = $("#imageGeneratorForm");
   if (!page || !promptInput || !form) return;
 
+  // Follow the Android visual viewport so the composer stays above the
+  // on-screen keyboard instead of being covered by it.
+  const syncImageGeneratorViewport = () => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    page.style.height = `${viewport.height}px`;
+    page.style.top = `${viewport.offsetTop}px`;
+  };
+  syncImageGeneratorViewport();
+  window.visualViewport?.addEventListener("resize", syncImageGeneratorViewport);
+  window.visualViewport?.addEventListener("scroll", syncImageGeneratorViewport);
+  window.addEventListener("resize", syncImageGeneratorViewport);
+
   const submitButton = form.querySelector('button[type="submit"]');
   const note = $("#imageGeneratorNote");
   const promptSuggestions = page.querySelector(".image-prompt-suggestions");
