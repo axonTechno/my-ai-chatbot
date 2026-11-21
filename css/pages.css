@@ -1304,12 +1304,14 @@ body.dark #imageGeneratorPage .image-generator-actions button {
 }
 #imageGeneratorPage .generate-instant-nav-title {
   align-self: flex-start;
+  display: block;
+  width: max-content;
   margin: 12px 0 0 2px;
   color: #fff;
-  font-size: clamp(28px, 7.5vw, 36px);
-  line-height: 1.02;
-  font-weight: 900;
-  letter-spacing: -.8px;
+  font-size: clamp(38px, 10vw, 46px);
+  line-height: .98;
+  font-weight: 950;
+  letter-spacing: -1.2px;
   text-align: left;
   text-shadow: 0 2px 14px rgba(0,0,0,.4);
 }
@@ -1323,14 +1325,14 @@ body.dark #imageGeneratorPage .image-generator-actions button {
 }
 #imageGeneratorPage .generate-instant-art {
   display: block;
-  width: clamp(180px, 52vw, 230px);
+  width: clamp(135px, 40vw, 165px);
   height: auto;
-  max-height: 250px;
+  max-height: 180px;
   object-fit: contain;
   filter: drop-shadow(0 3px 18px rgba(0,0,0,.22));
 }
 @media (max-width: 420px) {
   #imageGeneratorPage .generate-instant-art {
-    width: clamp(175px, 54vw, 215px);
+    width: clamp(130px, 39vw, 155px);
   }
 }
