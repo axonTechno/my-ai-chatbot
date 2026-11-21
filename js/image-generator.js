@@ -19,9 +19,27 @@ export function initImageGenerator() {
   const resultImage = $("#imageGeneratorResultImage");
   const actionBar = $("#imageGeneratorActions");
   let currentPrompt = "";
+  const artwork = page.querySelector(".image-generator-welcome");
+  const heading = page.querySelector(".generate-instant-nav-title");
+
+  function setGeneratingView(active) {
+    page.classList.toggle("is-generating", active);
+    page.classList.remove("has-result");
+  }
+
+  function fitResultToImage(width, height) {
+    if (!resultPanel || !width || !height) return;
+    const maxWidth = Math.min(window.innerWidth * 0.86, 480);
+    const maxHeight = window.innerHeight * 0.52;
+    const scale = Math.min(maxWidth / width, maxHeight / height);
+    resultPanel.style.width = Math.round(width * scale) + "px";
+    resultPanel.style.height = Math.round(height * scale) + "px";
+    resultPanel.style.aspectRatio = width + " / " + height;
+  }
 
   async function createImage(prompt) {
     promptSuggestions?.classList.add("hidden");
+    setGeneratingView(true);
     if (submitButton) submitButton.disabled = true;
     actionBar?.classList.add("hidden");
     if (resultPanel) {
@@ -34,6 +52,13 @@ export function initImageGenerator() {
     try {
       const result = await generateImage({ prompt });
       if (!result?.image) throw new Error("The image service returned no image.");
+      const dimensionsProbe = new Image();
+      await new Promise((resolve, reject) => {
+        dimensionsProbe.onload = resolve;
+        dimensionsProbe.onerror = reject;
+        dimensionsProbe.src = result.image;
+      });
+      fitResultToImage(dimensionsProbe.naturalWidth, dimensionsProbe.naturalHeight);
       await saveImage(result.image, {
         category: "generated",
         prompt,
@@ -41,8 +66,10 @@ export function initImageGenerator() {
       });
       if (resultImage) {
         resultImage.onload = () => {
-          resultImage.style.aspectRatio = resultImage.naturalWidth + " / " + resultImage.naturalHeight;
+          fitResultToImage(resultImage.naturalWidth, resultImage.naturalHeight);
           resultPanel?.classList.remove("is-loading");
+          page.classList.remove("is-generating");
+          page.classList.add("has-result");
           actionBar?.classList.remove("hidden");
         };
         resultImage.src = result.image;
@@ -55,6 +82,7 @@ export function initImageGenerator() {
       return result.image;
     } catch (error) {
       console.error("[axon] Standalone image generation failed", error);
+      setGeneratingView(false);
       if (resultPanel) {
         resultPanel.classList.add("hidden");
         resultPanel.classList.remove("is-loading");
@@ -74,7 +102,11 @@ export function initImageGenerator() {
     if (resultPanel) {
       resultPanel.classList.add("hidden");
       resultPanel.classList.remove("is-loading");
+      resultPanel.style.width = "";
+      resultPanel.style.height = "";
+      resultPanel.style.aspectRatio = "";
     }
+    setGeneratingView(false);
     if (resultImage) {
       resultImage.removeAttribute("src");
       resultImage.style.aspectRatio = "";
