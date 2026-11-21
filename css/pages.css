@@ -1298,18 +1298,39 @@ body.dark #imageGeneratorPage .image-generator-actions button {
 }
 
 
-/* Generate Instant top-left heading */
-#imageGeneratorPage .generate-instant-nav-title {
-  margin-left: 10px;
-  margin-right: auto;
-  color: #fff;
-  font-size: 20px;
-  line-height: 1.05;
-  font-weight: 850;
-  letter-spacing: -.45px;
-  text-align: left;
-  text-shadow: 0 2px 14px rgba(0,0,0,.38);
+/* Generate Instant title below the back arrow and centered artwork. */
+#imageGeneratorPage .generate-instant-topbar {
+  justify-content: space-between;
 }
-#imageGeneratorPage .generate-instant-topbar .generate-nav-gallery {
-  margin-left: 12px;
+#imageGeneratorPage .generate-instant-nav-title {
+  align-self: flex-start;
+  margin: 12px 0 0 2px;
+  color: #fff;
+  font-size: clamp(28px, 7.5vw, 36px);
+  line-height: 1.02;
+  font-weight: 900;
+  letter-spacing: -.8px;
+  text-align: left;
+  text-shadow: 0 2px 14px rgba(0,0,0,.4);
+}
+#imageGeneratorPage .image-generator-welcome {
+  flex: 1;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+#imageGeneratorPage .generate-instant-art {
+  display: block;
+  width: clamp(180px, 52vw, 230px);
+  height: auto;
+  max-height: 250px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 18px rgba(0,0,0,.22));
+}
+@media (max-width: 420px) {
+  #imageGeneratorPage .generate-instant-art {
+    width: clamp(175px, 54vw, 215px);
+  }
 }
