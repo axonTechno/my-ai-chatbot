@@ -74,7 +74,8 @@ export function initImageGenerator() {
     const archivedActions = actionBar?.cloneNode(true);
     if (archivedActions) {
       archivedActions.removeAttribute("id");
-      archivedActions.classList.remove("hidden");
+      archivedActions.classList.remove("hidden", "image-generator-actions");
+      archivedActions.classList.add("image-generator-archived-actions");
       archivedActions.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
       const [saveButton, shareButton, retryButton] = archivedActions.querySelectorAll("button");
 
