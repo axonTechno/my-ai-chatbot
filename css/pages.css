@@ -1599,7 +1599,7 @@ body.dark #imageGeneratorPage .image-generator-actions button {
 
 /* Chat-like image generation thread: scrollable history above a persistent composer. */
 #imageGeneratorPage .image-generator-content {
-  height: 100%;
+  height: auto;
   min-height: 0 !important;
   overflow: hidden !important;
   display: flex;
