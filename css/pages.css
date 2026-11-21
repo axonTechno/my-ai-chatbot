@@ -1547,3 +1547,51 @@ body.dark #imageGeneratorPage .image-generator-actions button {
   width: 19px;
   height: 19px;
 }
+
+
+/* Image prompt appears beneath the gallery navigation after submission. */
+#imageGeneratorPage .image-generator-user-prompt {
+  position: absolute;
+  z-index: 7;
+  top: calc(62px + var(--safe-top, 0px));
+  right: 18px;
+  width: fit-content;
+  max-width: min(76%, 420px);
+  padding: 10px 14px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 17px 5px 17px 17px;
+  color: rgba(255,255,255,.96);
+  background: rgba(95, 112, 168, .28);
+  box-shadow: 0 5px 22px rgba(0,0,0,.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  cursor: context-menu;
+}
+#imageGeneratorPage .image-generator-user-prompt.hidden { display: none !important; }
+#imageGeneratorPage .image-generator-result.is-loading .image-generator-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid rgba(8, 12, 22, .62);
+  border-radius: 18px;
+  background: rgba(12, 16, 27, .22);
+  backdrop-filter: blur(24px) saturate(125%);
+  -webkit-backdrop-filter: blur(24px) saturate(125%);
+}
+#imageGeneratorPage .image-generator-result.is-loading {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
