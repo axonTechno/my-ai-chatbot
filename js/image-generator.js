@@ -35,6 +35,7 @@ export function initImageGenerator() {
     resultPanel.style.width = Math.round(width * scale) + "px";
     resultPanel.style.height = Math.round(height * scale) + "px";
     resultPanel.style.aspectRatio = width + " / " + height;
+    if (actionBar) actionBar.style.top = "calc(50% + " + (Math.round(height * scale / 2) + 14) + "px)";
   }
 
   async function createImage(prompt) {
@@ -105,6 +106,7 @@ export function initImageGenerator() {
       resultPanel.style.width = "";
       resultPanel.style.height = "";
       resultPanel.style.aspectRatio = "";
+      if (actionBar) actionBar.style.top = "";
     }
     setGeneratingView(false);
     if (resultImage) {
