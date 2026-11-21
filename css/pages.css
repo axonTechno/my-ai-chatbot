@@ -1444,3 +1444,15 @@ body.dark #imageGeneratorPage .image-generator-actions button {
   #imageGeneratorPage .image-generator-result:not(.is-loading) { top: 43%; }
   #imageGeneratorPage .image-generator-actions:not(.hidden) { top: calc(43% + 23vh); }
 }
+
+
+/* Keep the Generate Instant composer anchored to the bottom edge. */
+#imageGeneratorPage .image-generator-content {
+  min-height: 100%;
+}
+#imageGeneratorPage .image-generator-composer {
+  flex: 0 0 auto;
+  margin: auto auto 0 !important;
+  width: 100%;
+  align-self: stretch;
+}
