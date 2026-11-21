@@ -6,7 +6,7 @@
 import { store, persistProfile, persistSettings } from "./state.js";
 import { $, $$, toast, confirmDialog } from "./ui.js";
 import { refreshAccountChip, renderHistory } from "./sidebar.js";
-import { isSignedIn, backendConfigured, queueOutbox, pushProfile, flushOutbox, session } from "./backend.js";
+import { isSignedIn, backendConfigured, queueOutbox, pushProfile, session } from "./backend.js";
 import { signOut, openAuthPage, restoreFromCloud, syncNow } from "./auth.js";
 import { renderMessages } from "./chat.js";
 
@@ -150,21 +150,17 @@ async function doLogout() {
   });
   if (!ok) return;
 
-  if (isSignedIn()) {
-    try {
-      await flushOutbox();
-    } catch (e) {}
-  }
+  // Do not wait for a network outbox flush here: it made logout feel slow.
+  // Local sign-out is immediate; pending items remain available for a later sync.
   signOut();
   closeAccountPage();
   $("#accountAccessPage")?.classList.add("hidden");
-  renderHistory();
   openAuthPage();
   toast("Logged out");
 }
 
 export function initAccount() {
-  $$("[data-avatar]").forEach((btn) => {
+  $("[data-avatar]") && $$("[data-avatar]").forEach((btn) => {
     btn.addEventListener("click", () => {
       avatarDraft = btn.dataset.avatar === "female" ? "female" : "male";
       paint({ preserveAvatarDraft: true });
@@ -193,7 +189,6 @@ export function initAccount() {
     openAccountAccessPage();
   });
 
-  // Add event listener for the back button in the account page
   const backButton = $("#accountPage button[data-back]");
   if (backButton) backButton.addEventListener("click", closeAccountPage);
   const accountBackButton = $("#accountAccessPage button[data-back]");
@@ -220,4 +215,3 @@ export function initAccount() {
 }
 
 export { paint as paintAccount };
-
