@@ -305,16 +305,17 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
       </button>
     </nav>
-    <div class="image-generator-user-prompt hidden" id="imageGeneratorUserPrompt" aria-label="Your image prompt"></div>
     <div class="image-generator-welcome">
       <img class="generate-instant-art" src="./ai-generate.png" alt="AI image generation illustration">
     </div>
     <h1 class="generate-instant-nav-title">Generate instant</h1>
-    <div class="image-generator-result hidden" id="imageGeneratorResult" aria-live="polite">
+    <div class="image-generator-thread" id="imageGeneratorThread" aria-live="polite">
+      <div class="image-generator-user-prompt hidden" id="imageGeneratorUserPrompt" aria-label="Your image prompt"></div>
+      <div class="image-generator-result hidden" id="imageGeneratorResult">
       <div class="image-generator-placeholder"><span class="image-generator-thinking" aria-hidden="true"><i></i><i></i><i></i></span><span>Generating...</span></div>
       <img id="imageGeneratorResultImage" alt="Generated image" role="button" tabindex="0" aria-label="Open generated image">
     </div>
-    <div class="image-generator-actions hidden" id="imageGeneratorActions" aria-label="Generated image actions">
+      <div class="image-generator-actions hidden" id="imageGeneratorActions" aria-label="Generated image actions">
       <button type="button" id="imageGeneratorSave" aria-label="Save image" title="Save">
         <svg><use href="#i-download"/></svg>
       </button>
@@ -324,6 +325,7 @@
       <button type="button" id="imageGeneratorRetry" aria-label="Generate another image" title="Retry">
         <svg><use href="#i-refresh"/></svg>
       </button>
+      </div>
     </div>
     <div class="image-prompt-suggestions" aria-label="Image prompt ideas">
       <button type="button" class="image-prompt-chip" data-image-prompt="A realistic view of planet Earth from space">Realistic Earth</button>
