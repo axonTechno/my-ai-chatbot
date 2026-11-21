@@ -540,15 +540,15 @@ body.has-messages::before {
   opacity: 0;
 }
 
-/* Continuous soft blue glow across the entire bottom */
+/* Slightly stronger bottom fade on the welcome chat screen */
 body::before {
   inset: auto 0 0 0;
   width: 100%;
   height: 48vh;
   background: radial-gradient(
     ellipse 110% 100% at 50% 100%,
-    rgba(139, 213, 255, .30) 0%,
-    rgba(139, 213, 255, .16) 48%,
+    rgba(139, 213, 255, .38) 0%,
+    rgba(139, 213, 255, .21) 48%,
     transparent 100%
   );
   filter: blur(18px);
@@ -560,8 +560,8 @@ body::before {
 body.dark::before {
   background: radial-gradient(
     ellipse 110% 100% at 50% 100%,
-    rgba(100, 180, 255, .24) 0%,
-    rgba(100, 180, 255, .12) 48%,
+    rgba(100, 180, 255, .30) 0%,
+    rgba(100, 180, 255, .17) 48%,
     transparent 100%
   );
 }
