@@ -905,3 +905,77 @@ body.dark .about-hero h2 {
 .image-generator-placeholder .image-generator-thinking i:nth-child(1) { animation-delay: 0s; }
 .image-generator-placeholder .image-generator-thinking i:nth-child(2) { animation-delay: .3s; }
 .image-generator-placeholder .image-generator-thinking i:nth-child(3) { animation-delay: .6s; }
+
+
+/* Generate Instant: calm, blurred pastel AI atmosphere.
+   Decorative background only — no lettering, symbols, or logo artwork.
+   The existing prompt cards and composer retain their original styling. */
+#imageGeneratorPage {
+  isolation: isolate;
+  overflow: hidden;
+  background: #f7f8ff;
+}
+#imageGeneratorPage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 78% 44% at 50% 18%, rgba(202, 216, 255, .58), transparent 78%),
+    radial-gradient(ellipse 70% 48% at 8% 55%, rgba(224, 218, 255, .48), transparent 78%),
+    radial-gradient(ellipse 72% 50% at 100% 72%, rgba(198, 225, 255, .52), transparent 78%),
+    linear-gradient(155deg, #fbfaff 0%, #f0f3ff 48%, #f8f9ff 100%);
+}
+#imageGeneratorPage::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  width: min(112vw, 560px);
+  height: min(72vw, 360px);
+  left: 50%;
+  top: 35%;
+  transform: translate(-50%, -50%) rotate(-13deg);
+  border: 1px solid rgba(155, 181, 245, .16);
+  border-radius: 50%;
+  box-shadow:
+    0 0 48px rgba(169, 190, 255, .16),
+    inset 0 0 54px rgba(207, 215, 255, .12);
+  filter: blur(13px);
+}
+#imageGeneratorPage > * {
+  position: relative;
+  z-index: 1;
+}
+#imageGeneratorPage .page-header {
+  background: rgba(250, 251, 255, .58);
+  border-bottom-color: rgba(166, 183, 226, .12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+#imageGeneratorPage .image-generator-content {
+  background: transparent;
+}
+#imageGeneratorPage .image-generator-welcome h1 {
+  color: #34416b;
+  font-weight: 600;
+  letter-spacing: -.45px;
+}
+body.dark #imageGeneratorPage {
+  background: #11172a;
+}
+body.dark #imageGeneratorPage::before {
+  background:
+    radial-gradient(ellipse 78% 44% at 50% 18%, rgba(89, 115, 177, .22), transparent 78%),
+    radial-gradient(ellipse 70% 48% at 8% 55%, rgba(110, 101, 165, .16), transparent 78%),
+    radial-gradient(ellipse 72% 50% at 100% 72%, rgba(84, 133, 181, .2), transparent 78%),
+    linear-gradient(155deg, #141a2d 0%, #171d34 48%, #121a2d 100%);
+}
+body.dark #imageGeneratorPage .page-header {
+  background: rgba(20, 26, 44, .58);
+  border-bottom-color: rgba(180, 195, 235, .1);
+}
+body.dark #imageGeneratorPage .image-generator-welcome h1 {
+  color: #edf1ff;
+}
