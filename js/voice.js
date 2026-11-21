@@ -28,7 +28,8 @@ const voice = {
   socket: null,
   lastReply: "",
   permission: "unknown",
-  busy: false
+  busy: false,
+  autoListen: false
 };
 
 const LANG_MAP = {
@@ -145,13 +146,23 @@ export function speak(text) {
     };
     utter.onend = () => {
       voice.speaking = false;
-      setOrbMode(voice.listening ? "listening" : "");
-      setState(voice.listening ? "Listening…" : "Tap the microphone to speak");
+      setOrbMode("");
+      if (voice.open && voice.autoListen && !voice.busy) {
+        setState("Listening…");
+        startRecognition();
+      } else {
+        setState("Tap the microphone to speak");
+      }
     };
     utter.onerror = () => {
       voice.speaking = false;
       setOrbMode("");
+      if (voice.open && voice.autoListen && !voice.busy) {
+        setState("Listening…");
+        startRecognition();
+      }
     };
+    voice.speaking = true;
     window.speechSynthesis.speak(utter);
     return true;
   } catch (e) {
@@ -172,6 +183,7 @@ export function stopSpeaking() {
 /* ================= RECOGNITION ================= */
 
 function startRecognition() {
+  if (!voice.open || voice.busy || voice.speaking || voice.listening) return false;
   if (!SpeechRecognition) {
     setHint("Speech recognition is not available in this browser. You can still type, or use Chrome on Android.", true);
     setState("Voice input unavailable");
@@ -218,10 +230,19 @@ function startRecognition() {
 
     rec.onend = () => {
       voice.listening = false;
+      voice.recognition = null;
       $("#voiceMicBtn")?.classList.remove("active");
-      if (!voice.busy && !voice.speaking) {
+      if (voice.open && voice.autoListen && !voice.busy && !voice.speaking) {
         setOrbMode("");
-        setState("Tap the microphone to speak");
+        setState("Listening…");
+        window.setTimeout(() => {
+          if (voice.open && voice.autoListen && !voice.busy && !voice.speaking && !voice.listening) {
+            startRecognition();
+          }
+        }, 350);
+      } else if (!voice.busy && !voice.speaking) {
+        setOrbMode("");
+        setState("Microphone paused");
       }
     };
 
@@ -350,6 +371,7 @@ export async function openVoice() {
   const screen = $("#voiceScreen");
   if (!screen) return;
   voice.open = true;
+  voice.autoListen = true;
   screen.classList.remove("hidden");
   document.body.style.overflow = "hidden";
   $("#voiceBtn")?.classList.add("active");
@@ -362,28 +384,30 @@ export async function openVoice() {
   if (!realtime) {
     setHint(
       SpeechRecognition
-        ? "Tap the microphone and speak. AXON replies with your device voice."
-        : "Speech input is not supported in this browser. You can still type in chat.",
+        ? "Hands-free mode: speak naturally. Tap the microphone to pause or resume."
+        : "Speech input is not supported in this browser. Try Chrome on Android.",
       !SpeechRecognition
     );
   }
 
   setState("Preparing microphone…");
   const ok = await startLevelMeter();
-  if (!ok) {
-    if (voice.permission === "denied") {
-      setHint("Microphone permission is blocked. Allow it in your browser settings to use voice chat.", true);
-      setState("Microphone blocked");
-    } else {
-      setState("Tap the microphone to speak");
-    }
+  if (!voice.open) return;
+  if (!ok && voice.permission === "denied") {
+    voice.autoListen = false;
+    setHint("Microphone permission is blocked. Allow it in your browser settings to use voice chat.", true);
+    setState("Microphone blocked");
+  } else if (SpeechRecognition) {
+    startRecognition();
   } else {
-    setState("Tap the microphone to speak");
+    voice.autoListen = false;
+    setState("Voice input unavailable");
   }
 }
 
 export function closeVoice() {
   voice.open = false;
+  voice.autoListen = false;
   stopRecognition();
   stopSpeaking();
   stopLevelMeter();
@@ -411,19 +435,26 @@ export function initVoice() {
   $("#welcomeVoiceBtn")?.addEventListener("click", openVoice);
 
   $("#voiceMicBtn")?.addEventListener("click", () => {
+    if (voice.permission === "denied") {
+      setHint("Microphone permission is blocked. Allow it in your browser settings, then reopen voice chat.", true);
+      return;
+    }
     if (voice.speaking) {
       stopSpeaking();
+      voice.autoListen = true;
+      startRecognition();
       return;
     }
-    if (voice.listening) {
+    if (voice.listening || voice.autoListen) {
+      voice.autoListen = false;
       stopRecognition();
-      setState("Tap the microphone to speak");
+      setOrbMode("");
+      setState("Microphone paused");
+      setHint("Tap the microphone to resume hands-free conversation.");
       return;
     }
-    if (voice.permission === "denied") {
-      setHint("Microphone permission is blocked. Allow it in your browser settings, then reload AXON.", true);
-      return;
-    }
+    voice.autoListen = true;
+    setHint("Hands-free mode: speak naturally. Tap the microphone to pause.");
     startRecognition();
   });
 
