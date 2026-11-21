@@ -979,3 +979,63 @@ body.dark #imageGeneratorPage .page-header {
 body.dark #imageGeneratorPage .image-generator-welcome h1 {
   color: #edf1ff;
 }
+
+
+/* Glassmorphism refinement for Generate Instant.
+   Frosted controls only; the image prompt composer is intentionally untouched. */
+#imageGeneratorPage::before {
+  background:
+    radial-gradient(ellipse 85% 36% at 52% 10%, rgba(201, 220, 255, .62), transparent 78%),
+    radial-gradient(ellipse 58% 48% at 0% 58%, rgba(222, 216, 255, .54), transparent 80%),
+    radial-gradient(ellipse 62% 42% at 100% 74%, rgba(190, 222, 255, .56), transparent 80%),
+    radial-gradient(ellipse 50% 24% at 72% 42%, rgba(230, 235, 255, .7), transparent 82%),
+    linear-gradient(145deg, #fbfcff 0%, #f0f4ff 52%, #f8f9ff 100%);
+}
+#imageGeneratorPage::after {
+  width: min(118vw, 620px);
+  height: min(118vw, 620px);
+  top: 42%;
+  border: 1px solid rgba(151, 177, 224, .17);
+  box-shadow:
+    0 0 42px rgba(165, 194, 244, .17),
+    inset 0 0 60px rgba(203, 215, 246, .14),
+    0 0 0 18px rgba(220, 229, 250, .035);
+  filter: blur(15px);
+}
+#imageGeneratorPage .page-header {
+  background: rgba(255, 255, 255, .34);
+  border-bottom-color: rgba(159, 178, 218, .13);
+  backdrop-filter: blur(22px) saturate(125%);
+  -webkit-backdrop-filter: blur(22px) saturate(125%);
+}
+#imageGeneratorPage .page-header .icon-btn {
+  background: rgba(255, 255, 255, .34);
+  border: 1px solid rgba(255, 255, 255, .56);
+  box-shadow: 0 4px 18px rgba(100, 124, 175, .07), inset 0 1px 0 rgba(255,255,255,.5);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+#imageGeneratorPage .image-prompt-chip,
+#imageGeneratorPage .image-generator-actions button {
+  background: rgba(255, 255, 255, .34);
+  border: 1px solid rgba(255, 255, 255, .62);
+  box-shadow: 0 5px 18px rgba(105, 126, 174, .06), inset 0 1px 0 rgba(255,255,255,.55);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+}
+#imageGeneratorPage .image-prompt-chip:active,
+#imageGeneratorPage .image-generator-actions button:active {
+  background: rgba(255, 255, 255, .52);
+}
+#imageGeneratorPage .image-generator-welcome h1 {
+  color: #34416b;
+  font-weight: 600;
+  letter-spacing: -.45px;
+}
+body.dark #imageGeneratorPage .page-header .icon-btn,
+body.dark #imageGeneratorPage .image-prompt-chip,
+body.dark #imageGeneratorPage .image-generator-actions button {
+  background: rgba(255, 255, 255, .075);
+  border-color: rgba(210, 222, 255, .16);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
