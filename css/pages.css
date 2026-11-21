@@ -1312,7 +1312,9 @@ body.dark #imageGeneratorPage .image-generator-actions button {
   font-size: clamp(42px, 11vw, 50px);
   line-height: .98;
   font-weight: 900;
-  letter-spacing: .2px;
+  letter-spacing: 0;
+  transform: scaleX(1.16);
+  transform-origin: left center;
   text-align: left;
   text-shadow: 0 2px 14px rgba(0,0,0,.4);
 }
